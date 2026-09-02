@@ -42,6 +42,10 @@ examples = [
   "opencv-python",
   "matplotlib",
 ]
+llm = [
+  "openai",
+  "anthropic",
+]
 vr = [
   "pyopenxr",
   "dearpygui",
@@ -49,7 +53,7 @@ vr = [
   "rich-click",
   "pyyaml",
   "oculus-reader @ git+https://github.com/helen9975/oculus_reader.git"
-  # ⚠️ Oculus Quest setup requires Git LFS and ADB (see docs/vr_teleop.md)
+  # Oculus Quest setup requires Git LFS and ADB (see docs/vr_teleop.md)
 ]
 
 [tool.setuptools.packages.find]

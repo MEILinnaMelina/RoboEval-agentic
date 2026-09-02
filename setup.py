@@ -67,5 +67,9 @@ setuptools.setup(
             "matplotlib",
             "pandas",
         ],
+        "llm": [
+            "openai",
+            "anthropic",
+        ],
     },
 )
