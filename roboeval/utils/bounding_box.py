@@ -83,7 +83,6 @@ class BodyBoundingBox(IBoundingBox):
                     [size[0], size[1], size[2]],
                 ]
             )
-            breakpoint()
             new_points = np.dot(points + center, rot.T) + pos
             self.min = np.minimum(self.min, new_points)
             self.max = np.maximum(self.max, new_points)

@@ -33,6 +33,14 @@ def _pose_of_prop(prop: Prop) -> dict[str, Any]:
     if prop.aabb is not None:
         data["aabb_position"] = _as_list(prop.aabb.get_position())
         data["aabb_size"] = _as_list(prop.aabb.mjcf.size)
+    elif prop.bbox is not None:
+        # No "boundary" site on this prop's XML (e.g. cube/blocks) - fall back
+        # to the real per-geom bounding box computed at runtime.
+        prop.bbox.update()
+        size = prop.bbox.max - prop.bbox.min
+        if np.all(np.isfinite(size)):
+            data["aabb_position"] = _as_list((prop.bbox.max + prop.bbox.min) / 2.0)
+            data["aabb_size"] = _as_list(size)
     if prop.sites:
         data["sites"] = [
             {
@@ -111,7 +119,7 @@ def collect_env_state(env: Any, info: dict[str, Any] | None = None) -> dict[str,
             key = f"{object_name}_to_{side.name.lower()}_gripper"
             object_distances[key] = round(float(distance(obj_body, gripper.body)), 5)
 
-    return {
+    state = {
         "task_name": env.task_name,
         "seed": env.seed,
         "control_frequency": env.control_frequency,
@@ -131,6 +139,12 @@ def collect_env_state(env: Any, info: dict[str, Any] | None = None) -> dict[str,
         "object_distances": object_distances,
         "metrics": _jsonify_metrics(info),
     }
+    table = getattr(env, "table", None)
+    if table is not None:
+        # Not a graspable task object (kept out of get_task_objects/objects)
+        # - just table-height/extent context for collision-aware reasoning.
+        state["table"] = _pose_of_prop(table) if isinstance(table, Prop) else _pose_of_body(table.body)
+    return state
 
 
 def _jsonify_metrics(value: Any) -> Any:
