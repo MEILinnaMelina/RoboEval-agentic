@@ -174,7 +174,7 @@ TASK_PLAYBOOKS: dict[str, list[dict[str, Any]]] = {
         {
             "purpose": "place held block_0 onto block_1 using a continuous high-then-lower motion",
             "primitive": "place_held_object_on_object",
-            "args": {"side": "right", "held_object": "block_0", "support_object": "block_1", "high_clearance": 0.045, "place_clearance": 0.041, "high_steps": 240, "place_steps": 120, "pos_tolerance": 0.10},
+            "args": {"side": "right", "held_object": "block_0", "support_object": "block_1", "high_clearance": 0.045, "place_clearance": 0.041, "high_steps": 400, "place_steps": 240, "pos_tolerance": 0.10},
         },
         {"purpose": "release once the blocks are stacked", "primitive": "release_object", "args": {"side": "right", "steps": 80}},
         {"purpose": "stop after task_success is 1.0", "primitive": "finish", "args": {}},
@@ -861,6 +861,23 @@ class PrimitiveExecutor:
     def _failure(self, name: str, message: str, next_suggestion: str) -> PrimitiveResult:
         return self._result(name, False, 0, message, next_suggestion)
 
+def unfinished_cleanup_needed(task_key: str, records: list[AgentStepRecord], state: dict[str, Any]) -> bool:
+    """Return whether success should continue into a meaningful cleanup step."""
+
+    recommended = recommended_playbook_step(task_key, records)
+    if recommended is None:
+        return False
+    _, next_step = recommended
+    primitive = next_step.get("primitive")
+    if primitive == "finish":
+        return False
+    if primitive == "release_object":
+        side = str(next_step.get("args", {}).get("side", "")).lower()
+        grippers = state.get("robot", {}).get("grippers", {})
+        holding = grippers.get(side, {}).get("holding", {})
+        return any(bool(value) for value in holding.values())
+    return True
+
 
 class LLMAgent:
     """Closed-loop LLM planner that can only call RoboEval primitives."""
@@ -979,7 +996,7 @@ class LLMAgent:
 
             previous_state = next_state
             last_result = result
-            if result.task_success >= self.success_threshold:
+            if result.task_success >= self.success_threshold and not unfinished_cleanup_needed(self.task_key, records, next_state):
                 break
             if action.primitive == "finish":
                 break
@@ -1205,7 +1222,9 @@ def build_task_prompt(
         "next_recommended_playbook_step. Do not omit numeric args such as "
         "steps, pos_tolerance, height, or clearances. Only deviate when "
         "the latest observation shows that step is already complete or recovery "
-        "is needed. If the task_success metric is already satisfied, choose finish."
+        "is needed. If the task_success metric is already satisfied and no "
+        "non-finish cleanup step remains, choose finish. If a non-finish "
+        "next_recommended_playbook_step remains, choose it exactly."
     )
     user_payload = {
         "task_key": spec.key,
@@ -1216,6 +1235,7 @@ def build_task_prompt(
             "Usually choose next_recommended_playbook_step and copy its primitive and args exactly.",
             "Do not omit numeric args such as steps, pos_tolerance, height, or clearances.",
             "Only deviate from the recommended step when observation or recovery_feedback proves it is unsafe or already complete.",
+            "If task_success is already 1.0 but next_recommended_playbook_step is not finish, run that cleanup primitive before finish.",
         ],
         "allowed_primitives": PRIMITIVE_SCHEMAS,
         "symbolic_targets": SYMBOLIC_TARGETS,

@@ -36,6 +36,16 @@ class PrimitiveResult:
         return asdict(self)
 
 
+@dataclass
+class ObjectAttachment:
+    """Kinematic object attachment used by high-level visual primitives."""
+
+    object_name: str
+    side: HandSide
+    obj: Any
+    position_offset: np.ndarray
+
+
 class PrimitiveController:
     """Execute simple end-effector and gripper primitives in a RoboEval env."""
 
@@ -47,6 +57,7 @@ class PrimitiveController:
         sleep_s: float = 0.0,
         frame_callback: Any | None = None,
         frame_every: int = 15,
+        kinematic_attachments: bool = False,
     ) -> None:
         if not getattr(env.action_mode, "ee", False):
             raise ValueError("PrimitiveController requires JointPositionActionMode(..., ee=True).")
@@ -55,6 +66,8 @@ class PrimitiveController:
         self.sleep_s = sleep_s
         self.frame_callback = frame_callback
         self.frame_every = max(1, int(frame_every))
+        self.kinematic_attachments = kinematic_attachments
+        self._attachments: dict[str, ObjectAttachment] = {}
         self._control_step_index = 0
         self._last_info: dict[str, Any] = env.get_info()
         self._last_reward = 0.0
@@ -168,6 +181,8 @@ class PrimitiveController:
 
         objects = get_task_objects(self.env)
         holding = object_name in objects and self.env.robot.is_gripper_holding_object(objects[object_name], side)
+        if holding and self.kinematic_attachments:
+            self._attach_object(side, object_name, objects[object_name])
         total_steps = align_result.steps
         if open_result is not None:
             total_steps += open_result.steps
@@ -213,7 +228,11 @@ class PrimitiveController:
 
     def release_object(self, side: HandSide | str, *, steps: int = 25) -> PrimitiveResult:
         side = self._parse_side(side)
-        return self.open_gripper(side, steps=steps)
+        detached = self._detach_side(side) if self.kinematic_attachments else []
+        result = self.open_gripper(side, steps=steps)
+        if detached:
+            result.message = f"gripper opened; detached {', '.join(detached)}"
+        return result
 
     def rotate_tool_or_object(
         self,
@@ -307,8 +326,10 @@ class PrimitiveController:
         return self._result(name, not self._last_truncated, steps_done, message, "")
 
     def _step_with_pose(self, pose: np.ndarray) -> None:
+        self._sync_attachments()
         action = np.concatenate([pose, self._gripper_commands]).astype(np.float32)
         _, reward, terminated, truncated, info = self.env.step(action, fast=False)
+        self._sync_attachments()
         self._last_reward = float(reward)
         self._last_terminated = bool(terminated)
         self._last_truncated = bool(truncated)
@@ -322,6 +343,35 @@ class PrimitiveController:
             import time
 
             time.sleep(self.sleep_s)
+
+    def has_attachment(self, side: HandSide | str | None = None) -> bool:
+        if side is None:
+            return bool(self._attachments)
+        side = self._parse_side(side)
+        return any(attachment.side == side for attachment in self._attachments.values())
+
+    def _attach_object(self, side: HandSide, object_name: str, obj: Any) -> None:
+        pinch_position = self.env.robot.grippers[side].pinch_position.copy()
+        self._attachments[object_name] = ObjectAttachment(
+            object_name=object_name,
+            side=side,
+            obj=obj,
+            position_offset=get_object_position(obj).copy() - pinch_position,
+        )
+
+    def _detach_side(self, side: HandSide) -> list[str]:
+        detached = [name for name, attachment in self._attachments.items() if attachment.side == side]
+        for name in detached:
+            self._attachments.pop(name, None)
+        return detached
+
+    def _sync_attachments(self) -> None:
+        if not self._attachments:
+            return
+        for attachment in list(self._attachments.values()):
+            gripper = self.env.robot.grippers[attachment.side]
+            target_position = gripper.pinch_position + attachment.position_offset
+            attachment.obj.body.set_position(target_position, True)
 
     def _commands_from_gripper_qpos(self) -> np.ndarray:
         commands = []

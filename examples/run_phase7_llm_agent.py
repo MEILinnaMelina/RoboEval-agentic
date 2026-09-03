@@ -39,6 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--record-gif", action="store_true")
     parser.add_argument("--gif-every", type=int, default=15)
     parser.add_argument("--gif-duration", type=float, default=0.12)
+    parser.add_argument("--kinematic-attachments", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs") / "phase7_llm")
     return parser.parse_args()
 
@@ -176,6 +177,7 @@ def run_one(
             sleep_s=0.02 if args.window else 0.0,
             frame_callback=(lambda _env, step: capture_frame(f"sim_step_{step:06d}")) if args.record_gif else None,
             frame_every=args.gif_every,
+            kinematic_attachments=args.kinematic_attachments,
         )
         planner = make_planner(
             args.provider,
@@ -211,6 +213,7 @@ def run_one(
             "trajectory_gif": trajectory_gif,
         }
         report["phase"] = 7
+        report["kinematic_attachments"] = args.kinematic_attachments
         report["trial_index"] = trial_index
         report["trial_dir"] = str(trial_dir)
         report["final_metrics"] = metrics
@@ -232,6 +235,7 @@ def run_one(
             "success": success,
             "provider": args.provider,
             "model": args.model,
+            "kinematic_attachments": args.kinematic_attachments,
             "final_task_success": result.final_task_success,
             "final_metrics": metrics,
             "report_path": str(report_path),
@@ -248,6 +252,7 @@ def run_one(
             "success": success,
             "provider": args.provider,
             "model": args.model,
+            "kinematic_attachments": args.kinematic_attachments,
             "final_task_success": result.final_task_success,
             "steps": len(result.steps),
             "final_metrics": metrics,
