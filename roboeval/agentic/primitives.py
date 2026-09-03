@@ -147,9 +147,11 @@ class PrimitiveController:
         *,
         ee_offset: np.ndarray | None = None,
         steps: int = 90,
+        preopen: bool = True,
+        close_after: bool = True,
     ) -> PrimitiveResult:
         side = self._parse_side(side)
-        open_result = self.open_gripper(side, steps=15)
+        open_result = self.open_gripper(side, steps=15) if preopen else None
         align_result = self.align_to_object(
             side,
             object_name,
@@ -157,14 +159,19 @@ class PrimitiveController:
             steps=steps,
             pos_tolerance=0.05,
         )
-        close_result = self.close_gripper(side, steps=35)
+        close_result = self.close_gripper(side, steps=35) if close_after else None
 
         objects = get_task_objects(self.env)
         holding = object_name in objects and self.env.robot.is_gripper_holding_object(objects[object_name], side)
+        total_steps = align_result.steps
+        if open_result is not None:
+            total_steps += open_result.steps
+        if close_result is not None:
+            total_steps += close_result.steps
         result = self._result(
             f"grasp_{side.name.lower()}_{object_name}",
             bool(holding),
-            open_result.steps + align_result.steps + close_result.steps,
+            total_steps,
             "object is held" if holding else "object was approached but not detected as held",
             "Try a different pinch_offset or approach side if holding is false.",
         )

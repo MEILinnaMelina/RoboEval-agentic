@@ -60,8 +60,10 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
             "target": "optional symbolic target alias",
             "ee_offset": "optional xyz offset from the object",
             "steps": "optional int",
+            "preopen": "optional bool; false keeps the gripper in its current state before approach",
+            "close_after": "optional bool; false skips the close command after approach",
         },
-        "description": "Open, align, close, and check whether the object is held.",
+        "description": "Approach with optional open/close steps and check whether the object is held.",
     },
     "lift_object": {
         "args": {"side": "left, right, or both", "height": "meters", "steps": "optional int"},
@@ -560,6 +562,8 @@ class PrimitiveExecutor:
                     object_name,
                     ee_offset=offset,
                     steps=self._int_arg(args, "steps", 90),
+                    preopen=self._bool_arg(args, "preopen", True),
+                    close_after=self._bool_arg(args, "close_after", True),
                 )
             if primitive == "lift_object":
                 return self.controller.lift_object(
@@ -624,6 +628,12 @@ class PrimitiveExecutor:
 
     def _float_arg(self, args: PrimitiveArgs, key: str, default: float) -> float:
         return float(args.get(key, default))
+
+    def _bool_arg(self, args: PrimitiveArgs, key: str, default: bool) -> bool:
+        value = args.get(key, default)
+        if isinstance(value, str):
+            return value.lower() in {"1", "true", "yes", "y"}
+        return bool(value)
 
     def _task_success(self) -> float:
         return float(self.env.get_info().get("task_success", 0.0))
