@@ -68,6 +68,39 @@ class PrimitiveController:
 
         return self.env.robot.forward_kinematics(self._arm_qpos())
 
+    # Below this horizontal (xy) travel distance, keep the arm's current yaw
+    # rather than recomputing one - avoids perturbing the many small/vertical
+    # approaches (e.g. top-down object grasps) that already converge fine.
+    _MIN_REORIENT_XY_DISPLACEMENT = 0.03
+
+    def face_target_pose(self, side: HandSide | str, target_position: np.ndarray) -> np.ndarray:
+        """Build a 6-DoF pose at target_position for a large horizontal reach.
+
+        Keeps the current roll/pitch, but rotates yaw to face the horizontal
+        direction of travel once xy displacement is non-trivial. The IK
+        solver has to satisfy position AND orientation together each step;
+        blindly inheriting an orientation picked for a totally different
+        position/approach direction makes it fail to converge on large
+        reaches (see docs/phase8_success_rate_debug_log.md P14).
+        """
+        side = self._parse_side(side)
+        current_pose = self.current_ee_pose()[self._pose_slice(side)].copy()
+        target_position = np.asarray(target_position, dtype=np.float32)
+        pose = current_pose.copy()
+        pose[:3] = target_position
+        dx = float(target_position[0] - current_pose[0])
+        dy = float(target_position[1] - current_pose[1])
+        if (dx * dx + dy * dy) ** 0.5 >= self._MIN_REORIENT_XY_DISPLACEMENT:
+            # The +-pi/2 sign was empirically validated per side (clean,
+            # fresh-env tests, not reused-env warm-started ones - see
+            # docs/phase8_success_rate_debug_log.md P14) and is consistent
+            # with a mirrored bimanual rig: left and right gripper frames
+            # are mirror images, so the same heading needs opposite bias.
+            bias = np.pi / 2.0 if side == HandSide.LEFT else -np.pi / 2.0
+            yaw = float(np.arctan2(dy, dx) + bias)
+            pose[5] = (yaw + np.pi) % (2 * np.pi) - np.pi
+        return pose
+
     def move_left_ee(
         self,
         target_pose: np.ndarray,
@@ -136,8 +169,7 @@ class PrimitiveController:
             )
         obj_pos = get_object_position(objects[object_name]).copy()
         ee_offset = np.asarray(ee_offset if ee_offset is not None else [0.0, 0.0, 0.08])
-        target_pose = self.current_ee_pose()[self._pose_slice(side)].copy()
-        target_pose[:3] = obj_pos + ee_offset
+        target_pose = self.face_target_pose(side, obj_pos + ee_offset)
         return self._move_single(
             side,
             target_pose,

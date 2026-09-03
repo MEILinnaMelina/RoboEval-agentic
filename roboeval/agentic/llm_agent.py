@@ -415,9 +415,8 @@ class TargetResolver:
             arr = np.asarray(target, dtype=np.float32)
             if arr.shape == (6,):
                 return arr
-        current_pose = self.controller.current_ee_pose()[self._pose_slice(side_enum)].copy()
-        current_pose[:3] = self.resolve_position(target, side_enum)
-        return current_pose
+        position = self.resolve_position(target, side_enum)
+        return self.controller.face_target_pose(side_enum, position)
 
     def resolve_position(self, target: Any, side: str | HandSide | None = None) -> np.ndarray:
         if isinstance(target, (list, tuple)):
