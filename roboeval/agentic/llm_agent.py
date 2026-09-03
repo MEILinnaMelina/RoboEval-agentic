@@ -326,7 +326,7 @@ class OpenAIPlanner:
         model: str,
         *,
         reasoning_effort: str | None = "low",
-        max_output_tokens: int = 600,
+        max_output_tokens: int = 1200,
     ) -> None:
         try:
             from openai import OpenAI
@@ -1017,6 +1017,8 @@ def build_task_prompt(
         "output robot joint values, torques, raw MuJoCo actions, or policy "
         "weights. Use only the allowed primitive names and JSON arguments. "
         "Return exactly one JSON object with keys: thought, primitive, args. "
+        "Keep thought to one short sentence (under 20 words) - your reasoning "
+        "budget belongs to picking good args, not writing a long explanation. "
         "Do not wrap the JSON in Markdown. Reason from success_condition, "
         "stage_meaning, the current object/gripper positions and sizes, and "
         "recovery_feedback from your last action. Pick your own grasp side, "
@@ -1043,7 +1045,7 @@ def build_task_prompt(
         "state": state_summary,
         "recent_history": compact_history,
         "required_response_format": {
-            "thought": "short reason for the next primitive",
+            "thought": "one short sentence (under 20 words) - the reason for the next primitive",
             "primitive": "one key from allowed_primitives",
             "args": "JSON object containing only primitive-level arguments",
         },

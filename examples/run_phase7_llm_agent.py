@@ -34,7 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trials", type=int, default=1)
     parser.add_argument("--max-steps", type=int, default=8)
     parser.add_argument("--reasoning-effort", default="low")
-    parser.add_argument("--max-output-tokens", type=int, default=600)
+    parser.add_argument("--max-output-tokens", type=int, default=1200)
     parser.add_argument("--window", action="store_true")
     parser.add_argument("--record-gif", action="store_true")
     parser.add_argument("--gif-every", type=int, default=15)
