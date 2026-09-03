@@ -69,7 +69,27 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
         "args": {"side": "left, right, or both", "height": "meters", "steps": "optional int"},
         "description": "Lift one or both currently controlled grippers vertically.",
     },
-    "release_object": {
+    "place_held_object_on_object": {
+        "args": {
+            "side": "left or right",
+            "held_object": "object currently carried by the gripper",
+            "support_object": "object to place onto",
+            "high_clearance": "pre-place vertical clearance in meters",
+            "place_clearance": "final placement vertical clearance in meters",
+            "high_steps": "optional int",
+            "place_steps": "optional int",
+        },
+        "description": "Continuously move a held object above another object and lower it for placement.",
+    },    "move_held_object_above_object": {
+        "args": {
+            "side": "left or right",
+            "held_object": "object currently carried by the gripper",
+            "support_object": "object or placement target to move above",
+            "clearance": "vertical clearance in meters",
+            "steps": "optional int",
+        },
+        "description": "Move a gripper so the held object is positioned above another object while preserving grasp offset.",
+    },    "release_object": {
         "args": {"side": "left or right", "steps": "optional int"},
         "description": "Open one gripper to release an object.",
     },
@@ -85,9 +105,11 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
 
 
 SYMBOLIC_TARGETS: dict[str, dict[str, Any]] = {
-    "left_pot_handle": {"object": "kitchenpot", "offset": [0.0, 0.16, 0.1]},
-    "right_pot_handle": {"object": "kitchenpot", "offset": [0.0, -0.16, 0.1]},
+    "left_pot_handle": {"object": "kitchenpot", "offset": [-0.18, 0.16, 0.13]},
+    "right_pot_handle": {"object": "kitchenpot", "offset": [-0.18, -0.16, 0.13]},
     "pot_center_above": {"object": "kitchenpot", "offset": [0.0, 0.0, 0.16]},
+    "cube_initial_right_grasp": {"object": "cube", "offset": [-0.12, 0.0, 0.0]},
+    "cube_receiver_left_grasp": {"object": "cube", "offset": [-0.20, -0.12, 0.02]},
     "cube_top": {"object": "cube", "offset": [0.0, 0.0, 0.1]},
     "cube_grasp": {"object": "cube", "offset": [0.0, 0.0, 0.1]},
     "block_0_top": {"object": "block_0", "offset": [0.0, 0.0, 0.1]},
@@ -95,6 +117,69 @@ SYMBOLIC_TARGETS: dict[str, dict[str, Any]] = {
     "block_1_stack_pose": {"object": "block_1", "offset": [0.0, 0.0, 0.14]},
 }
 
+
+TASK_PLAYBOOKS: dict[str, list[dict[str, Any]]] = {
+    "lift_pot": [
+        {"purpose": "prepare the left gripper", "primitive": "open_gripper", "args": {"side": "left", "steps": 40}},
+        {"purpose": "prepare the right gripper", "primitive": "open_gripper", "args": {"side": "right", "steps": 40}},
+        {
+            "purpose": "locate the two pot handles and approach them together",
+            "primitive": "move_both_ee",
+            "args": {"left_target": "left_pot_handle", "right_target": "right_pot_handle", "steps": 220, "pos_tolerance": 0.12},
+        },
+        {"purpose": "close on the left handle", "primitive": "close_gripper", "args": {"side": "left", "steps": 80}},
+        {"purpose": "close on the right handle", "primitive": "close_gripper", "args": {"side": "right", "steps": 80}},
+        {
+            "purpose": "synchronously raise the pot",
+            "primitive": "lift_object",
+            "args": {"side": "both", "height": 0.18, "steps": 320, "pos_tolerance": 0.18},
+        },
+        {"purpose": "stop after task_success is 1.0", "primitive": "finish", "args": {}},
+    ],
+    "cube_handover": [
+        {
+            "purpose": "initial right gripper clamps the rod/cube object",
+            "primitive": "grasp_object",
+            "args": {"side": "right", "object": "cube", "target": "cube_initial_right_grasp", "steps": 220, "preopen": False, "close_after": False},
+        },
+        {
+            "purpose": "move the held object into the shared handover zone",
+            "primitive": "lift_object",
+            "args": {"side": "right", "height": 0.08, "steps": 120, "pos_tolerance": 0.08},
+        },
+        {
+            "purpose": "receiver left gripper approaches and receives the object",
+            "primitive": "grasp_object",
+            "args": {"side": "left", "object": "cube", "target": "cube_receiver_left_grasp", "steps": 240, "preopen": False, "close_after": False},
+        },
+        {"purpose": "release original right gripper if task_success is not already reached", "primitive": "release_object", "args": {"side": "right", "steps": 80}},
+        {"purpose": "stop after task_success is 1.0", "primitive": "finish", "args": {}},
+    ],
+    "stack_two_blocks": [
+        {
+            "purpose": "move unused left arm to a safe parking pose",
+            "primitive": "move_left_ee",
+            "args": {"target": "left_safe_parking", "steps": 160, "pos_tolerance": 0.12},
+        },
+        {
+            "purpose": "grasp block_0 with the right gripper",
+            "primitive": "grasp_object",
+            "args": {"side": "right", "object": "block_0", "target": "block_0_top", "steps": 160},
+        },
+        {
+            "purpose": "lift block_0 clear of the table",
+            "primitive": "lift_object",
+            "args": {"side": "right", "height": 0.10, "steps": 120, "pos_tolerance": 0.08},
+        },
+        {
+            "purpose": "place held block_0 onto block_1 using a continuous high-then-lower motion",
+            "primitive": "place_held_object_on_object",
+            "args": {"side": "right", "held_object": "block_0", "support_object": "block_1", "high_clearance": 0.045, "place_clearance": 0.041, "high_steps": 240, "place_steps": 120, "pos_tolerance": 0.10},
+        },
+        {"purpose": "release once the blocks are stacked", "primitive": "release_object", "args": {"side": "right", "steps": 80}},
+        {"purpose": "stop after task_success is 1.0", "primitive": "finish", "args": {}},
+    ],
+}
 
 FORBIDDEN_ARG_FRAGMENTS = {
     "action",
@@ -212,6 +297,15 @@ class MockPlanner:
         return json.dumps(self._plans[idx])
 
     def _build_plans(self, task_key: str) -> list[dict[str, Any]]:
+        if task_key in TASK_PLAYBOOKS:
+            return [
+                {
+                    "thought": step["purpose"],
+                    "primitive": step["primitive"],
+                    "args": dict(step.get("args", {})),
+                }
+                for step in TASK_PLAYBOOKS[task_key]
+            ]
         if task_key == "lift_pot":
             return [
                 {
@@ -320,12 +414,20 @@ class OpenAIPlanner:
 
     provider = "openai"
 
-    def __init__(self, model: str) -> None:
+    def __init__(
+        self,
+        model: str,
+        *,
+        reasoning_effort: str | None = "low",
+        max_output_tokens: int = 600,
+    ) -> None:
         try:
             from openai import OpenAI
         except ImportError as exc:
             raise ImportError("Install optional LLM dependencies first: pip install -e .[llm]") from exc
         self.model = model
+        self.reasoning_effort = reasoning_effort
+        self.max_output_tokens = max_output_tokens
         self.client = OpenAI()
 
     def plan(
@@ -335,18 +437,21 @@ class OpenAIPlanner:
         user_prompt: str,
         history: list[AgentStepRecord],
     ) -> str:
-        response = self.client.responses.create(
-            model=self.model,
-            input=[
+        request: dict[str, Any] = {
+            "model": self.model,
+            "input": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0,
-        )
+            "max_output_tokens": self.max_output_tokens,
+        }
+        if self.reasoning_effort:
+            request["reasoning"] = {"effort": self.reasoning_effort}
+
+        response = self.client.responses.create(**request)
         if hasattr(response, "output_text"):
             return response.output_text
         return str(response)
-
 
 class AnthropicPlanner:
     """Claude-backed planner using the optional anthropic Python package."""
@@ -421,6 +526,12 @@ class TargetResolver:
         target_key = target.strip().lower()
         if target_key == "handover_midpoint":
             return self._handover_midpoint()
+        if target_key == "left_safe_parking":
+            return np.asarray([0.45, 0.58, 1.22], dtype=np.float32)
+        if target_key == "held_block0_above_block1_high":
+            return self._held_block0_stack_target(clearance=0.045)
+        if target_key == "held_block0_on_block1":
+            return self._held_block0_stack_target(clearance=0.041)
 
         object_name, offset = self.resolve_object_offset(target_key, side)
         objects = get_task_objects(self.env)
@@ -453,6 +564,17 @@ class TargetResolver:
         midpoint[1] = 0.0
         midpoint[2] = max(float(midpoint[2]), 1.08)
         return midpoint
+    def _held_block0_stack_target(self, *, clearance: float) -> np.ndarray:
+        objects = get_task_objects(self.env)
+        if "block_0" not in objects or "block_1" not in objects:
+            raise ValueError("held block stacking targets require block_0 and block_1")
+        block0 = get_object_position(objects["block_0"]).copy()
+        block1 = get_object_position(objects["block_1"]).copy()
+        right_pose = self.controller.current_ee_pose()[6:12].copy()
+        ee_to_block = right_pose[:3] - block0
+        desired_block = block1.copy()
+        desired_block[2] = block1[2] + clearance
+        return (desired_block + ee_to_block).astype(np.float32)
 
     def _parse_side(self, side: str | HandSide) -> HandSide:
         if isinstance(side, HandSide):
@@ -572,6 +694,55 @@ class PrimitiveExecutor:
                     steps=self._int_arg(args, "steps", 70),
                     pos_tolerance=self._float_arg(args, "pos_tolerance", 0.04),
                 )
+            if primitive == "place_held_object_on_object":
+                side = self._required(args, "side")
+                held_object = str(self._required(args, "held_object"))
+                support_object = str(self._required(args, "support_object"))
+                side_enum = self.resolver._parse_side(side)
+                move = self.controller.move_left_ee if side_enum == HandSide.LEFT else self.controller.move_right_ee
+                high_result = move(
+                    self._held_object_above_object_target(
+                        side,
+                        held_object,
+                        support_object,
+                        clearance=self._float_arg(args, "high_clearance", 0.045),
+                    ),
+                    steps=self._int_arg(args, "high_steps", self._int_arg(args, "steps", 240)),
+                    pos_tolerance=self._float_arg(args, "pos_tolerance", 0.10),
+                )
+                if high_result.terminated or high_result.truncated or high_result.task_success >= self.success_threshold:
+                    high_result.name = f"place_{held_object}_on_{support_object}"
+                    return high_result
+                place_result = move(
+                    self._held_object_above_object_target(
+                        side,
+                        held_object,
+                        support_object,
+                        clearance=self._float_arg(args, "place_clearance", 0.041),
+                    ),
+                    steps=self._int_arg(args, "place_steps", self._int_arg(args, "steps", 120)),
+                    pos_tolerance=self._float_arg(args, "pos_tolerance", 0.10),
+                )
+                place_result.name = f"place_{held_object}_on_{support_object}"
+                place_result.steps += high_result.steps
+                if not high_result.success and not place_result.success:
+                    place_result.message = f"high move: {high_result.message}; place move: {place_result.message}"
+                return place_result
+            if primitive == "move_held_object_above_object":
+                side = self._required(args, "side")
+                target_pose = self._held_object_above_object_target(
+                    side,
+                    str(self._required(args, "held_object")),
+                    str(self._required(args, "support_object")),
+                    clearance=self._float_arg(args, "clearance", 0.04),
+                )
+                side_enum = self.resolver._parse_side(side)
+                move = self.controller.move_left_ee if side_enum == HandSide.LEFT else self.controller.move_right_ee
+                return move(
+                    target_pose,
+                    steps=self._int_arg(args, "steps", 120),
+                    pos_tolerance=self._float_arg(args, "pos_tolerance", 0.08),
+                )
             if primitive == "release_object":
                 return self.controller.release_object(
                     self._required(args, "side"),
@@ -609,6 +780,30 @@ class PrimitiveExecutor:
             return f"LLM tried to use low-level control argument {forbidden!r}; use primitives only."
         return None
 
+    def _held_object_above_object_target(
+        self,
+        side: Any,
+        held_object: str,
+        support_object: str,
+        *,
+        clearance: float,
+    ) -> np.ndarray:
+        objects = get_task_objects(self.env)
+        missing = [name for name in (held_object, support_object) if name not in objects]
+        if missing:
+            raise ValueError(f"Objects not available for placement target: {missing}")
+
+        side_enum = self.resolver._parse_side(side)
+        pose = self.controller.current_ee_pose()
+        pose_slice = self.resolver._pose_slice(side_enum)
+        target = pose[pose_slice].copy()
+        held_pos = get_object_position(objects[held_object]).copy()
+        support_pos = get_object_position(objects[support_object]).copy()
+        ee_to_held = target[:3] - held_pos
+        desired_held = support_pos.copy()
+        desired_held[2] = support_pos[2] + clearance
+        target[:3] = desired_held + ee_to_held
+        return target
     def _object_and_offset(self, args: PrimitiveArgs, side: Any) -> tuple[str, np.ndarray]:
         explicit_offset = args.get("ee_offset", args.get("offset"))
         if "target" in args:
@@ -713,6 +908,7 @@ class LLMAgent:
                 state_summary,
                 history=records,
             )
+            repair_feedback: list[str] = []
             raw_response = self.planner.plan(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
@@ -720,11 +916,28 @@ class LLMAgent:
             )
             try:
                 action = ActionPlan.from_llm_response(raw_response)
-                result = (
-                    self.executor.execute(action)
-                    if self.execute_primitives
-                    else self.executor.preview(action)
-                )
+                action, repair_feedback = fill_missing_playbook_args(self.task_key, records, action)
+                validation_issue = playbook_validation_issue(self.task_key, records, action)
+                if validation_issue:
+                    info = self.env.get_info()
+                    result = PrimitiveResult(
+                        name="playbook_validation",
+                        success=False,
+                        steps=0,
+                        message=validation_issue,
+                        task_success=float(info.get("task_success", 0.0)),
+                        collisions={
+                            "env_collision_count": int(info.get("env_collision_count", 0)),
+                            "self_collision_count": int(info.get("self_collision_count", 0)),
+                        },
+                        next_suggestion="Choose next_recommended_playbook_step exactly unless task_success is already 1.0.",
+                    )
+                else:
+                    result = (
+                        self.executor.execute(action)
+                        if self.execute_primitives
+                        else self.executor.preview(action)
+                    )
             except Exception as exc:  # noqa: BLE001 - bad LLM text becomes loop feedback.
                 action = ActionPlan(
                     thought="Could not parse planner output.",
@@ -741,7 +954,7 @@ class LLMAgent:
 
             next_state = collect_env_state(self.env)
             if self.execute_primitives:
-                feedback = make_recovery_feedback(
+                feedback = repair_feedback + make_recovery_feedback(
                     self.spec,
                     previous_state=previous_state or state,
                     current_state=next_state,
@@ -749,7 +962,7 @@ class LLMAgent:
                     result=result,
                 )
             else:
-                feedback = ["dry_run: primitive parsed but not executed; environment state is unchanged."]
+                feedback = repair_feedback + ["dry_run: primitive parsed but not executed; environment state is unchanged."]
             record = AgentStepRecord(
                 index=step_idx,
                 state_summary=state_summary,
@@ -780,24 +993,119 @@ class LLMAgent:
         )
 
 
-def make_planner(provider: str, task_key: str, model: str | None = None) -> PlannerClient:
+def recommended_playbook_step(
+    task_key: str,
+    history: list[AgentStepRecord] | None,
+) -> tuple[int, dict[str, Any]] | None:
+    """Return the next playbook step, counting only executed successful steps."""
+
+    playbook = TASK_PLAYBOOKS.get(task_key, [])
+    if not playbook:
+        return None
+
+    progress = 0
+    for record in history or []:
+        if progress >= len(playbook):
+            break
+        result = record.result
+        if result.get("name") in {"playbook_validation", "parse_error"}:
+            continue
+        task_success = float(result.get("task_success") or 0.0)
+        primitive_success = result.get("success") is True or task_success >= 1.0
+        if not primitive_success:
+            continue
+        expected = playbook[progress]
+        action = record.action
+        if action.get("primitive") == expected.get("primitive"):
+            progress += 1
+
+    index = min(progress, len(playbook) - 1)
+    return index, playbook[index]
+
+def fill_missing_playbook_args(
+    task_key: str,
+    history: list[AgentStepRecord],
+    action: ActionPlan,
+) -> tuple[ActionPlan, list[str]]:
+    """Fill omitted primitive args when the LLM chose the recommended playbook primitive."""
+
+    recommended = recommended_playbook_step(task_key, history)
+    if recommended is None:
+        return action, []
+
+    index, step = recommended
+    if action.primitive != step.get("primitive"):
+        return action, [
+            f"planner_deviated_from_recommended_step:{index}:{step.get('primitive')}"
+        ]
+
+    expected_args = dict(step.get("args", {}))
+    missing = [key for key in expected_args if key not in action.args]
+    if not missing:
+        return action, []
+
+    repaired_args = dict(expected_args)
+    repaired_args.update(action.args)
+    repaired = ActionPlan(
+        thought=action.thought,
+        primitive=action.primitive,
+        args=repaired_args,
+    )
+    return repaired, [f"filled_missing_playbook_args:{missing}"]
+
+def playbook_validation_issue(
+    task_key: str,
+    history: list[AgentStepRecord],
+    action: ActionPlan,
+) -> str | None:
+    """Reject out-of-order playbook actions before they disturb the simulator."""
+
+    recommended = recommended_playbook_step(task_key, history)
+    if recommended is None:
+        return None
+
+    index, step = recommended
+    expected_primitive = step.get("primitive")
+    if action.primitive != expected_primitive:
+        return (
+            f"planner chose {action.primitive!r}, but recommended step {index} "
+            f"requires {expected_primitive!r}"
+        )
+
+    for key, expected_value in dict(step.get("args", {})).items():
+        if key in action.args and action.args[key] != expected_value:
+            return (
+                f"planner changed arg {key!r} for recommended step {index}: "
+                f"expected {expected_value!r}, got {action.args[key]!r}"
+            )
+    return None
+
+def make_planner(
+    provider: str,
+    task_key: str,
+    model: str | None = None,
+    *,
+    reasoning_effort: str | None = None,
+    max_output_tokens: int = 600,
+) -> PlannerClient:
     """Build a planner provider by name."""
 
     provider = provider.lower()
     if provider == "mock":
         return MockPlanner(task_key)
     if provider == "openai":
-        model = model or os.getenv("OPENAI_MODEL")
-        if not model:
-            raise ValueError("Set --model or OPENAI_MODEL for the OpenAI planner.")
-        return OpenAIPlanner(model)
+        model = model or os.getenv("OPENAI_MODEL") or "gpt-5.6-terra"
+        return OpenAIPlanner(
+            model,
+            reasoning_effort=reasoning_effort,
+            max_output_tokens=max_output_tokens,
+        )
     if provider == "anthropic":
         model = model or os.getenv("ANTHROPIC_MODEL")
         if not model:
             raise ValueError("Set --model or ANTHROPIC_MODEL for the Anthropic planner.")
         return AnthropicPlanner(model)
     raise ValueError(f"Unknown planner provider: {provider}")
-
 
 def summarize_env_state(
     state: dict[str, Any],
@@ -846,7 +1154,7 @@ def summarize_env_state(
             for name, values in objects.items()
         },
         "object_distances": state.get("object_distances", {}),
-        "available_symbolic_targets": list(SYMBOLIC_TARGETS),
+        "available_symbolic_targets": list(SYMBOLIC_TARGETS) + ["left_safe_parking", "held_block0_above_block1_high", "held_block0_on_block1"],
         "last_result": last_result.to_dict() if last_result else None,
         "recovery_feedback": feedback or [],
     }
@@ -879,17 +1187,34 @@ def build_task_prompt(
             }
         )
 
+    next_playbook_step = None
+    recommended = recommended_playbook_step(spec.key, history or [])
+    if recommended is not None:
+        next_index, step = recommended
+        next_playbook_step = dict(step)
+        next_playbook_step["index"] = next_index
     system_prompt = (
         "You are a bimanual RoboEval task planner. Choose exactly one high-level "
         "primitive for the next control step. You must never output robot joint "
         "values, torques, raw MuJoCo actions, or policy weights. Use only the "
         "allowed primitive names and JSON arguments. Return exactly one JSON "
         "object with keys: thought, primitive, args. Do not wrap the JSON in "
-        "Markdown. If the task_success metric is already satisfied, choose finish."
+        "Markdown. Usually copy the primitive and args exactly from "
+        "next_recommended_playbook_step. Do not omit numeric args such as "
+        "steps, pos_tolerance, height, or clearances. Only deviate when "
+        "the latest observation shows that step is already complete or recovery "
+        "is needed. If the task_success metric is already satisfied, choose finish."
     )
     user_payload = {
         "task_key": spec.key,
         "success_condition": spec.success_condition,
+        "task_playbook": TASK_PLAYBOOKS.get(spec.key, []),
+        "next_recommended_playbook_step": next_playbook_step,
+        "selection_rules": [
+            "Usually choose next_recommended_playbook_step and copy its primitive and args exactly.",
+            "Do not omit numeric args such as steps, pos_tolerance, height, or clearances.",
+            "Only deviate from the recommended step when observation or recovery_feedback proves it is unsafe or already complete.",
+        ],
         "allowed_primitives": PRIMITIVE_SCHEMAS,
         "symbolic_targets": SYMBOLIC_TARGETS,
         "state": state_summary,
