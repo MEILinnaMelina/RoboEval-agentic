@@ -73,6 +73,22 @@ P16 did **not** recover `lift_pot`'s raw success (still 0/3) - the confound wasn
 
 **P17's fix did not work as hoped - `cube_handover` self-collision got worse, not better.** This directly contradicted the P17 diagnosis's prediction. Investigating led to **P18** above: `align_to_object` (not touched by P17, which only touched `move_*_ee`) was still applying `face_target_pose` unconditionally, and `cube_handover`'s actual grasp calls never use a named `target` - they're all plain `object="cube"` + `ee_offset=...`, which was *never* part of P14's validation either. One trial (`trial_003`) hit `self_collision_count=87` with zero successful grasps across 20 steps, both arms repeatedly reorienting toward the same central cube from different LLM-chosen offsets. Fixed by narrowing reorientation to trigger only when a named `SYMBOLIC_TARGETS` affordance is used (`_is_named_affordance()`), landed as P18. Also newly visible with n=5: `lift_pot`'s `both_grippers_holding` was `{left: true, right: false}` in 4/5 trials - a *systematic*, not random, left/right asymmetry, consistent with the right-arm yaw formula's weaker convergence already flagged in P14-followup. **Not yet re-validated with a real-API run.**
 
+### 2026-09-04 — P19+P20 validation, n=3 (formula fully removed, IK solver hardened instead)
+
+`outputs/phase8_p20_validation` (3 trials/task). Full comparison across every run so far:
+
+| task | succ (baseline/pre-P16/+P16/+P17,n5/**+P19+P20**) | env_col | self_col |
+| --- | --- | --- | --- |
+| `lift_pot` | 0.333/0/0/0/**0.000** | 15.0/10.7/11.3/21.8/**4.7** | 3.0/3.3/4.0/1.6/**1.0** |
+| `cube_handover` | 0/0/0/0/**0.000** | 5.0/5.7/6.3/5.2/**5.3** | 5.3/18.0/14.7/43.0/**14.7** |
+| `stack_two_blocks` | 0/0/0/0/**0.000** | 8.0/6.3/3.0/5.4/**9.7** | 25.3/13.3/21.7/19.6/**12.0** |
+
+**Collision metrics are the best/most consistent of any run so far** - `lift_pot` env-collision dropped 15.0->4.7 (a 69% reduction vs. baseline) and self-collision to its lowest ever (1.0); `cube_handover` self-collision recovered from the P17 disaster (43.0) back down near the pre-formula baseline area (14.7, still ~2.8x baseline but nowhere near 43); `stack_two_blocks` self-collision roughly halved vs. baseline (25.3->12.0). This is real, general evidence that P19 (collision breaker) + P20 (IK solver robustness) genuinely help, without any per-scenario geometry tuning.
+
+**But grasping got worse for `lift_pot` specifically.** Checked `both_grippers_holding` at the end of all 3 trials: `{left: false, right: false}` in *every single one* - worse than the P17/P18-era runs, where at least the left handle held in most trials. Reading all 3 trials' `compact_steps`: `grasp_object` **never once succeeded** across all 3 trials (`primitive_success=False` on every attempt). This matches the local finding already logged under P20: without *any* orientation adjustment, the pot-handle reach's position residual plateaus around 0.10-0.15m even though the IK solver no longer errors out - a real kinematic reach limit at the un-reoriented orientation, not a solver bug, and apparently far enough that contact-based grasp detection never triggers. `cube_handover`/`stack_two_blocks` were already at zero holding in every prior run too, so no regression there specifically - the clear, specific loss is `lift_pot`'s ability to grasp the pot handles at all.
+
+**Honest trade-off, not a clean win or a clean loss.** P19+P20 measurably improved collision safety everywhere (a real, general win, exactly what was asked for), but removing *all* orientation help - including the narrowly-scoped, actually-validated P18 case (named pot-handle targets specifically, where the clean fresh-env sweep showed a real 40-50% error reduction and 6x less drift) - cost `lift_pot` its only working grasp path. P18's mistake was never "reorienting for named pot-handle targets is wrong" - every real failure (P17, P18-before-fix) came from applying reorientation *beyond* that one validated case (to `move_*_ee`, to plain object+offset grasps). Recommended next step: **reintroduce P18's narrow gating (reorient only when `args["target"]` names a known `SYMBOLIC_TARGETS` affordance) on top of P19+P20**, rather than reviving the broader formula - this combines the one piece of orientation logic that was ever actually shown to help with the new general IK robustness, instead of choosing between them.
+
 ## Next actions (in order)
 
 1. ~~P2 (raise `max_output_tokens`, shorten `thought` guidance)~~ — **done**, verified `parse_error=0/45`.
