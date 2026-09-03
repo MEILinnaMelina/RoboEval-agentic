@@ -45,12 +45,17 @@ class PrimitiveController:
         *,
         render: bool = False,
         sleep_s: float = 0.0,
+        frame_callback: Any | None = None,
+        frame_every: int = 15,
     ) -> None:
         if not getattr(env.action_mode, "ee", False):
             raise ValueError("PrimitiveController requires JointPositionActionMode(..., ee=True).")
         self.env = env
         self.render = render
         self.sleep_s = sleep_s
+        self.frame_callback = frame_callback
+        self.frame_every = max(1, int(frame_every))
+        self._control_step_index = 0
         self._last_info: dict[str, Any] = env.get_info()
         self._last_reward = 0.0
         self._last_terminated = False
@@ -308,6 +313,9 @@ class PrimitiveController:
         self._last_terminated = bool(terminated)
         self._last_truncated = bool(truncated)
         self._last_info = info
+        self._control_step_index += 1
+        if self.frame_callback is not None and self._control_step_index % self.frame_every == 0:
+            self.frame_callback(self.env, self._control_step_index)
         if self.render and self.env.render_mode:
             self.env.render()
         if self.sleep_s:

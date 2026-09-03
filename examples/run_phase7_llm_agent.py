@@ -36,6 +36,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reasoning-effort", default="low")
     parser.add_argument("--max-output-tokens", type=int, default=600)
     parser.add_argument("--window", action="store_true")
+    parser.add_argument("--record-gif", action="store_true")
+    parser.add_argument("--gif-every", type=int, default=15)
+    parser.add_argument("--gif-duration", type=float, default=0.12)
     parser.add_argument("--output-dir", type=Path, default=Path("outputs") / "phase7_llm")
     return parser.parse_args()
 
@@ -44,6 +47,41 @@ def save_frame(env: Any, path: Path) -> None:
     obs = env.get_observation()
     path.parent.mkdir(parents=True, exist_ok=True)
     imageio.imwrite(path, np.moveaxis(obs["rgb_external"], 0, -1))
+
+
+def sanitize_label(label: str) -> str:
+    keep = []
+    for char in label.lower():
+        keep.append(char if char.isalnum() else "_")
+    return "".join(keep).strip("_") or "frame"
+
+
+def write_gif(frame_paths: list[Path], path: Path, duration_s: float) -> str | None:
+    if not frame_paths:
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frames = [imageio.imread(frame_path) for frame_path in frame_paths]
+    imageio.mimsave(path, frames, duration=max(0.01, duration_s))
+    return str(path)
+
+
+def visual_diagnostics_from_state(state: dict[str, Any]) -> dict[str, Any]:
+    grippers = state.get("robot", {}).get("grippers", {})
+    return {
+        "gripper_qpos": {side: data.get("qpos") for side, data in grippers.items()},
+        "holding": {side: data.get("holding", {}) for side, data in grippers.items()},
+        "pinch_position": {side: data.get("pinch_position") for side, data in grippers.items()},
+        "object_positions": {
+            name: value.get("position")
+            for name, value in state.get("objects", {}).items()
+        },
+        "object_distances": state.get("object_distances", {}),
+        "metrics": state.get("metrics", {}),
+    }
+
+
+def visual_diagnostics(env: Any) -> dict[str, Any]:
+    return visual_diagnostics_from_state(collect_env_state(env))
 
 
 def task_keys(selection: str) -> list[str]:
@@ -120,10 +158,24 @@ def run_one(
         env.reset()
         save_frame(env, trial_dir / "before.png")
 
+        frame_paths: list[Path] = []
+        step_diagnostics: list[dict[str, Any]] = []
+
+        def capture_frame(label: str) -> None:
+            if not args.record_gif:
+                return
+            frame_path = trial_dir / "frames" / f"{len(frame_paths):04d}_{sanitize_label(label)}.png"
+            save_frame(env, frame_path)
+            frame_paths.append(frame_path)
+
+        capture_frame("before")
+
         controller = PrimitiveController(
             env,
             render=args.window,
             sleep_s=0.02 if args.window else 0.0,
+            frame_callback=(lambda _env, step: capture_frame(f"sim_step_{step:06d}")) if args.record_gif else None,
+            frame_every=args.gif_every,
         )
         planner = make_planner(
             args.provider,
@@ -133,11 +185,31 @@ def run_one(
             max_output_tokens=args.max_output_tokens,
         )
         agent = LLMAgent(task_key, env, controller, planner, execute_primitives=True)
-        result = agent.run(max_steps=args.max_steps)
+
+        def after_agent_step(record: Any, next_state: dict[str, Any]) -> None:
+            step_diagnostics.append(
+                {
+                    "index": record.index,
+                    "primitive": record.action.get("primitive"),
+                    "args": record.action.get("args"),
+                    "result": record.result,
+                    "state_after": visual_diagnostics_from_state(next_state),
+                }
+            )
+            capture_frame(f"agent_step_{record.index:02d}_{record.action.get('primitive', 'unknown')}")
+
+        result = agent.run(max_steps=args.max_steps, step_callback=after_agent_step)
         save_frame(env, trial_dir / "after.png")
+        capture_frame("after")
+        trajectory_gif = write_gif(frame_paths, trial_dir / "trajectory.gif", args.gif_duration) if args.record_gif else None
 
         report = result.to_dict()
         metrics = final_metrics(env)
+        diagnostics = {
+            "final": visual_diagnostics(env),
+            "per_agent_step": step_diagnostics,
+            "trajectory_gif": trajectory_gif,
+        }
         report["phase"] = 7
         report["trial_index"] = trial_index
         report["trial_dir"] = str(trial_dir)
@@ -145,7 +217,9 @@ def run_one(
         report["screenshots"] = {
             "before": str(trial_dir / "before.png"),
             "after": str(trial_dir / "after.png"),
+            "trajectory_gif": trajectory_gif,
         }
+        report["visual_diagnostics"] = diagnostics
         report["compact_steps"] = [compact_step(step) for step in report.get("steps", [])]
         report_path = trial_dir / "llm_agent_report.json"
         report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -162,6 +236,8 @@ def run_one(
             "final_metrics": metrics,
             "report_path": str(report_path),
             "planning_trace": report["compact_steps"],
+            "visual_diagnostics": diagnostics,
+            "trajectory_gif": trajectory_gif,
             "failed_step": None if success else first_failed_step(report),
         }
         case_path.write_text(json.dumps(case_payload, indent=2), encoding="utf-8")
@@ -178,6 +254,7 @@ def run_one(
             "trial_dir": str(trial_dir),
             "report_path": str(report_path),
             "case_log_path": str(case_path),
+            "trajectory_gif": trajectory_gif,
             "failed_step": None if success else first_failed_step(report),
         }
     finally:

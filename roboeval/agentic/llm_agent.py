@@ -889,7 +889,7 @@ class LLMAgent:
         self.execute_primitives = execute_primitives
         self.success_threshold = success_threshold
 
-    def run(self, *, max_steps: int = 8) -> AgentRunResult:
+    def run(self, *, max_steps: int = 8, step_callback: Any | None = None) -> AgentRunResult:
         records: list[AgentStepRecord] = []
         previous_state: dict[str, Any] | None = None
         last_result: PrimitiveResult | None = None
@@ -974,6 +974,8 @@ class LLMAgent:
                 feedback=feedback,
             )
             records.append(record)
+            if step_callback is not None:
+                step_callback(record, next_state)
 
             previous_state = next_state
             last_result = result
