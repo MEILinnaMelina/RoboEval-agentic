@@ -158,6 +158,7 @@ class PrimitiveController:
         ee_offset: np.ndarray | None = None,
         steps: int = 90,
         pos_tolerance: float = 0.04,
+        reorient: bool = False,
     ) -> PrimitiveResult:
         side = self._parse_side(side)
         objects = get_task_objects(self.env)
@@ -169,7 +170,17 @@ class PrimitiveController:
             )
         obj_pos = get_object_position(objects[object_name]).copy()
         ee_offset = np.asarray(ee_offset if ee_offset is not None else [0.0, 0.0, 0.08])
-        target_pose = self.face_target_pose(side, obj_pos + ee_offset)
+        target_position = obj_pos + ee_offset
+        if reorient:
+            # Only validated for reaching a named affordance (e.g. a pot
+            # handle) - see docs/phase8_success_rate_debug_log.md P14/P17/
+            # P18. Generic object+ee_offset grasps (no named target) keep
+            # the arm's current orientation, matching what was measured to
+            # work fine before P14 for those cases.
+            target_pose = self.face_target_pose(side, target_position)
+        else:
+            target_pose = self.current_ee_pose()[self._pose_slice(side)].copy()
+            target_pose[:3] = target_position
         return self._move_single(
             side,
             target_pose,
@@ -187,6 +198,7 @@ class PrimitiveController:
         steps: int = 90,
         preopen: bool = True,
         close_after: bool = True,
+        reorient: bool = False,
     ) -> PrimitiveResult:
         side = self._parse_side(side)
         open_result = self.open_gripper(side, steps=15) if preopen else None
@@ -196,6 +208,7 @@ class PrimitiveController:
             ee_offset=ee_offset,
             steps=steps,
             pos_tolerance=0.05,
+            reorient=reorient,
         )
         close_result = self.close_gripper(side, steps=35) if close_after else None
 
