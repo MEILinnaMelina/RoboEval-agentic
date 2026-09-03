@@ -114,9 +114,16 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
 # (e.g. handle offsets aren't separately named objects in get_task_objects()).
 # These describe *where a feature is*, never *what to do with it or when* -
 # the LLM decides sequencing, grasp side, and any other offsets itself.
+# left/right_pot_handle offsets are measured from the kitchenpot mesh's
+# real handle-region collision geoms (world position minus pot body
+# origin, averaged over the handle sub-geoms on each side) - see
+# docs/phase8_success_rate_debug_log.md P13/P14 for how these were found
+# and why the old guessed values [-0.18, +-0.16, 0.13] were ~10cm off in Z
+# and ~18cm off in X, landing the gripper above/beside the pot instead of
+# on the handle.
 SYMBOLIC_TARGETS: dict[str, dict[str, Any]] = {
-    "left_pot_handle": {"object": "kitchenpot", "offset": [-0.18, 0.16, 0.13]},
-    "right_pot_handle": {"object": "kitchenpot", "offset": [-0.18, -0.16, 0.13]},
+    "left_pot_handle": {"object": "kitchenpot", "offset": [0.0, 0.19, 0.03]},
+    "right_pot_handle": {"object": "kitchenpot", "offset": [0.0, -0.20, 0.03]},
     "pot_center_above": {"object": "kitchenpot", "offset": [0.0, 0.0, 0.16]},
 }
 
