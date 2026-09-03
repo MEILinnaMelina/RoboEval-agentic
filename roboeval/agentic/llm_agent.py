@@ -1096,6 +1096,18 @@ def make_recovery_feedback(
     if action.primitive == "grasp_object" and not result.success:
         hints.append("grasp_not_detected: align closer to the object's top/handle and close again.")
 
+    if action.primitive in {"place_held_object_on_object", "move_held_object_above_object"} and not result.success:
+        max_dist = max(result.distances.values(), default=0.0)
+        if max_dist > 0.15:
+            hints.append(
+                f"placement_far_from_target: still {max_dist:.2f}m from the target after this move. "
+                "Carrying a held object this far in one primitive may be beyond comfortable single-arm "
+                "reach - consider releasing it partway (e.g. near the workspace midline) and re-grasping "
+                "with the other arm to complete a shorter placement, instead of repeating the same long move."
+            )
+        else:
+            hints.append(f"placement_missed: still {max_dist:.2f}m from the target - retry with more steps or a smaller clearance.")
+
     return hints
 
 
