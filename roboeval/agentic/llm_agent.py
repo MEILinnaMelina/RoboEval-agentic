@@ -966,6 +966,7 @@ def summarize_env_state(
         "grippers": {
             side: {
                 "qpos": values.get("qpos"),
+                "aperture_m": values.get("aperture_m"),
                 "pinch_position": values.get("pinch_position"),
                 "controlled_ee_pose": values.get("controlled_ee_pose"),
                 "holding": values.get("holding", {}),
@@ -1043,6 +1044,7 @@ def build_task_prompt(
             "Decide the next primitive yourself from state.objects, state.grippers, and metrics - nothing here is pre-selected for you.",
             "If the previous primitive failed or recovery_feedback/quality_check_failed hints appear, adapt (different side, larger/smaller ee_offset, more steps) rather than repeating the same args.",
             "Object positions/sizes and available_symbolic_targets (fixed handle/affordance offsets) are the only geometry you get - use ee_offset to grasp/approach any object at any point you choose.",
+            "grippers[side].aperture_m is how wide that gripper can currently open (max ~0.08m) - a grasp point needs the object's cross-section at that point to fit within it.",
             "Call settle before finish once you believe the task is done, to confirm it holds up under physics; only call finish once quality_assessment.passed is true or no non-finish primitive can plausibly help anymore.",
         ],
         "allowed_primitives": PRIMITIVE_SCHEMAS,

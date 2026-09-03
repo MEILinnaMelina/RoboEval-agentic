@@ -96,6 +96,7 @@ def collect_env_state(env: Any, info: dict[str, Any] | None = None) -> dict[str,
         pose_start = idx * 6
         grippers[side.name.lower()] = {
             "qpos": round(float(gripper.qpos), 5),
+            "aperture_m": round(float(gripper.aperture_m), 5),
             "wrist_position": _as_list(gripper.wrist_position),
             "pinch_position": _as_list(gripper.pinch_position),
             "controlled_ee_pose": _as_list(ee_pose[pose_start : pose_start + 6]),

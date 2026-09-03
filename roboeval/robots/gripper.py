@@ -151,6 +151,24 @@ class Gripper:
         return np.round(np.average(positions), decimals=self._ROUND_DECIMALS)
 
     @property
+    def aperture_m(self) -> float:
+        """Get the real finger-to-finger opening distance in meters.
+
+        Unlike `qpos` (normalized to the gripper's configured command
+        range), this sums each actuated joint's raw physical travel from
+        its closed position (read live from the MJCF joint range), giving
+        the true physical gap between the finger pads - e.g. 0 to 0.08m
+        for the Panda hand's two 0-0.04m prismatic finger joints.
+        """
+        span = 0.0
+        for joint in self._actuated_joints:
+            bound = self._mojo.physics.bind(joint)
+            span += float(bound.qpos.item() - bound.range[0])
+        # _ROUND_DECIMALS (1dp) is tuned for the normalized 0..1 qpos range;
+        # a meters value spanning only ~0.08m needs finer precision.
+        return round(span, 4)
+
+    @property
     def qvel(self) -> float:
         """Get the average velocity of gripper actuators.
         
