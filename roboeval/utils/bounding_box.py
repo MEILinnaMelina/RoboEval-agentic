@@ -84,5 +84,5 @@ class BodyBoundingBox(IBoundingBox):
                 ]
             )
             new_points = np.dot(points + center, rot.T) + pos
-            self.min = np.minimum(self.min, new_points)
-            self.max = np.maximum(self.max, new_points)
+            self.min = np.minimum(self.min, np.min(new_points, axis=0))
+            self.max = np.maximum(self.max, np.max(new_points, axis=0))
