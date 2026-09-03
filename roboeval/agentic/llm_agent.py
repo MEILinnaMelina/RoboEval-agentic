@@ -49,7 +49,7 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
             "side": "left or right",
             "object": "object name, for example cube or block_0",
             "target": "optional symbolic target alias",
-            "ee_offset": "optional xyz offset from the object",
+            "ee_offset": "optional xyz offset; if target names a known affordance (e.g. a _handle), this is ADDED to its measured offset as a nudge, not a replacement - otherwise it's the offset from the object's origin",
             "steps": "optional int",
         },
         "description": "Move a gripper to an object-relative pre-grasp pose.",
@@ -59,7 +59,7 @@ PRIMITIVE_SCHEMAS: dict[str, dict[str, Any]] = {
             "side": "left or right",
             "object": "object name",
             "target": "optional symbolic target alias",
-            "ee_offset": "optional xyz offset from the object",
+            "ee_offset": "optional xyz offset; if target names a known affordance (e.g. a _handle), this is ADDED to its measured offset as a nudge, not a replacement - otherwise it's the offset from the object's origin",
             "steps": "optional int",
             "preopen": "optional bool; false keeps the gripper in its current state before approach",
             "close_after": "optional bool; false skips the close command after approach",
@@ -457,7 +457,16 @@ class TargetResolver:
         key = target_or_object.strip().lower()
         if key in SYMBOLIC_TARGETS:
             spec = SYMBOLIC_TARGETS[key]
-            return str(spec["object"]), self._vector(explicit_offset, spec["offset"])
+            base = np.asarray(spec["offset"], dtype=np.float32)
+            if explicit_offset is None:
+                return str(spec["object"]), base
+            # A named target's offset is measured, known-good geometry
+            # (see docs/phase8_success_rate_debug_log.md P13/P16) - an
+            # ee_offset supplied alongside it is a *nudge* added on top,
+            # not a full replacement, so "retry with a different offset"
+            # (as the prompt/recovery_feedback suggests) refines a good
+            # starting point instead of discarding it entirely.
+            return str(spec["object"]), base + self._vector(explicit_offset, [0.0, 0.0, 0.0])
 
         objects = get_task_objects(self.env)
         if key in objects:
