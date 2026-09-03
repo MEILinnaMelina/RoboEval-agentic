@@ -410,13 +410,22 @@ class TargetResolver:
         self.controller = controller
 
     def resolve_pose(self, target: Any, side: str | HandSide) -> np.ndarray:
+        # NOTE: deliberately does NOT use controller.face_target_pose() here.
+        # That reorientation was validated (P14) only for align_to_object's
+        # object-directed approaches; applying it to arbitrary move_*_ee
+        # targets (e.g. "handover_midpoint", a non-object point) measurably
+        # increased self-collisions in a real run - see
+        # docs/phase8_success_rate_debug_log.md P17. Keep move_*_ee on the
+        # old "inherit current orientation" behavior until reorientation is
+        # separately validated for non-grasp moves.
         side_enum = self._parse_side(side)
         if isinstance(target, (list, tuple)):
             arr = np.asarray(target, dtype=np.float32)
             if arr.shape == (6,):
                 return arr
-        position = self.resolve_position(target, side_enum)
-        return self.controller.face_target_pose(side_enum, position)
+        current_pose = self.controller.current_ee_pose()[self._pose_slice(side_enum)].copy()
+        current_pose[:3] = self.resolve_position(target, side_enum)
+        return current_pose
 
     def resolve_position(self, target: Any, side: str | HandSide | None = None) -> np.ndarray:
         if isinstance(target, (list, tuple)):
