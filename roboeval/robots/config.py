@@ -115,7 +115,7 @@ class RobotIKConfig:
     kp: float = 1000
     kv: float = None
     joint_damping: float = None
-    solver_max_steps: int = 40
+    solver_max_steps: int = 100
     wrist_angle_scale: float = 2
     timestep_factor: int = 10
     

@@ -177,7 +177,7 @@ class GenericUpperBodyIK(UpperBodyIK):
                 target_pos=target_pose.position,
                 target_quat=target_pose.orientation.elements,
                 joint_names=[j.name for j in mjcf_utils.safe_find_all(shoulder, "joint")],
-                tol=0.000001,
+                tol=self._config.convergence_threshold,
                 max_steps=self._config.solver_max_steps,
                 inplace=True,
             )
@@ -263,7 +263,7 @@ class GenericUpperBodyIK(UpperBodyIK):
                 target_pos=target_pose_left.position,
                 target_quat=target_pose_left.orientation.elements,
                 joint_names=[j.name for j in mjcf_utils.safe_find_all(self._shoulders[0], "joint")],
-                tol=0.00001,
+                tol=self._config.convergence_threshold,
                 max_steps=self._config.solver_max_steps,
                 inplace=inplace,
             )
@@ -278,7 +278,7 @@ class GenericUpperBodyIK(UpperBodyIK):
                     target_pos=target_pose_right.position,
                     target_quat=target_pose_right.orientation.elements,
                     joint_names=[j.name for j in mjcf_utils.safe_find_all(self._shoulders[1], "joint")],
-                    tol=0.00001,
+                    tol=self._config.convergence_threshold,
                     max_steps=self._config.solver_max_steps,
                     inplace=inplace,
                 )

@@ -410,14 +410,13 @@ class TargetResolver:
         self.controller = controller
 
     def resolve_pose(self, target: Any, side: str | HandSide) -> np.ndarray:
-        # NOTE: deliberately does NOT use controller.face_target_pose() here.
-        # That reorientation was validated (P14) only for align_to_object's
-        # object-directed approaches; applying it to arbitrary move_*_ee
-        # targets (e.g. "handover_midpoint", a non-object point) measurably
-        # increased self-collisions in a real run - see
-        # docs/phase8_success_rate_debug_log.md P17. Keep move_*_ee on the
-        # old "inherit current orientation" behavior until reorientation is
-        # separately validated for non-grasp moves.
+        # Keeps the arm's current orientation, only changes position. A
+        # hand-derived "face the target" yaw formula was tried (P14) and
+        # repeatedly failed to generalize beyond the one geometry it was
+        # tuned on (P17, P18) - see docs/phase8_success_rate_debug_log.md.
+        # Abandoned in favor of making the IK solver itself more robust
+        # (P20: solver_max_steps/convergence_threshold) instead of hand-
+        # tuning per-scenario orientation heuristics.
         side_enum = self._parse_side(side)
         if isinstance(target, (list, tuple)):
             arr = np.asarray(target, dtype=np.float32)
@@ -591,7 +590,6 @@ class PrimitiveExecutor:
                     ee_offset=offset,
                     steps=self._int_arg(args, "steps", 90),
                     pos_tolerance=self._float_arg(args, "pos_tolerance", 0.04),
-                    reorient=self._is_named_affordance(args),
                 )
             if primitive == "grasp_object":
                 side = self._required(args, "side")
@@ -603,7 +601,6 @@ class PrimitiveExecutor:
                     steps=self._int_arg(args, "steps", 90),
                     preopen=self._bool_arg(args, "preopen", True),
                     close_after=self._bool_arg(args, "close_after", True),
-                    reorient=self._is_named_affordance(args),
                 )
             if primitive == "lift_object":
                 return self.controller.lift_object(
@@ -732,18 +729,6 @@ class PrimitiveExecutor:
         if object_name is None:
             object_name = self.primary_object
         return self.resolver.resolve_object_offset(str(object_name), side, explicit_offset)
-
-    def _is_named_affordance(self, args: PrimitiveArgs) -> bool:
-        """Whether args["target"] names a measured SYMBOLIC_TARGETS affordance.
-
-        Reorientation (face_target_pose) is only validated for this case
-        (e.g. a pot handle) - see docs/phase8_success_rate_debug_log.md
-        P14/P17/P18. Generic object+ee_offset grasps (no named target, e.g.
-        cube_handover's cube or stack_two_blocks' blocks) keep the arm's
-        current orientation instead.
-        """
-        target = args.get("target")
-        return target is not None and str(target).strip().lower() in SYMBOLIC_TARGETS
 
     def _required(self, args: PrimitiveArgs, key: str) -> Any:
         if key not in args:
