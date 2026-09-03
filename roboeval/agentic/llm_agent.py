@@ -590,6 +590,7 @@ class PrimitiveExecutor:
                     ee_offset=offset,
                     steps=self._int_arg(args, "steps", 90),
                     pos_tolerance=self._float_arg(args, "pos_tolerance", 0.04),
+                    reorient=self._is_named_affordance(args),
                 )
             if primitive == "grasp_object":
                 side = self._required(args, "side")
@@ -601,6 +602,7 @@ class PrimitiveExecutor:
                     steps=self._int_arg(args, "steps", 90),
                     preopen=self._bool_arg(args, "preopen", True),
                     close_after=self._bool_arg(args, "close_after", True),
+                    reorient=self._is_named_affordance(args),
                 )
             if primitive == "lift_object":
                 return self.controller.lift_object(
@@ -729,6 +731,18 @@ class PrimitiveExecutor:
         if object_name is None:
             object_name = self.primary_object
         return self.resolver.resolve_object_offset(str(object_name), side, explicit_offset)
+
+    def _is_named_affordance(self, args: PrimitiveArgs) -> bool:
+        """Whether args["target"] names a measured SYMBOLIC_TARGETS affordance.
+
+        Reorientation (face_target_pose) is only validated for this case
+        (e.g. a pot handle) - see docs/phase8_success_rate_debug_log.md
+        P14/P18/P20/P21. Generic object+ee_offset grasps (no named target,
+        e.g. cube_handover's cube or stack_two_blocks' blocks) keep the
+        arm's current orientation instead.
+        """
+        target = args.get("target")
+        return target is not None and str(target).strip().lower() in SYMBOLIC_TARGETS
 
     def _required(self, args: PrimitiveArgs, key: str) -> Any:
         if key not in args:
