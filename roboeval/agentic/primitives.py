@@ -351,6 +351,18 @@ class PrimitiveController:
             sides=[side],
         )
 
+    # Abort a primitive early if it causes this many *new* self-collision
+    # events during its own execution - a general safety net independent of
+    # why the collisions are happening (bad orientation, bad LLM-chosen
+    # offset, etc.), so a single primitive call can't grind through its full
+    # step budget while repeatedly hitting itself. See
+    # docs/phase8_success_rate_debug_log.md P18/P19.
+    _MAX_NEW_SELF_COLLISIONS_PER_PRIMITIVE = 3
+
+    def _collision_breaker_tripped(self, start_self_collision: int) -> bool:
+        current = int(self._last_info.get("self_collision_count", 0))
+        return (current - start_self_collision) >= self._MAX_NEW_SELF_COLLISIONS_PER_PRIMITIVE
+
     def _execute_pose_ramp(
         self,
         start: np.ndarray,
@@ -362,11 +374,16 @@ class PrimitiveController:
         sides: list[HandSide],
     ) -> PrimitiveResult:
         steps_done = 0
+        start_self_collision = int(self._last_info.get("self_collision_count", 0))
+        aborted_collision = False
         for alpha in np.linspace(0.0, 1.0, max(1, steps)):
             pose = start + (target - start) * alpha
             self._step_with_pose(pose)
             steps_done += 1
             if self._last_terminated or self._last_truncated:
+                break
+            if self._collision_breaker_tripped(start_self_collision):
+                aborted_collision = True
                 break
 
         current = self.current_ee_pose()
@@ -378,6 +395,15 @@ class PrimitiveController:
             distances[f"{side.name.lower()}_ee_to_target"] = round(dist, 5)
             ok = ok and dist <= pos_tolerance
 
+        if aborted_collision:
+            return self._result(
+                name,
+                False,
+                steps_done,
+                "aborted early: self-collision increased rapidly during this move",
+                "Choose a different offset/target, or move one arm out of the way first before retrying.",
+                distances=distances,
+            )
         return self._result(
             name,
             ok and not self._last_truncated,
