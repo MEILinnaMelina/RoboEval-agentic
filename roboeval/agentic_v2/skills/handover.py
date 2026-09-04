@@ -181,14 +181,19 @@ class HandoverSkill(BaseSkill):
                 position_tolerance=0.06,
                 orientation_tolerance=0.35,
             )
+            # No stop_condition here (unlike GraspSkill's top-down approach):
+            # is_gripper_holding_object() is a pure pad-contact check with no
+            # requirement that the gripper be closed or gripping firmly, and
+            # this is a lateral approach where a fingertip can graze the rod
+            # well before the wrist reaches the precisely-computed, centered
+            # target pose - stopping early there left the grip badly aligned
+            # more often than not. Travel the full planned path instead.
             approach, approach_ik, approach_path = self.move(
                 name=f"{candidate.name}_approach",
                 targets={receiver: candidate.receiver_grasp_pose},
                 constraints=constraints,
                 require_holds=True,
                 candidate_count=9,
-                stop_condition=lambda observed: receiver in observed.objects[object_name].held_by,
-                terminal_constraints=terminal,
             )
             if approach is not None:
                 reports.append(approach)
