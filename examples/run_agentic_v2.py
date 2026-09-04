@@ -149,7 +149,9 @@ def main() -> None:
                 "render": args.render,
                 "record_gif": args.record_gif,
                 "max_skills": args.max_skills,
-                "online_replan": not args.no_replan,
+                # FixedSemanticPlanner never replans regardless of --no-replan;
+                # record that truthfully instead of implying it does.
+                "online_replan": args.planner != "fixed" and not args.no_replan,
                 "cross_trial_memory": args.memory,
                 "pricing_usd_per_million": {
                     "input": args.input_cost_per_million,
