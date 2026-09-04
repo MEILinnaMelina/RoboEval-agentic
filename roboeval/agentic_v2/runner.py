@@ -254,10 +254,23 @@ def environment_metadata() -> dict[str, Any]:
             capture_output=True,
             text=True,
         ).stdout.strip()
+        # A clean git_commit SHA is misleading on its own: uncommitted local
+        # edits at run time would make the recorded commit look correct
+        # while not actually matching what ran.
+        dirty = bool(
+            subprocess.run(
+                ["git", "status", "--porcelain"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+        )
     except (OSError, subprocess.CalledProcessError):
         commit = None
+        dirty = None
     return {
         "git_commit": commit,
+        "git_dirty": dirty,
         "python": sys.version,
         "platform": platform.platform(),
         "packages": packages,
