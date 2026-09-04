@@ -73,6 +73,8 @@ committed - see `results/README.md`):
 - first three tasks: `outputs/gif_success_seed0/v2-fixed/<task>/seed_000/trajectory.gif`
   (LLM-driven: `outputs/gif_api_success_seed0/v2-full/<task>/seed_000/trajectory.gif`)
 - six new tasks: `outputs/gif_success_seed0_newtasks/v2-fixed/<task>/seed_000/trajectory.gif`
+  (LLM-driven: `outputs/gif_api_success_seed0_newtasks/v2-full/<task>/seed_000/trajectory.gif`,
+  recorded at `172818e`, every one `benchmark_success=1.0`)
 
 ## How each new task is solved (measured geometry, not tuned constants)
 
