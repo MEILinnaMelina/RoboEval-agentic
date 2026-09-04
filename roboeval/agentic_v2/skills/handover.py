@@ -322,6 +322,16 @@ class HandoverSkill(BaseSkill):
         )
         reports.append(settle)
 
+        # The receiver never moves during the steps above, but holding
+        # position for that many physics steps while the donor works can
+        # still let it settle into incidental near-zero contact with the
+        # table (observed: a live finger-table touch at ~0.1mm that isn't
+        # part of any planned motion). A small checked nudge clears it
+        # before the regrasp's own collision checks run.
+        nudge = self.retreat(receiver, distance=0.02)
+        if nudge is not None:
+            reports.append(nudge)
+
         grasp_result = GraspSkill(self.context).execute(
             SkillRequest(
                 SkillName.GRASP, object_name=object_name,
@@ -418,7 +428,12 @@ class HandoverSkill(BaseSkill):
     @staticmethod
     def _rendezvous_poses(state, object_name):
         obj = state.objects[object_name]
-        z = max(obj.pose.position[2], 1.08)
+        # The first pose used to have zero table-clearance margin (unlike
+        # the other two) and the receiver's forearm - not just its fingers -
+        # was measured touching the table by 0.1mm at exactly that height
+        # during a real dual-hold verification. +0.04 matches the margin
+        # the second pose already used.
+        z = max(obj.pose.position[2], 1.08) + 0.04
         return (
             Pose((obj.pose.position[0], 0.0, z), obj.pose.quaternion_wxyz),
             Pose((0.55, 0.0, z + 0.04), obj.pose.quaternion_wxyz),
