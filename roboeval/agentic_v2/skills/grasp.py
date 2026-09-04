@@ -54,6 +54,14 @@ class GraspSkill(BaseSkill):
                 open_report.failure_code or FailureCode.EXECUTION_DIVERGED,
                 "failed to open before approach", reports,
             )
+        # The object is still untouched and the scene has had the open
+        # command's steps to settle: record the surface it rests on so a
+        # later staged handover can place it back at this height.
+        settled = open_report.final_state.objects.get(object_name)
+        if settled is not None and not settled.held_by:
+            self.context.resting_surfaces[object_name] = float(
+                settled.pose.position[2] - settled.canonical_size[2] / 2.0
+            )
 
         for candidate in candidates:
             result = self._attempt(request, candidate, reports)

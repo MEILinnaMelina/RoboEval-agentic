@@ -36,6 +36,11 @@ class SkillContext:
     candidates: CandidateGenerator
     attachments: dict[tuple[str, str], HeldObjectAttachment] = field(default_factory=dict)
     planning_trace: list[dict[str, Any]] = field(default_factory=list)
+    # Support-surface height (world z of the object's bottom face) observed
+    # while each object was last at rest, keyed by object name. Lets a
+    # staged handover put an object back down at a known-good height even
+    # in scenes with no other resting object to reference.
+    resting_surfaces: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def create(

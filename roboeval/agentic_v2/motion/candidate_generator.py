@@ -130,7 +130,17 @@ class CandidateGenerator:
     @staticmethod
     def _grasp_policy(object_name: str, side: str) -> AllowedContactPolicy:
         return AllowedContactPolicy(
-            rules=(AllowedContactRule(f"robot:{side}:finger", f"object:{object_name}"),),
+            rules=(
+                AllowedContactRule(f"robot:{side}:finger", f"object:{object_name}"),
+                # A fingertip grazing the support surface while closing on a
+                # short object resting on it is normal tabletop picking, not
+                # a crash (reproduced on a 4cm block at -0.1mm, blocking an
+                # otherwise-correct regrasp). Tolerate it at a few mm only;
+                # wrist/link-table contact stays forbidden.
+                AllowedContactRule(
+                    f"robot:{side}:finger", "scene:*table*", penetration_tolerance=0.004
+                ),
+            ),
             penetration_tolerance=0.008,
         )
 

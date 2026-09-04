@@ -135,6 +135,10 @@ class Pose:
 class AllowedContactRule:
     first: str
     second: str
+    # Optional per-rule penetration cap; falls back to the policy's
+    # tolerance when None. Lets a light fingertip-support-surface touch be
+    # tolerated at a few mm without loosening finger-object contact.
+    penetration_tolerance: float | None = None
 
     def matches(self, first: str, second: str) -> bool:
         return (
@@ -150,9 +154,17 @@ class AllowedContactPolicy:
     penetration_tolerance: float = 1e-6
 
     def allows(self, first: str, second: str, distance: float = 0.0) -> bool:
-        return distance >= -self.penetration_tolerance and any(
-            rule.matches(first, second) for rule in self.rules
-        )
+        for rule in self.rules:
+            if not rule.matches(first, second):
+                continue
+            tolerance = (
+                self.penetration_tolerance
+                if rule.penetration_tolerance is None
+                else rule.penetration_tolerance
+            )
+            if distance >= -tolerance:
+                return True
+        return False
 
 
 @dataclass(frozen=True)
@@ -412,6 +424,11 @@ class RendezvousCandidate:
     receiver_side: str
     contact_policy: AllowedContactPolicy
     score: float
+    # Object width across this candidate's finger-closing axis. A real grip
+    # leaves the aperture near this value; fingers that closed *beside*
+    # the object (glancing pad contact still reads as "holding") close to
+    # ~0 - the aperture is the discriminator pad contact alone is not.
+    grip_width: float = 0.0
 
 
 @dataclass(frozen=True)

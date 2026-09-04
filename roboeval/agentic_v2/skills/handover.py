@@ -30,11 +30,18 @@ _RECEIVER_GAP_AXIS_CANDIDATES = (
     np.array([0.0, 0.0, 1.0]),
     np.array([1.0, 0.0, 0.0]),
 )
-# Below this, the object is too small for donor and receiver to grip
-# simultaneously at opposite ends without their hands colliding with each
-# other (two Panda grippers are each roughly this scale) - use a staged
-# place-then-regrasp handoff instead of a joint dual hold.
-_DUAL_HOLD_MIN_SIZE = 0.10
+# Objects up to this size are handed over by a staged place-then-regrasp
+# (donor sets it down, clears out, receiver picks it up top-down) rather
+# than a simultaneous dual hold. Both dual-hold geometries were measured
+# to fail on the 0.20 m rod: top-down for both arms self-collides at the
+# pregrasp stand-off (two hands cannot share the airspace above a 20 cm
+# object), and a lateral end-on receiver approach puts a gravity moment on
+# the 12 Nm wrist-pitch joint that saturates it (joint error 0.063 rad vs
+# 0.006 rad at saturation, no contacts) so the fingers stop ~4 cm short of
+# the object and close beside it. The staged route only ever uses the
+# vertical-hand grasp both arms are already verified on. Objects larger
+# than this fall through to the dual-hold path, which remains available.
+_STAGED_REGRASP_MAX_SIZE = 0.30
 
 
 class HandoverSkill(BaseSkill):
@@ -60,7 +67,7 @@ class HandoverSkill(BaseSkill):
         reports = []
         attempts = []
         obj = state.objects[object_name]
-        if max(obj.canonical_size) <= _DUAL_HOLD_MIN_SIZE:
+        if max(obj.canonical_size) <= _STAGED_REGRASP_MAX_SIZE:
             donor_attachment = (
                 self.context.attachments.get((object_name, donor))
                 or capture_attachment(state, object_name, donor)
@@ -211,12 +218,25 @@ class HandoverSkill(BaseSkill):
             )
             reports.append(closed)
             both = collect_scene_state(self.env)
-            if not closed.success or set(both.objects[object_name].held_by) != {donor, receiver}:
+            aperture = float(both.robot.arms[receiver].gripper_aperture_m)
+            # Pad contact alone is fooled by fingers that closed *beside* the
+            # object with one pad grazing it: reproduced an aperture of
+            # 0.0014 on a 0.040 rod where held_by still listed the receiver,
+            # which then "lost" the object during the hold. A real grip
+            # leaves the aperture near the object's width across the gap.
+            grip_ok = aperture >= 0.5 * candidate.grip_width
+            if (
+                not closed.success
+                or set(both.objects[object_name].held_by) != {donor, receiver}
+                or not grip_ok
+            ):
                 attempts.append({
                     "candidate": candidate.name,
                     "stage": "receiver_close",
                     "failure": FailureCode.GRASP_FAILED.value,
                     "holders": both.objects[object_name].held_by,
+                    "aperture": aperture,
+                    "expected_grip_width": candidate.grip_width,
                 })
                 self._recover_receiver(receiver, object_name, donor_attachment, reports)
                 continue
@@ -362,16 +382,18 @@ class HandoverSkill(BaseSkill):
             diagnostics={"donor": donor, "receiver": receiver, "strategy": "staged_regrasp"},
         )
 
-    @staticmethod
-    def _resting_surface_z(state, object_name):
-        """Bottom-face height of another object at rest, used as a proxy for
-        the table surface (avoids hardcoding or re-deriving table geometry)."""
+    def _resting_surface_z(self, state, object_name):
+        """Support-surface height to place the object back onto: the bottom
+        face of another object currently at rest in the scene (fully
+        settled by now), else the height this object itself rested at when
+        it was first grasped (recorded by GraspSkill - the only reference
+        available in single-object scenes such as cube_handover)."""
 
         for name, other in state.objects.items():
             if name == object_name or other.held_by:
                 continue
             return other.pose.position[2] - other.canonical_size[2] / 2.0
-        return None
+        return self.context.resting_surfaces.get(object_name)
 
     def _release_donor(self, request, donor, receiver, donor_attachment, receiver_attachment, reports):
         object_name = request.object_name
@@ -489,7 +511,8 @@ class HandoverSkill(BaseSkill):
             # is a world-frame direction but canonical_size is body-frame,
             # so rotate it into the object's frame before comparing.
             gap_local = object_rotation.T @ gap
-            required_aperture = float(np.dot(np.abs(gap_local), obj.canonical_size)) + 0.012
+            grip_width = float(np.dot(np.abs(gap_local), obj.canonical_size))
+            required_aperture = grip_width + 0.012
             if required_aperture > MAXIMUM_APERTURE:
                 continue
             lateral = np.cross(gap, inward)
@@ -507,6 +530,7 @@ class HandoverSkill(BaseSkill):
                     Pose.from_matrix(HandoverSkill._matrix(pregrasp, rotation)),
                     Pose.from_matrix(HandoverSkill._matrix(wrist, rotation)),
                     receiver, policy, float(np.linalg.norm(pregrasp - np.asarray(state.robot.arms[receiver].ee_pose.position))),
+                    grip_width=grip_width,
                 ))
         return tuple(sorted(result, key=lambda item: item.score))
 
