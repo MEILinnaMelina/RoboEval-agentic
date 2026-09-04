@@ -29,59 +29,63 @@ C:\Users\melin\.conda\envs\roboeval\python.exe
 | Task | Result | Coverage |
 |---|---|---|
 | `lift_pot` | 10/10 `benchmark_success` | full seeds 0-9, verified at an earlier commit; grasp path untouched by any change since |
-| `cube_handover` | 0/10 `benchmark_success` | full seeds 0-9 at commit `84ad0a8` (after the rendezvous-height fix) |
-| `stack_two_blocks` | not passing | single-seed (seed 0) spot check only, after the receiver-drift fix |
+| `cube_handover` | 0/10 `benchmark_success` | full seeds 0-9 at commit `3cfd536` (hold-patience fix only); the later `stop_condition` removal (`19aaa41`) measurably reaches `dual_verify` more often in spot checks but has not had its own full 10-seed rerun |
+| `stack_two_blocks` | 0/10 `benchmark_success` | full seeds 0-9 at commit `abd36e1` (drift + hold-patience fixes); not rerun after the later `stop_condition` fix (`2cee8eb`) |
 
-**A full 10-seed rerun of `stack_two_blocks` against the current commit has
-not been done** - only `cube_handover` got a full rerun after its latest fix.
+## Known open issues (found, root-caused; grip-stability fix attempts exhausted for now)
 
-## Known open issues (found, root-caused, not yet fixed)
+Real bugs found and fixed this round (`84ad0a8`, `3cfd536`, `19aaa41`,
+`2cee8eb`): rendezvous height had no table-clearance margin on one pose;
+receiver arm settled into incidental table contact while idle; hold/slip
+detection had no debounce unlike the tracking/velocity checks; and both
+`HandoverSkill` and `GraspSkill` used `is_gripper_holding_object()` (a
+pure pad-contact check, not a "gripping firmly" check - see
+`roboeval/robots/gripper.py:184`) as an approach stop-condition, which
+could stop the arm short of the precisely-computed grasp pose.
 
-Both of the previous entries here ("HandoverSkill's own held_by check is
-stricter than RoboEval's ground truth", "generic top-down grasp lacks
-table clearance for short objects") turned out to be imprecise - direct
-reproduction (not inference) found the *actual* mechanisms below. Two real
-bugs found this way (rendezvous height had no table-clearance margin on
-one pose; receiver arm settled into incidental table contact while idle)
-are already fixed as of `84ad0a8`. What's left is more fundamental:
+What's left, after those fixes:
 
-- **`cube_handover`**: the rod is thin, and the receiver's grasp point is
-  offset toward one end (`tip_margin=0.035`) specifically so it clears the
-  donor's hand at the workspace center. Reproduced one case that closed
-  successfully and passed `dual_verify`, then `SLIP_DETECTED` during the
-  hold-still verification - the grip itself is marginally stable, not a
-  detection bug. Across a full 10-seed run, the dominant failure varies
-  seed to seed among `GRASP_FAILED` (close didn't register a hold),
-  `HELD_OBJECT_COLLISION`, and this slip - consistent with a grip that's
-  right at the edge of reliable, not a single deterministic cause. Needs a
-  grip-stability fix (firmer close, more dwell before verifying, or a
-  grip point traded further from the tip against less donor clearance),
-  not another collision-geometry fix.
-- **`stack_two_blocks`**: the receiver-drift `ENV_COLLISION` is fixed, but
-  the regrasp close itself is still unreliable for this very thin (4cm)
-  object resting flush on the table - not yet re-verified across a full
-  10-seed run after the drift fix, so the current true pass rate is
-  unknown.
+- **`cube_handover`**: with the stop_condition fix, the real gate run
+  showed the receiver reaching `dual_verify` in 10 of 60 candidate
+  attempts across 10 seeds (up from near-zero before) - but **all 10**
+  failed there with `SLIP_DETECTED left lost cube` (confirmed via the
+  monitor's own event message, not inferred). The donor's identical
+  aperture/material never once loses grip through a full monitored lift;
+  only the receiver's grip does. **Tried and reverted**: switching the
+  receiver from its side approach to the donor's proven top-down
+  orientation - reproducibly caused `SELF_COLLISION` at the pregrasp
+  stand-off on 5/5 seeds (two arms cannot share the airspace directly
+  above a 20cm rod from above at once) - worse than the slip it was meant
+  to fix, so `handover.py` is back to the side approach (`git checkout`
+  after `19aaa41`, confirmed clean). Remaining ideas, not yet tried:
+  direct visual inspection of the side-approach grip geometry (a
+  screenshot approach was used successfully earlier this session for a
+  different collision), or more close/settle time before verification.
+- **`stack_two_blocks`**: regrasp reliably reaches `receiver_close` for one
+  candidate (others `PATH_BLOCKED`) but still trips `ENV_COLLISION` there;
+  not yet root-caused as precisely as the cube_handover slip.
 
 ## API / LLM runs
 
-One informal 3-task x 3-seed OpenAI run has been made (model
-`gpt-5.6-terra`, no `--input-cost-per-million`/`--output-cost-per-million`
-set, so `llm_cost_usd` was not recorded). Results before any of the fixes
-in this file: `lift_pot` 3/3, `cube_handover` 1/1 valid (2/3 died to
+One informal 3-task x 3-seed OpenAI run has been made (commit `4ef7084`,
+model `gpt-5.6-terra`, no cost-per-million flags set, so `llm_cost_usd`
+was not recorded): `lift_pot` 3/3, `cube_handover` 1/1 valid (2/3 died to
 `APIConnectionError`, since fixed with a retry - see `llm_planner.py`),
 `stack_two_blocks` 0/3 valid (all 3 died to the same network error). A
-rerun of the network-killed trials after the retry fix landed reached
+rerun of the network-killed trials after the retry fix reached
 `max_skills=10` on all 5 without succeeding (`TIMEOUT`), consistent with
-the grip-stability and table-clearance issues above rather than a new bug -
-see `skill_results` sequences in those trial reports for exact failure
-codes per step.
+the grip-stability and table-clearance issues above.
 
-**No formal (10-seed) API run has been done.** Do not launch one until the
-two open issues above show real improvement on the deterministic gate -
-a 10-seed API matrix against a known-marginal grasp will mostly measure
-the grasp's flakiness, not the LLM's planning quality, and burns real
-budget doing it.
+Explicit decision (2026-09-04): after exhausting the readily-available
+grip-stability fixes above without reaching the 8/10 deterministic-gate
+bar, proceed with API experiments anyway rather than continue indefinitely
+- `lift_pot` is fully reliable and `cube_handover` has already
+demonstrated a real success in online API play (seed 0, first informal
+run) despite the deterministic gate not passing, so online replanning may
+route around some of the marginal-grasp cases the fixed script cannot.
+Treat `cube_handover`/`stack_two_blocks` API results accordingly: a low
+success rate there is expected to partly reflect the known grip issues
+above, not purely LLM planning quality, until those are fixed.
 
 ## Experiment naming convention
 
