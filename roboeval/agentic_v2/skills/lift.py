@@ -75,7 +75,8 @@ class LiftSkill(BaseSkill):
                 AllowedContactRule(f"robot:{side}:finger", f"object:{object_name}")
                 for side in holders
             )
-            + (AllowedContactRule(f"object:{object_name}", "scene:*table*"),),
+            + (AllowedContactRule(f"object:{object_name}", "scene:*table*"),)
+            + tuple(self.context.carry_contact_rules.get(object_name, ())),
             penetration_tolerance=0.01,
         )
         constraints = ConstraintSet(
@@ -105,11 +106,9 @@ class LiftSkill(BaseSkill):
             )
         final = collect_scene_state(self.env)
         rise = final.objects[object_name].pose.position[2] - start_pose.position[2]
-        task_height_reached = (
-            benchmark_success(final) >= 1.0
-            if state.task_key == "lift_pot" and strategy == "task_height"
-            else rise >= 0.75 * height
-        )
+        # Raw benchmark success is authoritative whenever the task is a
+        # lift; otherwise require most of the requested rise.
+        task_height_reached = benchmark_success(final) >= 1.0 or rise >= 0.75 * height
         if not task_height_reached or any(
             side not in final.objects[object_name].held_by for side in holders
         ):

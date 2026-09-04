@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from roboeval.agentic_v2.executor import CLOSE_COMMAND, OPEN_COMMAND
-from roboeval.agentic_v2.motion.candidate_generator import EDGE_GRASP_PAD_INSET
+from roboeval.agentic_v2.motion.candidate_generator import EDGE_GRASP_DEEP_INSET, EDGE_GRASP_PAD_INSET
 from roboeval.agentic_v2.state import capture_attachment, collect_scene_state, vertical_half_extent
 from roboeval.agentic_v2.types import (
     AllowedContactPolicy,
@@ -204,7 +204,8 @@ class GraspSkill(BaseSkill):
             + (
                 AllowedContactRule(f"object:{candidate.object_name}", "scene:*table*"),
                 AllowedContactRule(f"object:{candidate.object_name}", "scene:cabinet_*"),
-            ),
+            )
+            + tuple(self.context.carry_contact_rules.get(candidate.object_name, ())),
             penetration_tolerance=0.01,
         )
         constraints = ConstraintSet(
@@ -267,31 +268,32 @@ class GraspSkill(BaseSkill):
         )
         state = collect_scene_state(self.env)
         obj = state.objects[object_name]
-        # Overhang after the drag leaves the object's center this far
-        # inside the support edge; the pads then sit `depth` in from the
-        # object's near edge.
+        # Target pad depth: as deep as the palm allows (the object's edge
+        # then butts against the palm, which is what makes the pinch rigid;
+        # measured: a 4.2 cm pinch on the book just grazes the palm), never
+        # past the object's center.
         length = float(np.abs(np.asarray(obj.pose.as_matrix())[:3, :3].T @ approach) @ np.asarray(obj.canonical_size))
         margin = 0.012
-        depth = min(0.06, length / 2.0 - margin - 0.012)
-        # The object currently overhangs its support by the candidate
-        # generator's minimum-or-better; the pads must end up `depth` in
-        # with the lower finger still clear of the support edge.
-        overhang = self.context.candidates.edge_overhang(object_name, state)
+        depth = min(EDGE_GRASP_DEEP_INSET, length / 2.0 - margin - 0.012)
         needed = depth + 0.012 + margin
-        drag = max(0.0, needed - overhang) if overhang is not None else 0.0
-        current = state.robot.arms[side].ee_pose
-        if drag > 0.005:
-            # The object still rests on its support, which carries the
-            # weight during the drag.
+        # The pads slip along the object during a drag (the support's
+        # friction on a 4 kg object beats the pad shear), so drag on the
+        # live overhang, up to twice, without treating slip as failure.
+        for attempt in range(2):
+            overhang = self.context.candidates.edge_overhang(object_name, collect_scene_state(self.env))
+            drag = max(0.0, needed - overhang) if overhang is not None else 0.0
+            if drag <= 0.005:
+                break
+            current = collect_scene_state(self.env).robot.arms[side].ee_pose
             drag_target = Pose(
                 tuple(np.asarray(current.position) - drag * approach),
                 current.quaternion_wxyz,
             )
             dragged, _, _ = self.move(
-                name=f"{candidate.name}_deepen_drag",
+                name=f"{candidate.name}_deepen_drag_{attempt}",
                 targets={side: drag_target},
                 constraints=drag_constraints,
-                require_holds=True,
+                require_holds=False,
                 candidate_count=7,
             )
             if dragged is not None:
@@ -303,13 +305,21 @@ class GraspSkill(BaseSkill):
         reports.append(opened)
         if not opened.success:
             return None
-        current = collect_scene_state(self.env).robot.arms[side].ee_pose
-        advance = depth - EDGE_GRASP_PAD_INSET
+        state = collect_scene_state(self.env)
+        overhang = self.context.candidates.edge_overhang(object_name, state)
+        if overhang is not None:
+            depth = min(depth, overhang - 0.012 - margin)
+        if depth < EDGE_GRASP_PAD_INSET:
+            return None
+        current = state.robot.arms[side].ee_pose
+        pad = np.asarray(current.position) + 0.1034 * np.asarray(current.as_matrix())[:3, 2]
+        near_edge = np.asarray(state.objects[object_name].aabb_center) - 0.5 * np.asarray(state.objects[object_name].size) * np.sign(approach)
+        current_depth = float(np.dot(pad - near_edge, approach))
+        advance = depth - current_depth
         deeper_target = Pose(
             tuple(np.asarray(current.position) + advance * approach),
             current.quaternion_wxyz,
         )
-        state = collect_scene_state(self.env)
         protected = {object_name: state.objects[object_name].pose}
         advanced, _, _ = self.move(
             name=f"{candidate.name}_deepen_advance",
@@ -332,8 +342,13 @@ class GraspSkill(BaseSkill):
         if not closed.success or side not in grasped.objects[object_name].held_by:
             return None
         new_attachment = capture_attachment(grasped, object_name, side)
+        # The object's edge now sits against (or a millimetre from) the
+        # palm; that contact is part of the hold from here on.
+        palm_rule = AllowedContactRule(f"robot:{side}:link", f"object:{object_name}", penetration_tolerance=0.012)
+        self.context.carry_contact_rules[object_name] = (palm_rule,)
         verified = self._verify_lift(candidate, new_attachment, reports)
         if verified is None:
+            self.context.carry_contact_rules.pop(object_name, None)
             return None
         self.context.carry_modes[object_name] = f"edge:{depth:.3f}"
         self.context.edge_pinch_depths[object_name] = float(depth)

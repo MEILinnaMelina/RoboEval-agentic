@@ -67,9 +67,17 @@ class PlaceSkill(BaseSkill):
             or capture_attachment(state, object_name, side)
             for side in holders
         )
+        carry_rules = tuple(self.context.carry_contact_rules.get(object_name, ()))
+        # The object may still be grazing the surface it was picked from
+        # (a heavy object sags in the grip); leaving that surface is part of
+        # the move, not a collision.
+        departure_rules = (
+            AllowedContactRule(f"object:{object_name}", "scene:*table*"),
+            AllowedContactRule(f"object:{object_name}", "scene:cabinet_*"),
+        )
         constraints = held_constraints(
             object_name, attachments,
-            extra_rules=candidate.contact_policy.rules,
+            extra_rules=candidate.contact_policy.rules + carry_rules + departure_rules,
         )
         pre, pre_ik, pre_path = self.move(
             name=f"{candidate.name}_preplace",
@@ -84,7 +92,7 @@ class PlaceSkill(BaseSkill):
             attempts.append(self._evidence(candidate.name, "preplace", pre, pre_ik, pre_path))
             return None
         terminal = ConstraintSet(
-            allowed_contacts=AllowedContactPolicy(candidate.contact_policy.rules, 0.015),
+            allowed_contacts=AllowedContactPolicy(candidate.contact_policy.rules + carry_rules, 0.015),
             held_objects=attachments,
             position_tolerance=0.06,
             orientation_tolerance=0.35,
@@ -116,8 +124,13 @@ class PlaceSkill(BaseSkill):
             )
         for side in holders:
             self.context.attachments.pop((object_name, side), None)
+        self.context.carry_modes.pop(object_name, None)
+        self.context.edge_pinch_depths.pop(object_name, None)
+        self.context.carry_contact_rules.pop(object_name, None)
 
-        free_constraints = ConstraintSet(allowed_contacts=candidate.contact_policy)
+        free_constraints = ConstraintSet(
+            allowed_contacts=AllowedContactPolicy(candidate.contact_policy.rules + carry_rules, 0.012),
+        )
         for side in holders:
             current = collect_scene_state(self.env).robot.arms[side].ee_pose
             approach = np.asarray(current.as_matrix())[:3, 2]

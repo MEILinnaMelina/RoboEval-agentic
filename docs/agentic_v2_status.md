@@ -18,102 +18,148 @@ C:\Users\melin\.conda\envs\roboeval\python.exe
 
 `PYTHONPATH=<repo root>` (or run from repo root) is required when invoking
 `examples/*.py` directly - `roboeval` is not pip-installed in this env.
+`thirdparty/mujoco_menagerie` contains untracked, locally modified robot
+XMLs (`panda_nohand_modified.xml` etc.); a fresh checkout or `git worktree`
+does not have them and every env construction fails with
+`FileNotFoundError` - run experiments from this working tree.
 
 ## Unit tests
 
 `pytest tests/test_agentic_v2_*.py` in the `roboeval` env: **45/45 passed**
-at commit `42eb33b`.
+at the current commit.
 
-## Phase 9 deterministic gate (`--planner fixed`, no LLM) - PASSED
+## Scope: all nine RoboEval base tasks
 
-All three base tasks clear the plan's 8/10 bar, all at commit `42eb33b`,
-seeds 0-9, `benchmark_success` (RoboEval's raw metric):
+`BASE_TASK_KEYS` now covers every base task the assignment lists:
+`cube_handover`, `lift_pot`, `stack_two_blocks`, `vertical_cube_handover`,
+`lift_tray`, `pack_box`, `pick_single_book`, `stack_single_book_shelf`,
+`rotate_valve`. Two semantic skills were added for the box and the valves
+(`close_flap`, `rotate`); everything else reuses the existing
+grasp/bimanual_grasp/lift/handover/place skills. The LLM still only
+chooses skills; every pose, offset and contact rule below is derived by
+the deterministic layer from measured scene geometry.
 
-| Task | Result | Notes |
-|---|---|---|
-| `lift_pot` | **10/10** | `outputs/det_gate_lift_pot_grasp_policy_regression`; regression gate after the grasp-policy change, unchanged from before |
-| `cube_handover` | **10/10** | `outputs/det_gate_staged_both_seeds0-9`; behavior quality 10/10 |
-| `stack_two_blocks` | **10/10** | same run; behavior quality 0/10 - see the note below |
+## Phase 9 deterministic gate (`--planner fixed`, no LLM) - PASSED, 9/9 tasks
+
+`benchmark_success` (RoboEval's raw metric), seeds 0-9:
+
+| Task | Result | Commit | Notes |
+|---|---|---|---|
+| `lift_pot` | **10/10** | `42eb33b` | `outputs/det_gate_lift_pot_grasp_policy_regression`; seed 3 re-verified at the current tree |
+| `cube_handover` | **10/10** | `42eb33b` | `outputs/det_gate_staged_both_seeds0-9`; seed 3 re-verified at the current tree |
+| `stack_two_blocks` | **10/10** | `42eb33b` | same run; seed 0 re-verified at the current tree; behavior quality 0/10 (see note) |
+| `vertical_cube_handover` | **10/10** | `a4a47f2` | `outputs/det_gate_new_tasks_a`; behavior quality 10/10 |
+| `lift_tray` | **10/10** | `a4a47f2` | same run; behavior quality 10/10 |
+| `pack_box` | **10/10** | `a4a47f2` | `outputs/det_gate_new_tasks_b`; behavior quality 0/10 - RoboEval's `slip_count` registers 1 per trial while the fingertip pushes the flap |
+| `rotate_valve` | **10/10** | `a4a47f2` | same run; behavior quality 0/10 - `env_collision_count` 6 per trial: RoboEval counts the gripper's contact with the valve's own body as an environment collision |
+| `pick_single_book` | **10/10** | current tree | `outputs/det_gate_new_tasks_c`; `no_slip` fails (the book creeps a few degrees in the pinch during the lift) |
+| `stack_single_book_shelf` | **10/10** | current tree | same run |
+
+The base tasks have no pose randomisation (only the handover rods vary
+by seed), so a 10-seed gate mostly checks determinism; the seed-varying
+tasks are `cube_handover`, `vertical_cube_handover` and `stack_two_blocks`.
 
 `stack_two_blocks` behavior-quality note: every trial records exactly one
-robot-environment contact in RoboEval's own `env_collision_count`, and it
-is attributable to a single step in every seed - the receiver's regrasp
-close (`handover` skill, plan `close_left_gripper`). That is the fingertip
-grazing the table by ~0.1 mm while closing on the 4 cm block, which the
-grasp contact policy now deliberately tolerates (up to 4 mm, fingers only)
-because it is normal tabletop picking. The benchmark counts it anyway.
-`cube_handover`'s regrasp lands slightly higher and records 0 across 10
-seeds. Raising the grasp point a few mm for short table-resting objects
-would likely remove the count; it is a metric refinement, not a task
-failure, and has not been done.
+robot-environment contact in RoboEval's own `env_collision_count`, a
+fingertip grazing the table by ~0.1 mm at the receiver's regrasp close on
+the 4 cm block, which the grasp contact policy deliberately tolerates (up
+to 4 mm, fingers only). It is a metric refinement, not a task failure.
 
 Reproduce: `examples/evaluate_agentic_v2.py --launch --methods v2-fixed
 --tasks <task> --seeds 0 1 2 3 4 5 6 7 8 9`.
 
-## What was actually wrong (root causes, measured)
+Recordings of one successful seed-0 run per task (local only, not
+committed - see `results/README.md`):
+- first three tasks: `outputs/gif_success_seed0/v2-fixed/<task>/seed_000/trajectory.gif`
+  (LLM-driven: `outputs/gif_api_success_seed0/v2-full/<task>/seed_000/trajectory.gif`)
+- six new tasks: `outputs/gif_success_seed0_newtasks/v2-fixed/<task>/seed_000/trajectory.gif`
 
-Both previously-failing tasks were traced to physical mechanisms from real
-run data and instrumented executions, not inferred:
+## How each new task is solved (measured geometry, not tuned constants)
 
-- **`cube_handover` - receiver dual-hold**: per-joint tracking of the
-  receiver's lateral, end-on approach put the entire error on the
-  wrist-pitch joint (0.063 rad; every other joint < 0.01) with zero
-  contacts on the arm. That joint has `forcerange +/-12 Nm`, `gain 2000`,
-  so it saturates at 0.006 rad of error: the horizontal-hand pose loads it
-  ~10x past saturation and the hand droops, stopping the fingertips ~4 cm
-  short (measured wrist-cube dY 0.217 vs 0.168 designed). The fingers then
-  close beside the rod (aperture 0.0014 on a 0.040 object) while one pad
-  grazes it - enough for `is_gripper_holding_object()` (a pure pad-contact
-  check, `roboeval/robots/gripper.py:184`) to report "holding", which is
-  then "lost" during the hold. The executor's 0.30 rad joint-space success
-  tolerance masked the shortfall. Top-down for both arms was separately
-  measured to self-collide at the pregrasp stand-off (two hands cannot
-  share the airspace above a 20 cm object). The donor's vertical-hand
-  grasp puts no gravity moment on that joint and never once lost hold.
-- **`stack_two_blocks` - staged regrasp**: the receiver's regrasp close was
-  rejected for `robot:left:finger <-> scene:table` at -0.1 mm - a
-  fingertip grazing the support surface while closing on a 4 cm block.
+- **vertical_cube_handover** - the rod starts standing on end and drops 5 cm
+  onto the table during the first settle. The grasp candidates are now
+  computed *after* the open-gripper settle, tall objects are pinched
+  `0.028 m` below their top (the palm face sits `0.035 m` above the pad
+  centres - a 0.035 inset put the palm on the rod), and the staged
+  handover uses the world-vertical half extent (0.10 m for the standing
+  rod, not `canonical_size[2]/2 = 0.02`) to set it back down.
+- **lift_tray** - both arms pinch the two long rim walls (2.6 cm thick,
+  10 cm tall, at body-frame `x = +/-0.266`) from above, 3 cm below the
+  top edge; the wall at larger world y goes to the left arm. Lift tilt is
+  now measured as the change from the resting orientation (the tray's
+  body Y is up, so the old body-Z tilt test was meaningless).
+- **pack_box** - `close_flap`: the closed fingertip sweeps an arc of radius
+  0.12 m about each flap's hinge, from just below the open flap to
+  ~177 degrees, with the hand *trailing* the motion (fingers pointing along
+  the arc's tangent, pitch clamped at 40 degrees up). A hand pointing
+  straight down sits in the open flap's plane and cannot get under it
+  (-8.7 mm palm/flap penetration at the first waypoint). The joint anchor
+  sits at one *end* of the hinge (x = 0.386 for the left flap); the arc is
+  centred on the plate's projection onto the hinge line instead, which is
+  what the left arm needed (elbow at its limit otherwise). The right arm
+  closes the flap on its side first, then the left. Each flap's normalised
+  state ends at ~0.0003 (right) / ~-0.08 (left) against RoboEval's 0.1 bar.
+- **rotate_valve** - `rotate`: the handwheel is a horizontal 6.2 cm disc,
+  2.8 cm tall, with a vertical revolute joint (damping 0.01) on a 250 kg
+  base. The arm pinches it from above (pads 6 mm above the wheel centre so
+  the fingertips clear the valve body), twists the wrist about world +Z in
+  0.35 rad steps until the normalised state passes 0.16 (RoboEval needs
+  > 0.10), and can let go, wind back and re-grip if a wrist joint runs out
+  of travel. The task's success is polled inside each twist without
+  stopping the twist early (a 0.1002 result was measured when the executor
+  stopped on success mid-twist).
+- **pick_single_book / stack_single_book_shelf** - the book is **4 kg**
+  (`book/book` body mass), lies flat on the counter (16.5 x 9.5 x 3.1 cm)
+  and overhangs the counter's front edge by 3.3 cm. No top-down pinch fits
+  the 8 cm aperture, so it is pinched across its thickness at the
+  overhanging short edge with a horizontal hand (`edge_grasp`
+  candidates). Pinched 1.3 cm in, the 6.9 cm lever puts ~2.7 Nm on two
+  2 cm pads and the book creeps in the grip (2.8 cm rise for a 9 cm hand
+  rise); standing it up over the pinch or raising it flat both saturate
+  the 12 Nm wrist-pitch actuator (measured 0.15-0.29 rad steady error,
+  hand sinking 10 cm). What works: with the book still on the counter,
+  drag it back until ~7 cm overhangs (the pads slip along it, so the drag
+  is repeated on the live overhang), open, slide the fingers 4.2 cm under
+  the overhang and re-grip so the book's edge butts against the palm
+  (that palm contact is now an allowed carry contact), then verify-lift.
+  Placement keeps the flat resting orientation, leaves `depth + 1.2 cm`
+  of the book overhanging the shelf's front edge so the lower finger never
+  lands on the plank, lowers until the book touches `object:lower_shelf`,
+  releases, and backs the hand straight out before retreating upward. The
+  shelf planks are exposed to the planner as fixed objects
+  (`lower_shelf`, `upper_shelf`, `fixed: true`) so `place` can target
+  `on:lower_shelf`; the counter is labelled `scene:table`.
 
-Fixes (`42eb33b`): objects up to 0.30 m are handed over by the staged
-place-then-regrasp route (donor sets the object down at a recorded resting
-height, clears to its own side, receiver picks it up top-down), so both
-arms only ever use the vertical-hand grasp they are verified on;
-`CubeHandover._success` only requires the final holder to be the
-receiver, so setting the rod down mid-handover is allowed. Fingertip-table
-contact is tolerated at 4 mm during grasps via a per-rule tolerance on
-`AllowedContactRule`. The receiver-close check additionally requires the
-aperture to be at least half the object's width across the gap, so a
-fingers-closed-beside-the-object graze is an immediate `GRASP_FAILED`.
-The dual-hold path remains for objects larger than 0.30 m and is not
-exercised by the base tasks.
+## Robustness fixes that fell out of the new tasks (all measured)
 
-Earlier fixes still in place: rendezvous height table clearance
-(`84ad0a8`), receiver idle-drift nudge (`84ad0a8`), hold/slip debounce
-(`3cfd536`), removal of the premature pad-contact `stop_condition` from
-both handover (`19aaa41`) and `GraspSkill` (`2cee8eb`) approaches.
-
-Recordings of one successful seed-0 run per task at this commit (local
-only, not committed - see `results/README.md`):
-- deterministic fixed plan: `outputs/gif_success_seed0/v2-fixed/<task>/seed_000/trajectory.gif`
-- LLM-driven (`v2-full`, OpenAI): `outputs/gif_api_success_seed0/v2-full/<task>/seed_000/trajectory.gif`
-  (all three `benchmark_success=1.0`; the `stack_two_blocks` one shows the
-  online replan from a rejected direct `place` to `handover` then `place`)
+- **Idle-arm ratchet.** Every plan re-anchored the idle arm at its
+  *measured* joints; position servos settle a few mm below target under
+  gravity, so the idle hand walked downward plan after plan (7 cm over
+  ~250 steps in `pack_box`) until it rested on the box and vetoed every
+  plan for the working arm. IK seeds and hold plans now use the last
+  *commanded* joints (`JointActionAdapter.last_commanded`).
+- **Convergence wait.** The executor holds the final plan point until the
+  joints are within 0.03 rad (up to 40 extra steps): a torque-limited
+  joint lags a ramp well inside the 0.3 rad tracking tolerance yet left
+  the hand ~10 cm short of a 17 cm raise.
+- **Closed fingers are not a self-collision.** With the gripper fully
+  closed on nothing the two finger pads touch; that was rejecting every IK
+  candidate for the flap push.
+- **Idle arm parked.** Single-arm skills (`rotate`, `close_flap`) raise the
+  idle arm 5 cm first; in the valve scene both hands start 1 cm above the
+  two wheels.
+- **`canonical_size` honours per-geom placement** inside the body (the
+  book mesh is rotated 90 degrees in its body; the tray is nine offset
+  geoms; the pot's handles are now included: 0.39 x 0.52 x 0.22 m).
+- **Fixture-aware skills.** `grasp`/`lift`/`handover` refuse `fixed`
+  objects; `_resting_surface_z` ignores them; the prompt tells the LLM
+  what `fixed` means.
 
 ## API / LLM runs
 
-Earlier informal 3x3 OpenAI runs (`4ef7084`, `b8ac7dc`, model
-`gpt-5.6-terra`) predate the fixes above: `lift_pot` 3/3 both times;
-`cube_handover` and `stack_two_blocks` hit `max_skills=10` on every trial
-(`TIMEOUT`, ~7.7 replans/trial) for exactly the mechanisms above. The
-first run also lost 5/9 trials to `APIConnectionError`, since fixed with
-a transient-error retry in `llm_planner.py`. No cost-per-million flags
-were set, so `llm_cost_usd` is null in those; token counts are recorded.
-
-**Formal run at `42eb33b` - 30/30**: `v2-full` (full feasibility gate,
-online replan, no cross-trial memory), 3 tasks x seeds 0-9, OpenAI
-`gpt-5.6-terra`, 0 connection errors, ~303k tokens total. Summary in
-`results/openai-full_42eb33b_seeds0-9_20260905.json`; full traces in
-`outputs/openai-full_42eb33b_seeds0-9_20260905`.
+**Formal run at `42eb33b` - 30/30** (`v2-full`, OpenAI `gpt-5.6-terra`,
+seeds 0-9, first three tasks). Summary in
+`results/openai-full_42eb33b_seeds0-9_20260905.json`.
 
 | Task | `benchmark_success` | mean LLM calls | mean replans | env/self collisions, slip |
 |---|---|---|---|---|
@@ -121,13 +167,11 @@ online replan, no cross-trial memory), 3 tasks x seeds 0-9, OpenAI
 | `lift_pot` | 10/10 | 3.0 | 1.0 | 0 / 0 / 0 |
 | `stack_two_blocks` | 10/10 | 6.9 | 3.4 | 1 / 0 / 0 |
 
-`stack_two_blocks` is the only task where the LLM genuinely replans: it
-first requests a direct cross-workspace `place`, which the feasibility
-gate rejects, and then chooses `handover` followed by `place` - the
-0.7 m single-arm-carry problem the plan anticipated, resolved online
-rather than by a scripted hint. Its behavior-quality rate is 0/10 for
-the same reason as the deterministic gate (one fingertip-table graze at
-the regrasp close, counted by RoboEval's `env_collision_count`).
+The six new tasks' formal OpenAI run is launched from the commit that
+records their deterministic gate; its summary is added to `results/` and
+this table when it finishes. (A first attempt from a `git worktree` at
+`a4a47f2` failed before the first trial for the untracked-XML reason noted
+under Environment, and was discarded.)
 
 Not yet run: the other ablation rows in `METHOD_SPECS` (`v2-ik-only`,
 `v2-fixed` via the API launcher, `v2-full-no-replan`, `v2-full-memory`)

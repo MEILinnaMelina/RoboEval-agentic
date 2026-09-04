@@ -60,7 +60,10 @@ class TransportSkill(BaseSkill):
             or capture_attachment(state, object_name, side)
             for side in holders
         )
-        constraints = held_constraints(object_name, attachments)
+        constraints = held_constraints(
+            object_name, attachments,
+            extra_rules=self.context.carry_contact_rules.get(object_name, ()),
+        )
         execution, ik_result, path_result = self.move(
             name=f"transport_{object_name}",
             targets=ee_targets_for_object_pose(target, attachments),

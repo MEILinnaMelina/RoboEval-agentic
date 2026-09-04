@@ -56,6 +56,11 @@ class SkillContext:
     # of the object overhanging the support so the lower finger clears it.
     carry_modes: dict[str, str] = field(default_factory=dict)
     edge_pinch_depths: dict[str, float] = field(default_factory=dict)
+    # Extra contact rules that hold for as long as an object is carried a
+    # particular way (an edge-pinched book butts against the palm, which
+    # is what makes the pinch rigid - that palm contact must stay allowed
+    # through lifts, transports and placements).
+    carry_contact_rules: dict[str, tuple[AllowedContactRule, ...]] = field(default_factory=dict)
 
     @classmethod
     def create(

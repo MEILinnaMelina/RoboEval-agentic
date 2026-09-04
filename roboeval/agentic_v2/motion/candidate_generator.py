@@ -47,6 +47,9 @@ TALL_OBJECT_TOP_INSET = 0.028
 FLAT_OBJECT_MAX_THICKNESS = 0.045
 EDGE_GRASP_MINIMUM_OVERHANG = 0.025
 EDGE_GRASP_PAD_INSET = 0.013
+# Deepest pad inset before the object's edge meets the palm (measured on
+# the book: a 4.2 cm inset just grazes it).
+EDGE_GRASP_DEEP_INSET = 0.042
 
 
 class CandidateGenerator:

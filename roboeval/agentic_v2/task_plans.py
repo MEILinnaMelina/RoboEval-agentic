@@ -136,12 +136,6 @@ _FIXED_PLANS: dict[str, tuple[SkillRequest, ...]] = {
             strategy="nearest_arm",
         ),
         SkillRequest(
-            SkillName.LIFT,
-            object_name="book",
-            goal="clear_table",
-            strategy="clear_table",
-        ),
-        SkillRequest(
             SkillName.PLACE,
             object_name="book",
             goal="on:lower_shelf",
