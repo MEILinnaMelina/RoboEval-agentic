@@ -66,14 +66,40 @@ def test_forbidden_live_contact_interrupts_immediately() -> None:
 
 def test_lost_grasp_interrupts_before_transport_continues() -> None:
     attachment = HeldObjectAttachment("cube", "right", Pose.identity())
-    event = ExecutionMonitor(FakeChecker()).evaluate(
+    monitor = ExecutionMonitor(FakeChecker())
+    event = None
+    for step in range(monitor.config.hold_patience):
+        event = monitor.evaluate(
+            step=step,
+            target_joints=np.zeros(14),
+            state=state(held_by=()),
+            constraints=ConstraintSet(held_objects=(attachment,)),
+        )
+    assert event is not None
+    assert event.code is FailureCode.SLIP_DETECTED
+
+
+def test_single_step_hold_blip_does_not_interrupt() -> None:
+    # A momentary "not holding" reading below patience must not fail the
+    # grasp - only a loss that persists should (see test above).
+    attachment = HeldObjectAttachment("cube", "right", Pose.identity())
+    monitor = ExecutionMonitor(FakeChecker())
+    event = monitor.evaluate(
         step=0,
         target_joints=np.zeros(14),
         state=state(held_by=()),
         constraints=ConstraintSet(held_objects=(attachment,)),
     )
-    assert event is not None
-    assert event.code is FailureCode.SLIP_DETECTED
+    assert event is None
+    # And recovering resets the counter rather than carrying it forward.
+    event = monitor.evaluate(
+        step=1,
+        target_joints=np.zeros(14),
+        state=state(held_by=("right",)),
+        constraints=ConstraintSet(held_objects=(attachment,)),
+    )
+    assert event is None
+    assert monitor._hold_failures == 0
 
 
 def test_protected_object_displacement_interrupts() -> None:

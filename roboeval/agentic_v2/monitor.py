@@ -25,6 +25,7 @@ class MonitorConfig:
     maximum_joint_velocity: float = 8.0
     velocity_patience: int = 3
     protected_object_tolerance: float = 0.025
+    hold_patience: int = 3
 
 
 class ExecutionMonitor:
@@ -40,6 +41,7 @@ class ExecutionMonitor:
     def reset(self) -> None:
         self._tracking_failures = 0
         self._velocity_failures = 0
+        self._hold_failures = 0
 
     def evaluate(
         self,
@@ -86,8 +88,13 @@ class ExecutionMonitor:
             )
 
         if require_holds:
+            # A weak-but-real grip can read as momentarily "not holding" for
+            # a single physics step without actually having slipped -
+            # tracking error and velocity above already debounce the same
+            # way; a hold check with zero patience was the odd one out.
             hold_event = self._check_attachments(step, state, constraints)
-            if hold_event is not None:
+            self._hold_failures = self._hold_failures + 1 if hold_event is not None else 0
+            if self._hold_failures >= self.config.hold_patience:
                 return hold_event
 
         for name, reference in (protected_objects or {}).items():
