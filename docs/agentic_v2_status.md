@@ -167,11 +167,35 @@ seeds 0-9, first three tasks). Summary in
 | `lift_pot` | 10/10 | 3.0 | 1.0 | 0 / 0 / 0 |
 | `stack_two_blocks` | 10/10 | 6.9 | 3.4 | 1 / 0 / 0 |
 
-The six new tasks' formal OpenAI run is launched from the commit that
-records their deterministic gate; its summary is added to `results/` and
-this table when it finishes. (A first attempt from a `git worktree` at
+**Formal run at `b93f1bf` - 60/60** (`v2-full`, OpenAI `gpt-5.6-terra`,
+seeds 0-9, the six new tasks, clean tree, 0 connection errors). Summary in
+`results/openai-full_b93f1bf_seeds0-9_20260905.json`; full traces in
+`outputs/openai-full_b93f1bf_seeds0-9_20260905`.
+
+| Task | `benchmark_success` | mean LLM calls | mean replans | behavior quality |
+|---|---|---|---|---|
+| `vertical_cube_handover` | 10/10 | 2.0 | 0.0 | 10/10 |
+| `lift_tray` | 10/10 | 1.0 | 0.0 | 10/10 |
+| `pack_box` | 10/10 | 2.0 | 0.0 | 0/10 (slip metric, see gate note) |
+| `rotate_valve` | 10/10 | 3.8 | 0.0 | 0/10 (env-collision metric, see gate note) |
+| `pick_single_book` | 10/10 | 3.0 | 1.0 | 10/10 |
+| `stack_single_book_shelf` | 10/10 | 3.0 | 0.6 | 9/10 |
+
+What the LLM actually did: `lift_tray` is one `bimanual_grasp` (the tray
+task's success does not require the lift - both holds plus no table
+contact - and the verification lift already clears it); `pack_box` is two
+`close_flap` requests, right arm then left; `rotate_valve` usually issues
+a `grasp` on the wheel before `rotate` (harmless - the wheel cannot lift,
+but the grasp verifies within tolerance); `pick_single_book`'s first
+`lift` reports a short rise (the 4 kg book sags in the pinch) and the
+replan repeats it to the benchmark height; `stack_single_book_shelf` goes
+`grasp -> place` directly in half the seeds and via a `lift`/`transport`
+in the rest. (A first attempt at this run from a `git worktree` at
 `a4a47f2` failed before the first trial for the untracked-XML reason noted
 under Environment, and was discarded.)
+
+Together with the `42eb33b` run above that is **90/90 across all nine base
+tasks** with the LLM planner, and 90/90 for the deterministic gate.
 
 Not yet run: the other ablation rows in `METHOD_SPECS` (`v2-ik-only`,
 `v2-fixed` via the API launcher, `v2-full-no-replan`, `v2-full-memory`)

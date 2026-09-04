@@ -1,0 +1,153 @@
+{
+  "cross_trial_memory": false,
+  "date": "2026-09-05",
+  "feasibility_gate": "full",
+  "git_commit": "b93f1bfc69e29e694330f355311a2e96410998c5",
+  "git_dirty": false,
+  "max_skills": 10,
+  "method": "v2-full",
+  "model": "gpt-5.6-terra",
+  "note": "Six new base tasks (vertical_cube_handover, lift_tray, pack_box, pick_single_book, stack_single_book_shelf, rotate_valve) at b93f1bf; llm_cost_usd is null because no --input/--output-cost-per-million was set; token counts are exact.",
+  "online_replan": true,
+  "provider": "openai",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "tasks": {
+    "lift_tray": {
+      "behavior_quality_rate": 1,
+      "mean_env_collision_count": 0.0,
+      "mean_llm_calls": 1.0,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 0.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 18973,
+      "trials": 10
+    },
+    "pack_box": {
+      "behavior_quality_rate": 0,
+      "mean_env_collision_count": 0.0,
+      "mean_llm_calls": 2.0,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 0.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 1.0,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 50178,
+      "trials": 10
+    },
+    "pick_single_book": {
+      "behavior_quality_rate": 1,
+      "mean_env_collision_count": 0.0,
+      "mean_llm_calls": 3.0,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 1.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 75951,
+      "trials": 10
+    },
+    "rotate_valve": {
+      "behavior_quality_rate": 0,
+      "mean_env_collision_count": 9.2,
+      "mean_llm_calls": 3.8,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 0.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 104044,
+      "trials": 10
+    },
+    "stack_single_book_shelf": {
+      "behavior_quality_rate": 0.9,
+      "mean_env_collision_count": 0.0,
+      "mean_llm_calls": 3.0,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 0.6,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.1,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 76500,
+      "trials": 10
+    },
+    "vertical_cube_handover": {
+      "behavior_quality_rate": 1,
+      "mean_env_collision_count": 0.0,
+      "mean_llm_calls": 2.0,
+      "mean_llm_cost_usd": null,
+      "mean_replans": 0.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "success_ci95": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "success_rate": 1.0,
+      "successes": 10,
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "total_tokens": 44158,
+      "trials": 10
+    }
+  }
+}

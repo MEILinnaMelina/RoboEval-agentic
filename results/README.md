@@ -38,5 +38,5 @@ results from another's; a version-number suffix stops meaning anything once
 there have been several rounds of fixes. See `docs/agentic_v2_status.md` for
 the single source of truth on what's currently verified.
 
-This directory is empty as of this commit - no formal run (deterministic
-10-seed gate or API) has produced a result meeting this bar yet.
+Formal runs recorded so far: `openai-full_42eb33b_seeds0-9_20260905.json`
+(first three base tasks, 30/30) and `openai-full_b93f1bf_seeds0-9_20260905.json` (six new base tasks, 60/60).
