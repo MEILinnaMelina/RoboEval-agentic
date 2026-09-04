@@ -90,20 +90,19 @@ class GraspSkill(BaseSkill):
         reports.append(pre_execution)
 
         approach_constraints = ConstraintSet(allowed_contacts=candidate.contact_policy)
-        terminal_constraints = ConstraintSet(
-            allowed_contacts=AllowedContactPolicy(
-                rules=candidate.contact_policy.rules,
-                penetration_tolerance=0.02,
-            )
-        )
+        # No stop_condition: is_gripper_holding_object() is a pure
+        # pad-contact check with no requirement that the gripper be closed
+        # or gripping firmly (roboeval/robots/gripper.py:184), so an early
+        # stop on "first contact" can leave the wrist short of the
+        # precisely-computed grasp pose - most visible for objects resting
+        # close to a support surface, where the shortfall leaves fingers
+        # nearer the table on close. Travel the full planned path instead.
         approach, approach_ik, approach_path = self.move(
             name=f"{candidate.name}_approach",
             targets={side: candidate.grasp_pose},
             constraints=approach_constraints,
             protected_objects=protected,
             require_holds=False,
-            stop_condition=lambda state: side in state.objects[object_name].held_by,
-            terminal_constraints=terminal_constraints,
         )
         evidence = self._evidence(candidate.name, "approach", approach, approach_ik, approach_path)
         if approach is None or not approach.success:
