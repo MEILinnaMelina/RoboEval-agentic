@@ -87,6 +87,21 @@ Treat `cube_handover`/`stack_two_blocks` API results accordingly: a low
 success rate there is expected to partly reflect the known grip issues
 above, not purely LLM planning quality, until those are fixed.
 
+A second, clean formal 3-task x 3-seed run at commit `b8ac7dc` (all 9
+trials completed without a connection error this time) confirms the
+prediction above rather than contradicting it: `lift_pot` 3/3 (3.0 mean
+LLM calls, 1.0 mean replans - straightforward), `cube_handover` 0/3 and
+`stack_two_blocks` 0/3, both hitting `max_skills=10` every single trial
+(10.0 mean LLM calls, ~7.7 mean replans) with `TIMEOUT`. Every
+`cube_handover` trial shows `reached_transfer_stage: true` (the slip
+issue, not a planning failure); every `stack_two_blocks` trial plateaus
+at `subtask_progress=0.33` ("one block held", never further) consistent
+with the regrasp `ENV_COLLISION`. The LLM is visibly working hard to
+recover (~7-8 replans/trial) against a pipeline that cannot currently
+deliver a successful handover for these two tasks - fixing the grip
+issues remains the highest-leverage next step for these two tasks'
+success rate, not further prompt/planning changes.
+
 ## Experiment naming convention
 
 Formal runs are named `{method}_{commit_short}_seeds{range}[_{date}]`, e.g.
