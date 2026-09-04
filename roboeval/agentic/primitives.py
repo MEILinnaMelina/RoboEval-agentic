@@ -186,6 +186,10 @@ class PrimitiveController:
             steps,
             pos_tolerance,
             f"align_{side.name.lower()}_to_{object_name}",
+            # P22: protect the target object from being shoved/displaced by
+            # an approach that isn't actually gripping it yet - see
+            # docs/phase8_success_rate_debug_log.md P22.
+            protect_object=(object_name, objects[object_name]),
         )
 
     def grasp_object(
@@ -336,6 +340,8 @@ class PrimitiveController:
         steps: int,
         pos_tolerance: float,
         name: str,
+        *,
+        protect_object: tuple[str, Any] | None = None,
     ) -> PrimitiveResult:
         start = self.current_ee_pose()
         target = start.copy()
@@ -348,6 +354,7 @@ class PrimitiveController:
             pos_tolerance=pos_tolerance,
             name=name,
             sides=[side],
+            protect_object=protect_object,
         )
 
     # Abort a primitive early if it causes this many *new* self-collision
@@ -357,6 +364,17 @@ class PrimitiveController:
     # step budget while repeatedly hitting itself. See
     # docs/phase8_success_rate_debug_log.md P18/P19.
     _MAX_NEW_SELF_COLLISIONS_PER_PRIMITIVE = 3
+
+    # P22: if the object we're approaching (but not yet gripping) moves more
+    # than this during the approach, we're shoving it, not missing it -
+    # abort rather than let a longer step budget push it further/off the
+    # table. Calibrated against a real successful grasp attempt, which
+    # legitimately jostles the object ~0.03m while closing in before making
+    # stable contact (measured directly, not guessed) - set well above that
+    # (safety margin) but far below the >=0.2m displacement seen in the
+    # real trials where the object was actually knocked away. See
+    # docs/phase8_success_rate_debug_log.md P22.
+    _MAX_OBJECT_BUMP_DISPLACEMENT = 0.08
 
     def _collision_breaker_tripped(self, start_self_collision: int) -> bool:
         current = int(self._last_info.get("self_collision_count", 0))
@@ -371,10 +389,16 @@ class PrimitiveController:
         pos_tolerance: float,
         name: str,
         sides: list[HandSide],
+        protect_object: tuple[str, Any] | None = None,
     ) -> PrimitiveResult:
         steps_done = 0
         start_self_collision = int(self._last_info.get("self_collision_count", 0))
         aborted_collision = False
+        aborted_object_bump = False
+        protect_start_pos = None
+        if protect_object is not None:
+            _, protect_obj = protect_object
+            protect_start_pos = get_object_position(protect_obj).copy()
         for alpha in np.linspace(0.0, 1.0, max(1, steps)):
             pose = start + (target - start) * alpha
             self._step_with_pose(pose)
@@ -384,6 +408,12 @@ class PrimitiveController:
             if self._collision_breaker_tripped(start_self_collision):
                 aborted_collision = True
                 break
+            if protect_start_pos is not None:
+                _, protect_obj = protect_object
+                bump = float(np.linalg.norm(get_object_position(protect_obj) - protect_start_pos))
+                if bump >= self._MAX_OBJECT_BUMP_DISPLACEMENT:
+                    aborted_object_bump = True
+                    break
 
         current = self.current_ee_pose()
         distances = {}
@@ -401,6 +431,16 @@ class PrimitiveController:
                 steps_done,
                 "aborted early: self-collision increased rapidly during this move",
                 "Choose a different offset/target, or move one arm out of the way first before retrying.",
+                distances=distances,
+            )
+        if aborted_object_bump:
+            object_name = protect_object[0] if protect_object is not None else "object"
+            return self._result(
+                name,
+                False,
+                steps_done,
+                f"aborted early: {object_name} was displaced during approach (likely bumped, not gripped)",
+                "Back off and retry with a different ee_offset or approach angle, rather than continuing toward the same point.",
                 distances=distances,
             )
         return self._result(
