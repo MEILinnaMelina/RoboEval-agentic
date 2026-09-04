@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from roboeval.agentic_v2.skills.base import SkillContext
 from roboeval.agentic_v2.skills.bimanual_grasp import BimanualGraspSkill
+from roboeval.agentic_v2.skills.close_flap import CloseFlapSkill
 from roboeval.agentic_v2.skills.grasp import GraspSkill
 from roboeval.agentic_v2.skills.handover import HandoverSkill
 from roboeval.agentic_v2.skills.lift import LiftSkill
 from roboeval.agentic_v2.skills.place import PlaceSkill
+from roboeval.agentic_v2.skills.rotate import RotateSkill
 from roboeval.agentic_v2.skills.transport import TransportSkill
 from roboeval.agentic_v2.types import SkillName, SkillRequest, SkillResult
 
@@ -23,6 +25,8 @@ class SkillRegistry:
             SkillName.TRANSPORT: TransportSkill(context),
             SkillName.HANDOVER: HandoverSkill(context),
             SkillName.PLACE: PlaceSkill(context),
+            SkillName.CLOSE_FLAP: CloseFlapSkill(context),
+            SkillName.ROTATE: RotateSkill(context),
         }
 
     def execute(self, request: SkillRequest) -> SkillResult:
@@ -33,4 +37,3 @@ class SkillRegistry:
         except KeyError as error:
             raise ValueError(f"unsupported semantic skill {request.skill.value!r}") from error
         return skill.execute(request)
-

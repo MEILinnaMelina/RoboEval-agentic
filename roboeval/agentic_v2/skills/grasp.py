@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from typing import Any
 
+import numpy as np
+from scipy.spatial.transform import Rotation
+
 from roboeval.agentic_v2.executor import CLOSE_COMMAND, OPEN_COMMAND
-from roboeval.agentic_v2.state import capture_attachment, collect_scene_state
+from roboeval.agentic_v2.motion.candidate_generator import EDGE_GRASP_PAD_INSET
+from roboeval.agentic_v2.state import capture_attachment, collect_scene_state, vertical_half_extent
 from roboeval.agentic_v2.types import (
     AllowedContactPolicy,
     AllowedContactRule,
@@ -29,6 +33,11 @@ class GraspSkill(BaseSkill):
             return self.failure(
                 request, state, FailureCode.PRECONDITION_FAILED,
                 f"object {object_name!r} is unavailable", [],
+            )
+        if state.objects[object_name].fixed:
+            return self.failure(
+                request, state, FailureCode.INVALID_REQUEST,
+                f"{object_name} is a fixed scene part and cannot be grasped", [],
             )
         side = self._select_side(request, state)
         if side in state.objects[object_name].held_by:
@@ -60,8 +69,16 @@ class GraspSkill(BaseSkill):
         settled = open_report.final_state.objects.get(object_name)
         if settled is not None and not settled.held_by:
             self.context.resting_surfaces[object_name] = float(
-                settled.pose.position[2] - settled.canonical_size[2] / 2.0
+                settled.pose.position[2] - vertical_half_extent(settled)
             )
+            self.context.resting_orientations[object_name] = tuple(settled.pose.quaternion_wxyz)
+        # Re-derive the candidates from the settled pose: some tasks spawn
+        # the object above its support (the standing rod starts 5 cm in the
+        # air), and a grasp planned against the pre-settle pose would close
+        # above the object.
+        candidates = self.context.candidates.grasp_candidates(
+            object_name, side, open_report.final_state
+        ) or candidates
 
         for candidate in candidates:
             result = self._attempt(request, candidate, reports)
@@ -138,11 +155,21 @@ class GraspSkill(BaseSkill):
             return None, evidence
 
         attachment = capture_attachment(grasped, object_name, side)
-        verified = self._verify_lift(candidate, attachment, reports)
-        if verified is None:
-            self._record_recovery(reports, side, open_first=True, constraints=approach_constraints)
-            evidence.update({"stage": "verify_lift", "failure": FailureCode.SLIP_DETECTED.value})
-            return None, evidence
+        if candidate.edge_grasp and self.context.consolidate_edge_grasps:
+            # Deepen the pinch while the object still rests on its support
+            # (ends with its own verification lift).
+            consolidated = self._consolidate_edge_grasp(candidate, attachment, reports)
+            if consolidated is None:
+                self._record_recovery(reports, side, open_first=True, constraints=approach_constraints)
+                evidence.update({"stage": "consolidate", "failure": FailureCode.SLIP_DETECTED.value})
+                return None, evidence
+            attachment = capture_attachment(collect_scene_state(self.env), object_name, side)
+        else:
+            verified = self._verify_lift(candidate, attachment, reports)
+            if verified is None:
+                self._record_recovery(reports, side, open_first=True, constraints=approach_constraints)
+                evidence.update({"stage": "verify_lift", "failure": FailureCode.SLIP_DETECTED.value})
+                return None, evidence
         self.context.attachments[(object_name, side)] = attachment
         final_state = collect_scene_state(self.env)
         return SkillResult(
@@ -162,6 +189,16 @@ class GraspSkill(BaseSkill):
             (current.position[0], current.position[1], current.position[2] + 0.025),
             current.quaternion_wxyz,
         )
+        if candidate.edge_grasp:
+            # An edge grasp holds a thin object overhanging its support; a
+            # pure vertical lift is fine there too, but pull back a little
+            # along the approach as well so the lower finger clears the
+            # support's front edge rather than scraping up along it.
+            approach = np.asarray(candidate.approach_axis, dtype=float)
+            target = Pose(
+                tuple(np.asarray(target.position) - 0.01 * approach),
+                target.quaternion_wxyz,
+            )
         departure_policy = AllowedContactPolicy(
             rules=candidate.contact_policy.rules
             + (
@@ -192,6 +229,116 @@ class GraspSkill(BaseSkill):
             return None
         return execution
 
+    def _consolidate_edge_grasp(self, candidate, attachment, reports):
+        """Deepen an edge pinch by dragging the object further off its
+        support and re-gripping closer to its center.
+
+        The book is 4 kg. Pinched flat at one short edge (1.3 cm pad inset,
+        6.9 cm lever to its center) the gravity moment is ~2.7 Nm, far past
+        what two 2 cm pads resist by friction, so it creeps inside the grip
+        during any lift (measured: 2.8 cm rise for a 9 cm hand rise). Both
+        ways of re-orienting it were measured to saturate the 12 Nm
+        wrist-pitch joint (standing it over the pinch: 0.29 rad steady
+        error; raising it flat: hand sinking 10 cm). What does work is a
+        shorter lever: with the object still resting on its support (which
+        carries the weight), drag it back so ~8 cm overhangs, let go, slide
+        the open fingers 6 cm under the overhang and re-grip; the moment is
+        then ~0.9 Nm and the flat carry keeps the load within the wrist's
+        limits. The object's center stays over the support the whole time."""
+
+        side = candidate.side
+        object_name = candidate.object_name
+        approach = np.asarray(candidate.approach_axis, dtype=float)
+        approach[2] = 0.0
+        approach /= max(np.linalg.norm(approach), 1e-9)
+        policy = AllowedContactPolicy(
+            rules=candidate.contact_policy.rules
+            + (
+                AllowedContactRule(f"object:{object_name}", "scene:*table*", penetration_tolerance=0.02),
+                AllowedContactRule(f"object:{object_name}", "scene:cabinet_*", penetration_tolerance=0.02),
+            ),
+            penetration_tolerance=0.012,
+        )
+        drag_constraints = ConstraintSet(
+            allowed_contacts=policy,
+            held_objects=(attachment,),
+            position_tolerance=0.05,
+            orientation_tolerance=0.5,
+        )
+        state = collect_scene_state(self.env)
+        obj = state.objects[object_name]
+        # Overhang after the drag leaves the object's center this far
+        # inside the support edge; the pads then sit `depth` in from the
+        # object's near edge.
+        length = float(np.abs(np.asarray(obj.pose.as_matrix())[:3, :3].T @ approach) @ np.asarray(obj.canonical_size))
+        margin = 0.012
+        depth = min(0.06, length / 2.0 - margin - 0.012)
+        # The object currently overhangs its support by the candidate
+        # generator's minimum-or-better; the pads must end up `depth` in
+        # with the lower finger still clear of the support edge.
+        overhang = self.context.candidates.edge_overhang(object_name, state)
+        needed = depth + 0.012 + margin
+        drag = max(0.0, needed - overhang) if overhang is not None else 0.0
+        current = state.robot.arms[side].ee_pose
+        if drag > 0.005:
+            # The object still rests on its support, which carries the
+            # weight during the drag.
+            drag_target = Pose(
+                tuple(np.asarray(current.position) - drag * approach),
+                current.quaternion_wxyz,
+            )
+            dragged, _, _ = self.move(
+                name=f"{candidate.name}_deepen_drag",
+                targets={side: drag_target},
+                constraints=drag_constraints,
+                require_holds=True,
+                candidate_count=7,
+            )
+            if dragged is not None:
+                reports.append(dragged)
+            if dragged is None or not dragged.success:
+                return None
+        free = ConstraintSet(allowed_contacts=AllowedContactPolicy(policy.rules, 0.02))
+        opened = self.context.executor.command_gripper(side, OPEN_COMMAND, constraints=free)
+        reports.append(opened)
+        if not opened.success:
+            return None
+        current = collect_scene_state(self.env).robot.arms[side].ee_pose
+        advance = depth - EDGE_GRASP_PAD_INSET
+        deeper_target = Pose(
+            tuple(np.asarray(current.position) + advance * approach),
+            current.quaternion_wxyz,
+        )
+        state = collect_scene_state(self.env)
+        protected = {object_name: state.objects[object_name].pose}
+        advanced, _, _ = self.move(
+            name=f"{candidate.name}_deepen_advance",
+            targets={side: deeper_target},
+            constraints=ConstraintSet(allowed_contacts=candidate.contact_policy),
+            protected_objects=protected,
+            require_holds=False,
+            candidate_count=7,
+        )
+        if advanced is not None:
+            reports.append(advanced)
+        if advanced is None or not advanced.success:
+            return None
+        closed = self.context.executor.command_gripper(
+            side, CLOSE_COMMAND, steps=16,
+            constraints=ConstraintSet(allowed_contacts=candidate.contact_policy),
+        )
+        reports.append(closed)
+        grasped = collect_scene_state(self.env)
+        if not closed.success or side not in grasped.objects[object_name].held_by:
+            return None
+        new_attachment = capture_attachment(grasped, object_name, side)
+        verified = self._verify_lift(candidate, new_attachment, reports)
+        if verified is None:
+            return None
+        self.context.carry_modes[object_name] = f"edge:{depth:.3f}"
+        self.context.edge_pinch_depths[object_name] = float(depth)
+        return verified
+
     def _record_recovery(
         self,
         reports,
@@ -201,18 +348,29 @@ class GraspSkill(BaseSkill):
         constraints: ConstraintSet | None = None,
     ) -> None:
         if open_first:
+            lenient = (
+                ConstraintSet(
+                    allowed_contacts=AllowedContactPolicy(
+                        rules=constraints.allowed_contacts.rules,
+                        penetration_tolerance=0.02,
+                    )
+                )
+                if constraints is not None
+                else None
+            )
             opened = self.context.executor.command_gripper(
                 side,
                 OPEN_COMMAND,
-                constraints=constraints,
+                constraints=lenient,
             )
             reports.append(opened)
-            if not opened.success:
-                return
+            constraints = lenient
         for key in tuple(self.context.attachments):
             if key[1] == side:
                 self.context.attachments.pop(key, None)
-        retreat = self.retreat(side)
+        # Fingers that just opened are still touching the object; the
+        # retreat must tolerate that or it is vetoed before it starts.
+        retreat = self.retreat(side, constraints=constraints)
         if retreat is not None:
             reports.append(retreat)
 

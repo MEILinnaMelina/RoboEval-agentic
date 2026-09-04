@@ -53,6 +53,18 @@ def object_tilt(pose: Pose) -> float:
     return float(np.arccos(np.clip(np.dot(local_up, (0.0, 0.0, 1.0)), -1.0, 1.0)))
 
 
+def object_tilt_change(start: Pose, final: Pose) -> float:
+    """Angle by which the object's orientation relative to gravity changed
+    between two poses, ignoring yaw. Unlike `object_tilt`, this is correct
+    for objects whose body Z is not world-up at rest (the tray's body Y is
+    up, the book's mesh is rotated inside its body)."""
+
+    up = np.array([0.0, 0.0, 1.0])
+    start_up = start.as_matrix()[:3, :3].T @ up
+    final_up = final.as_matrix()[:3, :3].T @ up
+    return float(np.arccos(np.clip(np.dot(start_up, final_up), -1.0, 1.0)))
+
+
 def synchronized_velocity_difference(
     previous: SceneState,
     current: SceneState,

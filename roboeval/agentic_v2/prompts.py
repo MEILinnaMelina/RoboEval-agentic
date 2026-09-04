@@ -17,7 +17,9 @@ SKILL_PRECONDITIONS = {
     SkillName.LIFT.value: "The named object is held by one or both arms.",
     SkillName.TRANSPORT.value: "The named object is held; goal is a symbolic region.",
     SkillName.HANDOVER.value: "Exactly one arm currently holds the named object.",
-    SkillName.PLACE.value: "The named object is held and goal names a support as on:<object>.",
+    SkillName.PLACE.value: "The named object is held and goal names a support as on:<object> (shelf planks are valid supports).",
+    SkillName.CLOSE_FLAP.value: "The named object is an open box with hinged lid flaps; roles name which arm closes the flap on its own side (one flap per request).",
+    SkillName.ROTATE.value: "The named object is a valve handwheel; the chosen arm grips it from above and turns it counterclockwise until the task threshold.",
     SkillName.FINISH.value: "Use only when raw benchmark success is already observed or no recovery remains.",
 }
 
@@ -81,6 +83,7 @@ def compact_state(state: SceneState) -> dict[str, Any]:
                 "angular_velocity": list(obj.angular_velocity),
                 "contacts": list(obj.contacts),
                 "held_by": list(obj.held_by),
+                "fixed": obj.fixed,
             }
             for name, obj in state.objects.items()
         },
@@ -133,7 +136,8 @@ def build_planner_prompts(
         "rules": [
             "Use only named objects present in current_state.",
             "Roles may identify left/right or donor/receiver, but the live hold state is authoritative.",
-            "Use symbolic goals such as stable_hold, handover_region, task_success_height, or on:<object>.",
+            "Use symbolic goals such as stable_hold, handover_region, task_success_height, clear_table, closed, rotated, or on:<object>.",
+            "Objects marked fixed are scene fixtures: they can be placement supports but can never be grasped, lifted, or moved.",
             "Do not repeat an unchanged failed request without a semantic recovery reason.",
         ],
     }

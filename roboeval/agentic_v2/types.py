@@ -54,6 +54,8 @@ class SkillName(str, Enum):
     TRANSPORT = "transport"
     HANDOVER = "handover"
     PLACE = "place"
+    CLOSE_FLAP = "close_flap"
+    ROTATE = "rotate"
     FINISH = "finish"
 
 
@@ -217,6 +219,10 @@ class ObjectState:
     # soon as the object tilts even slightly - unsafe for aperture/fit
     # checks, which need the object's true, fixed cross-section.
     canonical_size: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    # Fixed scene parts (shelf planks) that are exposed as named placement
+    # supports but can never be grasped, moved, or used as a resting
+    # reference for other objects.
+    fixed: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "aabb_center", _tuple(self.aabb_center, 3, "aabb_center"))
@@ -269,6 +275,7 @@ class SceneState:
                 contacts=tuple(obj.get("contacts", ())),
                 held_by=tuple(obj.get("held_by", ())),
                 canonical_size=tuple(obj.get("canonical_size", (0.0, 0.0, 0.0))),
+                fixed=bool(obj.get("fixed", False)),
             )
             for name, obj in value["objects"].items()
         }
@@ -413,6 +420,10 @@ class GraspCandidate:
     required_aperture: float
     contact_policy: AllowedContactPolicy
     score: float
+    # True for a horizontal-hand pinch of a thin object's overhanging edge
+    # (fingers above and below it) rather than a top-down pinch; the grasp
+    # skill departs slightly backward as well as upward for these.
+    edge_grasp: bool = False
 
 
 @dataclass(frozen=True)

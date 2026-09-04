@@ -42,8 +42,14 @@ class PlaceSkill(BaseSkill):
             )
         reports = []
         attempts = []
-        for candidate in self.placement_candidates(object_name, support, state):
-            result = self._attempt(request, candidate, reports, attempts)
+        if state.objects[support].fixed:
+            candidates = self.shelf_candidates(object_name, support, state)
+            attempt = self._attempt
+        else:
+            candidates = self.placement_candidates(object_name, support, state)
+            attempt = self._attempt
+        for candidate in candidates:
+            result = attempt(request, candidate, reports, attempts)
             if result is not None:
                 return result
         return self.failure(
@@ -114,6 +120,22 @@ class PlaceSkill(BaseSkill):
         free_constraints = ConstraintSet(allowed_contacts=candidate.contact_policy)
         for side in holders:
             current = collect_scene_state(self.env).robot.arms[side].ee_pose
+            approach = np.asarray(current.as_matrix())[:3, 2]
+            if abs(approach[2]) < 0.5:
+                # Horizontal hand (edge grasp): one finger is still under the
+                # object, so back straight out along the approach first;
+                # lifting immediately would flip the object off its support.
+                back_target = Pose(
+                    tuple(np.asarray(current.position) - 0.08 * approach),
+                    current.quaternion_wxyz,
+                )
+                back, _, _ = self.move(
+                    name=f"place_release_back_{side}", targets={side: back_target},
+                    constraints=free_constraints, require_holds=False,
+                )
+                if back is not None:
+                    reports.append(back)
+                    current = collect_scene_state(self.env).robot.arms[side].ee_pose
             retreat_target = Pose(
                 (current.position[0], current.position[1], current.position[2] + 0.08),
                 current.quaternion_wxyz,
@@ -182,12 +204,68 @@ class PlaceSkill(BaseSkill):
             for index, (dx, dy) in enumerate(stable_offsets)
         )
 
+    def shelf_candidates(self, object_name, support_name, state):
+        """Place a held flat object onto a fixed plank (shelf). The object
+        keeps its current orientation; it is set down so that its near edge
+        overhangs the plank's front (robot-facing) edge by a few cm - the
+        hand gripping that edge has a finger *under* the object, which would
+        otherwise collide with the plank - while its center stays well over
+        the plank."""
+
+        obj = state.objects[object_name]
+        support = state.objects[support_name]
+        support_center = np.asarray(support.aabb_center)
+        support_size = np.asarray(support.size)
+        # Set the object down the way it lay at rest (an edge-grasped book
+        # is carried standing up); size it in that orientation.
+        resting = self.context.resting_orientations.get(object_name, obj.pose.quaternion_wxyz)
+        rest_rotation = np.asarray(Pose((0.0, 0.0, 0.0), resting).as_matrix())[:3, :3]
+        obj_size = np.abs(rest_rotation) @ np.asarray(obj.canonical_size)
+        front_x = support_center[0] - support_size[0] / 2.0
+        back_x = support_center[0] + support_size[0] / 2.0
+        top_z = support_center[2] + support_size[2] / 2.0
+        base_z = top_z + obj_size[2] / 2.0
+        current_y = obj.pose.position[1]
+        policy = AllowedContactPolicy(
+            (
+                *(AllowedContactRule(f"robot:{side}:finger", f"object:{object_name}") for side in ("left", "right")),
+                AllowedContactRule(f"object:{object_name}", f"object:{support_name}"),
+            ),
+            penetration_tolerance=0.012,
+        )
+        result = []
+        index = 0
+        # The lower finger of an edge grasp sits under the object about
+        # (pinch depth + 1.2 cm) in from its near edge; that much of the
+        # object must overhang the support's front edge or the finger lands
+        # on the plank. Fall back to a shallow default for other grasps.
+        depth = self.context.edge_pinch_depths.get(object_name)
+        base_overhang = (depth + 0.012) if depth is not None else 0.035
+        for overhang in (base_overhang, base_overhang + 0.01, base_overhang - 0.01):
+            center_x = front_x - overhang + obj_size[0] / 2.0
+            if center_x < front_x + 0.01 or center_x + obj_size[0] / 2.0 > back_x - 0.005:
+                continue
+            for dy in (0.0, 0.06, -0.06):
+                y = current_y + dy
+                if abs(y - support_center[1]) > support_size[1] / 2.0 - obj_size[1] / 2.0:
+                    continue
+                result.append(
+                    PlacementCandidate(
+                        f"{object_name}_on_{support_name}_{index}", object_name, support_name,
+                        Pose((center_x, y, base_z + 0.06), resting),
+                        Pose((center_x, y, base_z + 0.002), resting),
+                        policy, float(abs(dy) + abs(overhang - 0.035)),
+                    )
+                )
+                index += 1
+        return tuple(sorted(result, key=lambda candidate: candidate.score))
+
     @staticmethod
     def _support_name(request, state):
         goal = request.goal.strip().lower()
         if goal.startswith("on:") and goal[3:] in state.objects:
             return goal[3:]
-        others = [name for name in state.objects if name != request.object_name]
+        others = [name for name in state.objects if name != request.object_name and not state.objects[name].fixed]
         return others[0] if request.strategy == "stack" and len(others) == 1 else None
 
     @staticmethod

@@ -21,6 +21,88 @@ def geom_ids(physics: Any, obj: Any) -> set[int]:
     return {element_id(physics, geom) for geom in get_colliders(obj)}
 
 
+class StaticPart:
+    """A fixed scene fixture (shelf plank, ...) exposed as a named object.
+
+    Never held and never moved; reported at its world-aligned box center so
+    placement math can treat it exactly like any other support object."""
+
+    is_fixture = True
+
+    def __init__(self, env: Any, name: str, geom: Any) -> None:
+        physics = env.mojo.physics
+        bound = physics.bind(geom.mjcf)
+        aabb = np.asarray(bound.aabb, dtype=float)
+        rotation = np.asarray(bound.xmat, dtype=float).reshape(3, 3)
+        signs = np.array(
+            [[sx, sy, sz] for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)],
+            dtype=float,
+        )
+        corners = (signs * aabb[3:] + aabb[:3]) @ rotation.T + np.asarray(bound.xpos, dtype=float)
+        minimum, maximum = corners.min(axis=0), corners.max(axis=0)
+        self.name = name
+        self.geom = geom
+        self.colliders = [geom]
+        self.world_center = (minimum + maximum) / 2.0
+        self.world_size = maximum - minimum
+        self.canonical_size_override = self.world_size.copy()
+        self.body = _FixtureBody(geom, self.world_center)
+
+
+class _FixtureBody:
+    def __init__(self, geom: Any, center: np.ndarray) -> None:
+        self.mjcf = geom.mjcf
+        self.geoms = [geom]
+        self._center = np.asarray(center, dtype=float)
+
+    def get_position(self) -> np.ndarray:
+        return self._center.copy()
+
+    @staticmethod
+    def get_quaternion() -> np.ndarray:
+        return np.array([1.0, 0.0, 0.0, 0.0])
+
+
+def object_collider_geoms(env: Any, obj: Any) -> list[Any]:
+    """Collision geoms of a task object, robust to props whose collider
+    cache is empty because their geoms get contype/conaffinity from an
+    MJCF default class (e.g. the garage valves) rather than explicitly."""
+
+    colliders = list(get_colliders(obj))
+    if colliders:
+        return colliders
+    body = getattr(obj, "body", None)
+    physics = env.mojo.physics
+    result = []
+    for geom in getattr(body, "geoms", None) or []:
+        bound = physics.bind(geom.mjcf)
+        if int(bound.contype) or int(bound.conaffinity):
+            result.append(geom)
+    return result
+
+
+def task_objects(env: Any) -> dict[str, Any]:
+    """Named task objects for every Agentic v2 base task: the frozen v1 set
+    plus the tray, books, and the bookshelf planks as static fixtures."""
+
+    objects: dict[str, Any] = dict(get_task_objects(env))
+    tray = getattr(env, "breakfast_tray", None)
+    if tray is not None:
+        objects["tray"] = tray
+    books = getattr(env, "books", None)
+    if books:
+        if len(books) == 1:
+            objects["book"] = books[0]
+        else:
+            for index, book in enumerate(books):
+                objects[f"book_{index}"] = book
+    shelf = getattr(env, "book_shelf", None)
+    if shelf is not None:
+        objects["lower_shelf"] = StaticPart(env, "lower_shelf", shelf.lower_shelf_body)
+        objects["upper_shelf"] = StaticPart(env, "upper_shelf", shelf.upper_shelf_body)
+    return objects
+
+
 def safe_name(model: Any, element_id_value: int, kind: str) -> str:
     name = model.id2name(int(element_id_value), kind)
     return str(name) if name else f"{kind}_{int(element_id_value)}"
@@ -51,8 +133,8 @@ def wrist_site_ids(env: Any) -> dict[str, int]:
 def object_geom_ids(env: Any) -> dict[str, set[int]]:
     physics = env.mojo.physics
     return {
-        name: geom_ids(physics, obj)
-        for name, obj in get_task_objects(env).items()
+        name: {element_id(physics, geom) for geom in object_collider_geoms(env, obj)}
+        for name, obj in task_objects(env).items()
     }
 
 
@@ -70,13 +152,16 @@ def robot_geom_ids(env: Any) -> set[int]:
 
 def _named_scene_geoms(env: Any) -> dict[int, str]:
     result: dict[int, str] = {}
-    candidates = {
-        "table": getattr(env, "table", None),
-        "floor": getattr(env, "floor", None),
-        "cabinet_1": getattr(env, "cabinet_1", None),
-        "cabinet_2": getattr(env, "cabinet_2", None),
-    }
-    for name, obj in candidates.items():
+    candidates = [
+        ("table", getattr(env, "table", None)),
+        ("floor", getattr(env, "floor", None)),
+        ("cabinet_1", getattr(env, "cabinet_1", None)),
+        ("cabinet_2", getattr(env, "cabinet_2", None)),
+        # The bookshelf counter is the support surface books rest on; label
+        # it as the table so the ordinary tabletop contact rules apply.
+        ("table", getattr(getattr(env, "book_shelf", None), "counter", None)),
+    ]
+    for name, obj in candidates:
         if obj is None:
             continue
         for geom_id in geom_ids(env.mojo.physics, obj):
@@ -119,7 +204,9 @@ def geom_labels(env: Any) -> dict[int, str]:
 def object_freejoint_address(env: Any, object_name: str) -> int:
     """Find the seven-value free-joint qpos address for a task object."""
 
-    obj = get_task_objects(env)[object_name]
+    obj = task_objects(env)[object_name]
+    if getattr(obj, "is_fixture", False):
+        raise ValueError(f"object {object_name!r} is a fixed scene part and cannot be held")
     body_id = element_id(env.mojo.physics, obj.body)
     model = env.mojo.physics.model
     body_id_cursor = body_id
@@ -140,7 +227,10 @@ def contact_pairs(data: Any) -> Iterable[tuple[int, int, float]]:
 
 def body_velocity(env: Any, body: Any) -> tuple[np.ndarray, np.ndarray]:
     bound = env.mojo.physics.bind(getattr(body, "mjcf", body))
-    cvel = np.asarray(bound.cvel, dtype=float).reshape(-1)
+    try:
+        cvel = np.asarray(bound.cvel, dtype=float).reshape(-1)
+    except AttributeError:  # fixtures are bound to a geom, which has no cvel
+        return np.zeros(3), np.zeros(3)
     if cvel.size != 6:
         return np.zeros(3), np.zeros(3)
     return cvel[3:].copy(), cvel[:3].copy()

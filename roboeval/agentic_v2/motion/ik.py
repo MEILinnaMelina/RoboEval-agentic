@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 import warnings
 
 from dm_control.utils.inverse_kinematics import qpos_from_site_pose
@@ -61,6 +61,10 @@ class MultiStartIK:
         )
         self.lower = self.checker.lower
         self.upper = self.checker.upper
+        # Optional source of the last *commanded* arm joints; idle-side
+        # joints are seeded from it so the idle arm is re-commanded to where
+        # it was told to be, not to the slightly sagged pose it measures at.
+        self.commanded_joints: Callable[[], np.ndarray | None] | None = None
 
     def _root_pose(self) -> Pose:
         pelvis = self.env.robot.pelvis
@@ -85,6 +89,12 @@ class MultiStartIK:
         for side in active_sides:
             start = 0 if side == "left" else len(current) // 2
             active[start : start + len(current) // 2] = True
+        commanded = self.commanded_joints() if self.commanded_joints is not None else None
+        if commanded is not None and np.shape(commanded) == current.shape:
+            commanded = np.asarray(commanded, dtype=float)
+            if np.all(commanded >= self.lower) and np.all(commanded <= self.upper):
+                current = current.copy()
+                current[~active] = commanded[~active]
         initial_seed = current.copy()
         initial_seed[active] = initial[active]
         midpoint_seed = current.copy()

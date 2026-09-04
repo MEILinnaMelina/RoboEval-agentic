@@ -11,7 +11,12 @@ from roboeval.agentic_v2.motion.candidate_generator import MAXIMUM_APERTURE
 from roboeval.agentic_v2.skills.base import BaseSkill
 from roboeval.agentic_v2.skills.grasp import GraspSkill
 from roboeval.agentic_v2.skills.transport import TransportSkill, held_constraints
-from roboeval.agentic_v2.state import capture_attachment, collect_scene_state, infer_handover_roles
+from roboeval.agentic_v2.state import (
+    capture_attachment,
+    collect_scene_state,
+    infer_handover_roles,
+    vertical_half_extent,
+)
 from roboeval.agentic_v2.types import (
     AllowedContactPolicy,
     AllowedContactRule,
@@ -52,6 +57,11 @@ class HandoverSkill(BaseSkill):
         object_name = request.object_name
         if object_name not in state.objects:
             return self.failure(request, state, FailureCode.PRECONDITION_FAILED, "object unavailable", [])
+        if state.objects[object_name].fixed:
+            return self.failure(
+                request, state, FailureCode.INVALID_REQUEST,
+                f"{object_name} is a fixed scene part and cannot be handed over", [],
+            )
         try:
             inferred = infer_handover_roles(state, object_name)
         except ValueError as error:
@@ -277,7 +287,9 @@ class HandoverSkill(BaseSkill):
             })
             return None
         obj = state.objects[object_name]
-        half_height = obj.canonical_size[2] / 2.0
+        # World-vertical half extent at the object's *current* orientation:
+        # a rod standing on end is 0.10 m tall, not canonical_size[2]/2.
+        half_height = vertical_half_extent(obj)
         # Servoing all the way down to near-zero clearance fights the table
         # once real contact force appears (position control keeps commanding
         # further down after the object is physically blocked) and trips the
@@ -390,9 +402,9 @@ class HandoverSkill(BaseSkill):
         available in single-object scenes such as cube_handover)."""
 
         for name, other in state.objects.items():
-            if name == object_name or other.held_by:
+            if name == object_name or other.held_by or other.fixed:
                 continue
-            return other.pose.position[2] - other.canonical_size[2] / 2.0
+            return other.pose.position[2] - vertical_half_extent(other)
         return self.context.resting_surfaces.get(object_name)
 
     def _release_donor(self, request, donor, receiver, donor_attachment, receiver_attachment, reports):

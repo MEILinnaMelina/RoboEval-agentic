@@ -42,6 +42,12 @@ class JointActionAdapter:
             side: float(last[self.arm_count + index])
             for index, side in enumerate(self.sides)
         }
+        # Last arm joint targets actually sent. Position servos settle a few
+        # mm below their target under gravity; any plan that re-anchors an
+        # idle arm at its *measured* joints re-commands that sagged pose and
+        # the arm ratchets downward plan after plan (measured: an idle hand
+        # dropping 7 cm over ~250 steps until it rested on the scene).
+        self.last_commanded: np.ndarray | None = None
 
     def set_gripper(self, side: str, command: float) -> None:
         if side not in self.gripper_commands:
@@ -59,7 +65,16 @@ class JointActionAdapter:
         ).astype(np.float32)
         if np.any(action < self.env.action_space.low) or np.any(action > self.env.action_space.high):
             raise ValueError("action exceeds RoboEval action bounds")
+        self.last_commanded = joints.copy()
         return action
+
+    def hold_targets(self, measured: Any) -> np.ndarray:
+        """Joint targets that keep the robot where it was *told* to be."""
+
+        measured = np.asarray(measured, dtype=float)
+        if self.last_commanded is None or self.last_commanded.shape != measured.shape:
+            return measured
+        return self.last_commanded.copy()
 
 
 class MonitoredExecutor:
@@ -71,6 +86,8 @@ class MonitoredExecutor:
         render: bool = False,
         frame_callback: Callable[[int, Any], None] | None = None,
         settle_steps: int = 5,
+        convergence_tolerance: float = 0.03,
+        maximum_convergence_steps: int = 40,
     ) -> None:
         self.env = env
         self.checker = collision_checker or CollisionChecker(env)
@@ -79,6 +96,13 @@ class MonitoredExecutor:
         self.render = render
         self.frame_callback = frame_callback
         self.settle_steps = int(settle_steps)
+        # After the last planned point, keep commanding it until the joints
+        # have actually arrived. A torque-limited joint (the 12 Nm wrist
+        # pitch under a 4 kg book) lags the ramp by well under the 0.3 rad
+        # tracking tolerance yet leaves the hand ~10 cm short if the plan
+        # simply ends; given a moment it converges.
+        self.convergence_tolerance = float(convergence_tolerance)
+        self.maximum_convergence_steps = int(maximum_convergence_steps)
 
     def execute(
         self,
@@ -89,6 +113,7 @@ class MonitoredExecutor:
         require_holds: bool = True,
         stop_condition: Callable[[Any], bool] | None = None,
         terminal_constraints: ConstraintSet | None = None,
+        stop_on_success: bool = True,
     ) -> ExecutionReport:
         for side, command in (gripper_commands or {}).items():
             self.adapter.set_gripper(side, command)
@@ -119,7 +144,41 @@ class MonitoredExecutor:
             if stop_reached:
                 condition_reached = True
                 break
-            if benchmark_success(final_state) >= 1.0:
+            if stop_on_success and benchmark_success(final_state) >= 1.0:
+                # Stopping early on task success is a deliberate end, not a
+                # tracking failure - it must not trip the final-target check.
+                condition_reached = True
+                break
+        extra = 0
+        while (
+            not events
+            and not condition_reached
+            and extra < self.maximum_convergence_steps
+            and float(
+                np.max(
+                    np.abs(
+                        np.asarray(final_state.robot.joint_positions)
+                        - np.asarray(points[-1].joint_positions)
+                    )
+                )
+            ) > self.convergence_tolerance
+        ):
+            event, info, final_state, stop_reached = self._execute_point(
+                len(schedule) + extra,
+                points[-1],
+                plan.constraints,
+                protected_objects,
+                require_holds,
+                stop_condition,
+                terminal_constraints,
+            )
+            executed += 1
+            extra += 1
+            if event is not None:
+                events.append(event)
+                break
+            if stop_reached or (stop_on_success and benchmark_success(final_state) >= 1.0):
+                condition_reached = True
                 break
         final_error = float(
             np.max(
@@ -203,7 +262,9 @@ class MonitoredExecutor:
         steps: int,
         constraints: ConstraintSet | None = None,
     ) -> MotionPlan:
-        joints = tuple(collect_scene_state(self.env).robot.joint_positions)
+        joints = tuple(
+            self.adapter.hold_targets(collect_scene_state(self.env).robot.joint_positions)
+        )
         return MotionPlan(
             name=name,
             points=tuple(

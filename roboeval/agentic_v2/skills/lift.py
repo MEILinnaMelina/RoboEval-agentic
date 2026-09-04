@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from roboeval.agentic_v2.constraints.bimanual import ee_targets_for_object_pose, object_tilt
+from roboeval.agentic_v2.constraints.bimanual import ee_targets_for_object_pose, object_tilt_change
 from roboeval.agentic_v2.evaluator import benchmark_success
 from roboeval.agentic_v2.skills.base import BaseSkill
 from roboeval.agentic_v2.state import capture_attachment, collect_scene_state
@@ -41,6 +41,11 @@ class LiftSkill(BaseSkill):
             return self.failure(
                 request, state, FailureCode.PRECONDITION_FAILED,
                 f"{object_name} is not held", [],
+            )
+        if state.objects[object_name].fixed:
+            return self.failure(
+                request, state, FailureCode.INVALID_REQUEST,
+                f"{object_name} is a fixed scene part and cannot be lifted", [],
             )
         attachments = tuple(
             self.context.attachments.get((object_name, side))
@@ -117,7 +122,7 @@ class LiftSkill(BaseSkill):
                     "benchmark_success": benchmark_success(final),
                 },
             )
-        if object_tilt(final.objects[object_name].pose) > constraints.maximum_object_tilt:
+        if object_tilt_change(start_pose, final.objects[object_name].pose) > constraints.maximum_object_tilt:
             return self.failure(
                 request, final, FailureCode.CONSTRAINT_VIOLATION,
                 "object tilt exceeded the lift bound", reports,

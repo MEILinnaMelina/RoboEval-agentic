@@ -263,6 +263,11 @@ class CollisionChecker:
                 continue
             first = self.labels.get(geom1, f"geom:{geom1}")
             second = self.labels.get(geom2, f"geom:{geom2}")
+            if kind == ContactKind.SELF and first == second and first.endswith(":finger"):
+                # The two fingers of one hand touch each other whenever the
+                # gripper is fully closed on nothing; that is the commanded
+                # state, not a self-collision.
+                continue
             allowed = policy.allows(first, second, distance)
             if kind == ContactKind.OBJECT_OBJECT and not (held1 or held2) and not allowed:
                 continue

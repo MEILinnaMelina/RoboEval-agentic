@@ -15,6 +15,8 @@ from roboeval.agentic_v2.motion.ik import IKSearchResult, MultiStartIK
 from roboeval.agentic_v2.motion.path_planner import JointPathPlanner, PathSearchResult
 from roboeval.agentic_v2.state import collect_scene_state
 from roboeval.agentic_v2.types import (
+    AllowedContactPolicy,
+    AllowedContactRule,
     ConstraintSet,
     ExecutionReport,
     FailureCode,
@@ -41,6 +43,19 @@ class SkillContext:
     # staged handover put an object back down at a known-good height even
     # in scenes with no other resting object to reference.
     resting_surfaces: dict[str, float] = field(default_factory=dict)
+    # Orientation (wxyz) each object had while last at rest, so a placement
+    # can set it back down the way it lay even if the carry reoriented it.
+    resting_orientations: dict[str, tuple[float, float, float, float]] = field(default_factory=dict)
+    # Whether edge grasps are settled into a hanging carry after
+    # verification (see GraspSkill._consolidate_edge_grasp); off only for
+    # experiments.
+    consolidate_edge_grasps: bool = True
+    # How each held object is currently carried ("edge:<depth>" for a flat
+    # object pinched at one edge) and, for edge carries, how far in from
+    # that edge the pads sit - placement uses it to leave exactly that much
+    # of the object overhanging the support so the lower finger clears it.
+    carry_modes: dict[str, str] = field(default_factory=dict)
+    edge_pinch_depths: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def create(
@@ -57,17 +72,20 @@ class SkillContext:
             env,
             enforce_contacts=feasibility_gate == "full",
         )
+        executor = MonitoredExecutor(
+            env,
+            collision_checker=checker,
+            render=render,
+            frame_callback=frame_callback,
+        )
+        ik = MultiStartIK(env, checker)
+        ik.commanded_joints = lambda: executor.adapter.last_commanded
         return cls(
             env=env,
             checker=checker,
-            ik=MultiStartIK(env, checker),
+            ik=ik,
             planner=JointPathPlanner(env, checker),
-            executor=MonitoredExecutor(
-                env,
-                collision_checker=checker,
-                render=render,
-                frame_callback=frame_callback,
-            ),
+            executor=executor,
             candidates=CandidateGenerator(env),
         )
 
@@ -91,6 +109,7 @@ class BaseSkill:
         candidate_count: int = 7,
         stop_condition: Callable[[Any], bool] | None = None,
         terminal_constraints: ConstraintSet | None = None,
+        stop_on_success: bool = True,
     ) -> tuple[ExecutionReport | None, IKSearchResult, PathSearchResult | None]:
         started = perf_counter()
         constraints = constraints or ConstraintSet()
@@ -122,6 +141,7 @@ class BaseSkill:
             require_holds=require_holds,
             stop_condition=stop_condition,
             terminal_constraints=terminal_constraints,
+            stop_on_success=stop_on_success,
         )
         self._record_motion_trace(
             name, targets, constraints, ik_result, path_result, execution, started
@@ -161,7 +181,42 @@ class BaseSkill:
             }
         )
 
-    def retreat(self, side: str, *, distance: float = 0.08) -> ExecutionReport | None:
+    def nudge_clear(self, side: str, *, distance: float = 0.03) -> ExecutionReport | None:
+        """Lift one arm a little while tolerating whatever incidental contacts
+        it is currently in (an idle hand resting a fingertip on a wheel, a
+        finger grazing the table), so later motions start contact-free.
+        Does nothing when the arm is already clear."""
+
+        live = self.context.checker.check_live_contacts(ConstraintSet())
+        offending = [contact for contact in live.contacts if not contact.allowed]
+        if not offending:
+            return None
+        rules = tuple(
+            AllowedContactRule(contact.first, contact.second, penetration_tolerance=0.012)
+            for contact in offending
+        )
+        policy = AllowedContactPolicy(rules=rules, penetration_tolerance=0.012)
+        state = collect_scene_state(self.env)
+        current = state.robot.arms[side].ee_pose
+        target = Pose(
+            (current.position[0], current.position[1], current.position[2] + distance),
+            current.quaternion_wxyz,
+        )
+        execution, _, _ = self.move(
+            name=f"nudge_clear_{side}",
+            targets={side: target},
+            constraints=ConstraintSet(allowed_contacts=policy),
+            require_holds=False,
+        )
+        return execution
+
+    def retreat(
+        self,
+        side: str,
+        *,
+        distance: float = 0.08,
+        constraints: ConstraintSet | None = None,
+    ) -> ExecutionReport | None:
         state = collect_scene_state(self.env)
         current = state.robot.arms[side].ee_pose
         target = Pose(
@@ -175,9 +230,21 @@ class BaseSkill:
         execution, _, _ = self.move(
             name=f"checked_retreat_{side}",
             targets={side: target},
+            constraints=constraints,
             require_holds=False,
         )
         return execution
+
+    def park_idle_arm(self, side: str, *, distance: float = 0.05) -> ExecutionReport | None:
+        """Raise the arm that will stay idle during a single-arm skill. Idle
+        hands start a centimeter or so above scene parts in several tasks
+        (valve wheels, box flaps) and settle onto them while the other arm
+        works, which then vetoes every plan for the working arm."""
+
+        execution = self.retreat(side, distance=distance)
+        if execution is not None and execution.success:
+            return execution
+        return self.nudge_clear(side, distance=distance)
 
     @staticmethod
     def failure(
