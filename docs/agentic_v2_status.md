@@ -28,48 +28,60 @@ C:\Users\melin\.conda\envs\roboeval\python.exe
 
 | Task | Result | Coverage |
 |---|---|---|
-| `lift_pot` | 10/10 `benchmark_success` | full seeds 0-9, verified at an earlier commit |
-| `cube_handover` | not passing | single-seed (seed 0) spot check only, after the latest `handover.py` fixes |
-| `stack_two_blocks` | not passing | single-seed (seed 0) spot check only, after the latest `handover.py` fixes |
+| `lift_pot` | 10/10 `benchmark_success` | full seeds 0-9, verified at an earlier commit; grasp path untouched by any change since |
+| `cube_handover` | 0/10 `benchmark_success` | full seeds 0-9 at commit `84ad0a8` (after the rendezvous-height fix) |
+| `stack_two_blocks` | not passing | single-seed (seed 0) spot check only, after the receiver-drift fix |
 
-`lift_pot`'s grasp path (`kitchenpot` handles) goes through
-`CandidateGenerator._pot_handle_candidates`, which the recent aperture/frame
-fixes below did not touch, so the 10/10 result should still hold - but it
-has not been re-run against the current commit to confirm.
+**A full 10-seed rerun of `stack_two_blocks` against the current commit has
+not been done** - only `cube_handover` got a full rerun after its latest fix.
 
-**A full 10-seed rerun of all three tasks against the current commit has not
-been done.** The `outputs/agentic_v2_phase9_gate*` directories are gitignored
-local artifacts (removed from git tracking - see `git log` for the commit
-that last had them) and were generated at earlier, different commits; do not
-treat them as representative of the current code. `cube_handover`'s v3 run in
-particular recorded `git_commit: b91ba11`, which predates the actual
-`agentic_v2` package commit - that mismatch is exactly why those directories
-were untracked.
+## Known open issues (found, root-caused, not yet fixed)
 
-## Known open issues (found, not yet fixed)
+Both of the previous entries here ("HandoverSkill's own held_by check is
+stricter than RoboEval's ground truth", "generic top-down grasp lacks
+table clearance for short objects") turned out to be imprecise - direct
+reproduction (not inference) found the *actual* mechanisms below. Two real
+bugs found this way (rendezvous height had no table-clearance margin on
+one pose; receiver arm settled into incidental table contact while idle)
+are already fixed as of `84ad0a8`. What's left is more fundamental:
 
-- **`cube_handover`**: RoboEval's own `task_stage_reached[2]` ground truth
-  confirms the handover transfer does occur during some attempts
-  (`behavior_quality.reached_transfer_stage: true`), but `HandoverSkill`'s
-  own `set(held_by) == {donor, receiver}` verification still reports
-  failure - stricter or more timing-sensitive than the benchmark's own
-  check. Root cause not yet identified.
-- **`stack_two_blocks`**: the staged-regrasp mechanics (place, release,
-  donor clear-out, retry) work end-to-end and eliminated the earlier
-  `SELF_COLLISION`, but the final regrasp close still trips
-  `ENV_COLLISION` before the fingers even close - the object is very thin
-  (4cm) and rests flush on the table, leaving little clearance for a
-  generic top-down grasp. Needs either a grasp-height bias or a
-  table-clearance-aware candidate for short objects.
+- **`cube_handover`**: the rod is thin, and the receiver's grasp point is
+  offset toward one end (`tip_margin=0.035`) specifically so it clears the
+  donor's hand at the workspace center. Reproduced one case that closed
+  successfully and passed `dual_verify`, then `SLIP_DETECTED` during the
+  hold-still verification - the grip itself is marginally stable, not a
+  detection bug. Across a full 10-seed run, the dominant failure varies
+  seed to seed among `GRASP_FAILED` (close didn't register a hold),
+  `HELD_OBJECT_COLLISION`, and this slip - consistent with a grip that's
+  right at the edge of reliable, not a single deterministic cause. Needs a
+  grip-stability fix (firmer close, more dwell before verifying, or a
+  grip point traded further from the tip against less donor clearance),
+  not another collision-geometry fix.
+- **`stack_two_blocks`**: the receiver-drift `ENV_COLLISION` is fixed, but
+  the regrasp close itself is still unreliable for this very thin (4cm)
+  object resting flush on the table - not yet re-verified across a full
+  10-seed run after the drift fix, so the current true pass rate is
+  unknown.
 
 ## API / LLM runs
 
-**No OpenAI or Anthropic run has ever been executed against this
-codebase.** `--planner openai`/`--planner anthropic` and `OnlineReplanner`
-are covered by unit tests and static review only, not an empirical run.
-Do not run a full API matrix until the two open issues above are resolved
-(or at least understood well enough that API failures can be attributed
-correctly) - see the Phase 9 rationale in `agentic_v2_plan.md`.
+One informal 3-task x 3-seed OpenAI run has been made (model
+`gpt-5.6-terra`, no `--input-cost-per-million`/`--output-cost-per-million`
+set, so `llm_cost_usd` was not recorded). Results before any of the fixes
+in this file: `lift_pot` 3/3, `cube_handover` 1/1 valid (2/3 died to
+`APIConnectionError`, since fixed with a retry - see `llm_planner.py`),
+`stack_two_blocks` 0/3 valid (all 3 died to the same network error). A
+rerun of the network-killed trials after the retry fix landed reached
+`max_skills=10` on all 5 without succeeding (`TIMEOUT`), consistent with
+the grip-stability and table-clearance issues above rather than a new bug -
+see `skill_results` sequences in those trial reports for exact failure
+codes per step.
+
+**No formal (10-seed) API run has been done.** Do not launch one until the
+two open issues above show real improvement on the deterministic gate -
+a 10-seed API matrix against a known-marginal grasp will mostly measure
+the grasp's flakiness, not the LLM's planning quality, and burns real
+budget doing it.
 
 ## Experiment naming convention
 
