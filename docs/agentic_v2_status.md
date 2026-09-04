@@ -92,9 +92,12 @@ Earlier fixes still in place: rendezvous height table clearance
 (`3cfd536`), removal of the premature pad-contact `stop_condition` from
 both handover (`19aaa41`) and `GraspSkill` (`2cee8eb`) approaches.
 
-Recordings of one successful seed-0 run per task at this commit:
-`outputs/gif_success_seed0/v2-fixed/<task>/seed_000/trajectory.gif`
-(local only, not committed - see `results/README.md`).
+Recordings of one successful seed-0 run per task at this commit (local
+only, not committed - see `results/README.md`):
+- deterministic fixed plan: `outputs/gif_success_seed0/v2-fixed/<task>/seed_000/trajectory.gif`
+- LLM-driven (`v2-full`, OpenAI): `outputs/gif_api_success_seed0/v2-full/<task>/seed_000/trajectory.gif`
+  (all three `benchmark_success=1.0`; the `stack_two_blocks` one shows the
+  online replan from a rejected direct `place` to `handover` then `place`)
 
 ## API / LLM runs
 
