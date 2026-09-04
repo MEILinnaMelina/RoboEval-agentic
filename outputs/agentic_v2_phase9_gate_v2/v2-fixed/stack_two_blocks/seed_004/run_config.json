@@ -1,0 +1,30 @@
+{
+  "cross_trial_memory": false,
+  "environment": {
+    "git_commit": "b91ba11b020b5eae96f05a7719b40920ac84f82d",
+    "packages": {
+      "anthropic": "1.3.0",
+      "gymnasium": "0.29.2",
+      "mujoco": "3.3.3",
+      "numpy": "1.26.4",
+      "openai": "3.7.0",
+      "roboeval": "0.1.0"
+    },
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.21 | packaged by Anaconda, Inc. | (main, Aug 27 2026, 14:35:39) [MSC v.1942 64 bit (AMD64)]"
+  },
+  "feasibility_gate": "full",
+  "max_skills": 10,
+  "method": "v2-fixed",
+  "model": "fixed-semantic-v1",
+  "online_replan": true,
+  "planner": "fixed",
+  "pricing_usd_per_million": {
+    "input": null,
+    "output": null
+  },
+  "record_gif": false,
+  "render": "none",
+  "seed": 4,
+  "task": "stack_two_blocks"
+}

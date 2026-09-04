@@ -1,151 +1,396 @@
-# RoboEval-Agentic v2 (Agentic-TAMP) — Implementation Plan
+# RoboEval-Agentic v2 (Agentic-TAMP) - Implementation Plan
 
-Context: `roboeval/agentic/` (v1) spent an entire session (P1-P23, see
-`docs/phase8_success_rate_debug_log.md`) hand-tuning heuristics for a
-fundamentally mismatched architecture — asking an LLM to output continuous
-geometric parameters (`ee_offset`, `yaw`, `steps`) it has no reliable way to
-get right, then reactively patching each new failure mode. User proposed
-restarting on a TAMP-style architecture instead: **LLM decides *what*
-(semantic skill + target), a classical robotics layer decides *how*
-(feasibility + motion)** — matching SayCan / VLM-TAMP / ReKep. v1 stays
-untouched as a baseline; this is a new `roboeval/agentic_v2/` package.
+## Goal And Scope
 
-**Feasibility of the riskiest primitive is now confirmed, not assumed.**
-Verified directly against this repo's actual MuJoCo/mojo stack:
-`copy.copy(mojo.data)` gives a fully independent `MjData` snapshot;
-mutating its `qpos` and calling `mujoco.mj_kinematics()` +
-`mujoco.mj_collision()` (kinematics + contact only, no `mj_step`, no time
-advance) gives exact per-geom contact/penetration info without touching the
-live simulation. Confirmed both the "no false positives" case and the
-"detects a real forced self-collision" case (7 contacts on an extreme folded
-pose). This de-risks the entire Feasibility Gate / collision checker design.
+Build `roboeval/agentic_v2/` for the three base tasks: `lift_pot`,
+`cube_handover`, and `stack_two_blocks`.
 
-## Phase 0 — Freeze v1, set up v2 scaffold
+The LLM selects **what to do**: a semantic skill, object, arm roles, and goal.
+Deterministic robotics code decides **how to do it**: candidate generation,
+IK, collision checking, path planning, execution, monitoring, and verification.
+The LLM must never emit joint values, Cartesian offsets, yaw, controller
+gains, step counts, or unchecked trajectories.
 
-- [ ] Tag/branch the current `main` as the v1 baseline (or just rely on git history — already fully committed through P23).
-- [ ] Create `roboeval/agentic_v2/` package (empty `__init__.py` + subpackages per the layout below).
-- [ ] Create `examples/run_agentic_v2.py` as the eventual new entry point (stub for now).
-- [ ] Fix the two seeds/task set: `lift_pot`, `cube_handover`, `stack_two_blocks` (same three v1 already covers — no new tasks yet).
-- [ ] Do **not** add new P24+ heuristics to v1 `roboeval/agentic/` going forward — it's frozen as the comparison baseline.
+This milestone covers the three base tasks only. Position/orientation
+variants, long-horizon tasks, vision-only perception, PDDLStream, and GPU
+motion planners are deferred.
 
-## Phase 1 — Correctness cleanup (independent of v2, do first, low risk)
+## Non-Negotiable Rules
 
-These are v1 bugs worth fixing regardless of whether v2 ships, and they make
-the v1-vs-v2 comparison fairer:
-- [ ] `grasp_object`: never `close_gripper` after a failed `align_to_object` (currently it does — closing on a bad approach is part of why grasps look "attempted" when they shouldn't be).
-- [ ] Add an automatic retreat (small vertical/backward move) after any failed grasp/align attempt, not just report failure and let the next primitive start from wherever the arm ended up.
-- [ ] Standardize failure reasons as an enum-like set of string codes (`IK_UNREACHABLE`, `SELF_COLLISION`, `ENV_COLLISION`, `NO_VALID_GRASP`, `OBJECT_DISPLACED`, ...) instead of ad hoc free-text messages, in both v1 (where practical) and v2's design.
-- [ ] Keep `benchmark_success` (raw RoboEval metric) and `quality`/`behavior` metrics as clearly separate fields everywhere they're reported (v1's `quality_assessment` already does this — carry the same split into v2 from day one).
+- [ ] Keep `roboeval/agentic/` (v1) frozen; historical commits are baselines.
+- [ ] Put all new behavior in `roboeval/agentic_v2/` and a v2 entry point.
+- [ ] Use `JointPositionActionMode(ee=False, absolute=True)` in v2. Plan in
+      joint space and execute bounded trajectory chunks.
+- [ ] Never advance or mutate live MuJoCo state during planning.
+- [ ] Check both arms, held objects, and skill-specific allowed contacts at
+      every sampled trajectory state.
+- [ ] Never close after a failed approach or retry without checked recovery.
+- [ ] Keep raw RoboEval success separate from behavior-quality judgments.
+- [ ] Disable cross-trial memory in the primary method; test it only as a
+      named ablation.
 
-## Phase 2 — Core typed data interfaces (no GPT, no real planning yet)
+## Phase 0 - Freeze Baselines And Create The Scaffold
 
-New module: `roboeval_v2/types.py` (or `agentic_v2/types.py`).
-- [ ] `SceneState` — robot (qpos per arm, EE pose, gripper aperture, holding), objects (position, orientation, aabb, contact state), environment (table, obstacles), metrics (task_success, stage, collisions, slip). Reuse `roboeval/agentic/state.py`'s `collect_env_state()` logic as the source, just restructure into typed dataclasses instead of a raw dict.
-- [ ] `SkillRequest` — `skill: str`, `object: str | None`, `roles: dict[str, str] | None` (e.g. `{"left": "left_handle", "right": "right_handle"}`), `goal: str`.
-- [ ] `ConstraintSet`, `MotionCandidate`, `FeasibilityReport`, `MotionPlan`, `ExecutionReport` — per the user's original spec.
-- [ ] Hand-write a few `SkillRequest` instances and confirm they construct/validate correctly. No pipeline yet — just prove the types are usable.
+- [ ] Verify and record immutable v1 references in the experiment manifest:
+      `337d0f0` (P23 endpoint) and `d9198fa` (pre-memory P22).
+- [ ] Run each v1 baseline in an independent process so planner history and
+      cross-trial memory cannot leak between methods.
+- [ ] Create a dedicated v2 branch before implementation.
+- [ ] Create the minimal package layout:
+      `agentic_v2/{types,state,evaluator,executor,monitor}.py`,
+      `agentic_v2/motion/`, `agentic_v2/constraints/`, and
+      `agentic_v2/skills/`.
+- [ ] Create `examples/run_agentic_v2.py` with `--task`, `--seed`, `--render`,
+      `--planner`, `--memory`, and `--output-dir` options.
+- [ ] Fix primary evaluation seeds to integers `0..9` for every task. Save the
+      task, seed, git commit, config, package versions, and model with a trial.
+- [ ] Keep ReKep and VoxPoser outside the package and submission code. They are
+      local references, not runtime dependencies.
 
-## Phase 3 — Collision checker (the now-de-risked piece — build this first among the "hard" phases)
+**Exit gate:** v1 references and the 30-trial seed matrix are recorded, the v2
+entry point imports, and no v1 source file has changed.
+
+## Phase 1 - Typed Contracts, State, And Evaluation Semantics
+
+New modules: `agentic_v2/types.py`, `state.py`, and `evaluator.py`.
+
+- [ ] Define a `FailureCode` enum including `IK_UNREACHABLE`, `JOINT_LIMIT`,
+      `SELF_COLLISION`, `ENV_COLLISION`, `HELD_OBJECT_COLLISION`,
+      `OTHER_OBJECT_COLLISION`, `NO_VALID_GRASP`, `GRIPPER_APERTURE_MISMATCH`,
+      `HANDOVER_REGION_EMPTY`, `PLACEMENT_UNREACHABLE`, `RELEASE_FAILED`,
+      `PATH_BLOCKED`, `APPROACH_FAILED`, `GRASP_FAILED`, `OBJECT_DISPLACED`,
+      `SLIP_DETECTED`, `CONSTRAINT_VIOLATION`, `EXECUTION_DIVERGED`, and
+      `TIMEOUT`. Distinguish `HELD_OBJECT_COLLISION` (the object currently
+      grasped) from `OTHER_OBJECT_COLLISION` (an unrelated movable object
+      gets bumped, e.g. during transport in `stack_two_blocks`).
+- [ ] Define typed `Pose`, `RobotState`, `ObjectState`, `SceneState`,
+      `SkillRequest`, `AllowedContactPolicy`, `ConstraintSet`, `IKCandidate`,
+      `MotionCandidate`, `FeasibilityReport`, `MotionPlan`, `ExecutionReport`,
+      and `TrialReport` records.
+- [ ] Adapt v1 state-reading logic without changing v1. Include both arms'
+      joint state, end-effector pose, gripper aperture, and inferred holding;
+      object pose, orientation, dimensions/AABB, velocity, and contacts; task
+      stage; collision/slip counters; and raw RoboEval metrics.
+- [ ] Treat an AABB as a current-state measurement only. Never reuse a static
+      world-frame AABB for a transported object.
+- [ ] Infer handover donor/receiver roles from current grasp state; do not
+      permanently assign either arm as donor.
+- [ ] Serialize JSON with separate top-level fields `benchmark_success`,
+      `subtask_progress`, and `behavior_quality`.
+- [ ] Test JSON round trips, enum validation, malformed requests, missing
+      objects, and left/right role validation.
+
+**Exit gate:** semantic requests validate, a live state round-trips through
+JSON, and behavior quality cannot overwrite raw benchmark success.
+
+## Phase 2 - Side-Effect-Free Collision And Contact Checking
 
 New module: `agentic_v2/motion/collision_checker.py`.
-- [ ] `check_collision(mojo, candidate_qpos) -> list[Contact]` using the verified `copy.copy(data)` + `mj_kinematics` + `mj_collision` pattern.
-- [ ] Split into `check_self_collision` (both `geom1`/`geom2` belong to the robot) and `check_env_collision` (one side is scene, one is robot) and `check_held_object_collision` (checking a specific held object's geoms against the scene) — reuse the geom-ownership logic already in `roboeval/utils/metric_rollout.py` (`_robot_geoms`/`_scene_geoms`) rather than re-deriving it.
-- [ ] Test against 10 known-safe poses (e.g. the robot's neutral/reset qpos, small perturbations) and 10 known-bad poses (e.g. the extreme-fold pose already proven to trigger 7 contacts) — assert stable, correct results both ways.
 
-## Phase 4 — IK feasibility / candidate generation
+- [ ] Create an independent `MjData` clone for planning. Map a candidate's arm
+      joints into full `qpos`, then run the complete position update needed by
+      this model before `mujoco.mj_collision()`; never call `mj_step()`.
+- [ ] Add a regression test proving the planning data shares no writable state
+      with live data and leaves live `qpos`, `qvel`, controls, time, contacts,
+      object poses, and task counters byte-for-byte unchanged.
+- [ ] Reuse verified robot/scene geom ownership from
+      `roboeval/utils/metric_rollout.py`. Return typed contacts with geom names,
+      owners, signed distance/penetration, and classification.
+- [ ] Distinguish self collision, robot-environment collision, held-object
+      collision, and allowed task contact.
+- [ ] Require every skill to provide an `AllowedContactPolicy`. Examples:
+      fingers-target during grasp, pot-table before lift, upper-lower block
+      during place, and receiver-cube during handover. All other contact stays
+      forbidden unless explicitly justified.
+- [ ] While holding, propagate object pose at every candidate state using
+      `T_world_object = T_world_ee @ T_ee_object`, then recompute its geometry
+      before collision checking. Do not translate a stale AABB.
+- [ ] Test at least 10 in-limit known-safe poses, 10 in-limit known-colliding
+      poses, allowed-contact cases, forbidden-contact cases, and joint-limit
+      rejection. Keep the extreme folded pose only as an additional stress
+      case if it lies outside valid limits.
+
+**Exit gate:** repeated checks are deterministic, detect the expected contact
+class, and cannot alter a live episode.
+
+## Phase 3 - Multi-Start IK Feasibility
 
 New module: `agentic_v2/motion/ik.py`.
-- [ ] `solve_ik_candidates(target_pose, side, n=5) -> list[IKCandidate]` — random-restart around the existing `roboeval/ik/base_ik.py` `qpos_from_site_pose` call (it only returns one local solution seeded from current qpos; get diversity by seeding from several perturbed starting qpos, keep only converged solutions within joint limits).
-- [ ] Check each candidate against `roboeval/robots/config.py`'s `joint_limits`.
-- [ ] Label each candidate `IK_FEASIBLE` / `IK_UNREACHABLE` per the enum.
-- [ ] This is the first real "Feasibility Gate" output — test it standalone against a few known reachable/unreachable targets before wiring anything else to it.
 
-## Phase 5 — Collision-aware path planner (naive version first)
+- [ ] Wrap the existing RoboEval IK without changing v1. Do not accept its
+      returned `qpos` alone: retain convergence status, iteration count,
+      position error, orientation error, seed, and termination reason.
+- [ ] Generate deterministic multi-start seeds from current state, neutral
+      state, and bounded perturbations. Deduplicate near-identical solutions.
+- [ ] Reject non-converged solutions and candidates outside the configured
+      joint limits before collision checking.
+- [ ] Rank surviving candidates by pose error, distance from current joints,
+      joint-limit margin, and collision clearance.
+- [ ] For dual-arm goals, construct and validate combined configurations;
+      independent left/right IK success is not sufficient.
+- [ ] Return structured `IK_UNREACHABLE`, `JOINT_LIMIT`, `SELF_COLLISION`, or
+      `ENV_COLLISION` evidence when no candidate survives.
+- [ ] Test reachable, unreachable, near-limit, obstacle, and paired-arm targets
+      with deterministic expected outcomes.
+
+**Exit gate:** every accepted candidate is converged, in limits, collision
+checked, reproducible, and carries enough diagnostics to explain rejection.
+
+## Phase 4 - Collision-Aware Joint-Space Path Planning
 
 New module: `agentic_v2/motion/path_planner.py`.
-- [ ] `q_start -> q_goal`, N linear interpolation samples, `check_collision` (Phase 3) at each sample.
-- [ ] If clear: accept the straight-line joint-space path.
-- [ ] If not: try one intermediate waypoint (simple heuristic, e.g. lift-then-move) before falling back to failure - **do not** reach for RRT/CHOMP/cuRobo in this pass; naive-with-waypoint-fallback is enough to validate the pipeline shape.
-- [ ] Decide here (explicit checkpoint, not default-drift): stay on `ee=True` per-step IK (current v1 approach) or switch to `JointPositionActionMode(ee=False, absolute=True)` and plan once in joint space, then execute the trajectory open-loop per chunk. The user's proposal recommends the latter — flag this as a real behavior change worth confirming before committing, since it changes how `Execution Monitor` (Phase 10) needs to interrupt/replan mid-trajectory.
 
-## Phase 6 — Grasp candidate generation
+- [ ] Commit to `JointPositionActionMode(ee=False, absolute=True)` for v2.
+- [ ] Interpolate `q_start -> q_goal` with sample count determined by maximum
+      per-joint displacement, not by one fixed global `N`.
+- [ ] At every sample check limits, combined-arm collision, allowed-contact
+      policy, and propagated held-object geometry.
+- [ ] Rank clear paths by length, clearance, joint-limit margin, and bimanual
+      synchronization cost.
+- [ ] If a straight path is blocked, try alternative IK goals first, then a
+      small set of named joint-space recovery waypoints. Every segment must
+      pass the same checks.
+- [ ] Time-parameterize the selected path with bounded joint velocity and
+      acceleration. The controller must not infer timing from an LLM value.
+- [ ] Return `PATH_BLOCKED` with the blocking sample and contacts when all
+      candidates fail.
+- [ ] Defer RRT, CHOMP, cuRobo, and trajectory optimization until this simple
+      planner passes the deterministic end-to-end gate.
 
-New module: `agentic_v2/motion/candidate_generator.py` (grasp side).
-- [ ] `generate_grasp_candidates(object_name) -> list[GraspCandidate]` (grasp pose, pregrasp pose, approach axis, required aperture, score).
-- [ ] For objects with a real geometric affordance we already measured this session (pot handles, via P13's real geom data) - keep that as *environment affordance data*, not a scripted trajectory, exactly the same "measured, not guessed" principle v1 landed on for `SYMBOLIC_TARGETS`.
-- [ ] For generic objects (cube, blocks) - derive candidates from `aabb`/`bbox` geometry (already wired in v1's `state.py` this session) rather than guessing offsets.
-- [ ] Rank candidates by IK feasibility (Phase 4) + collision-free-ness (Phase 3), don't just take the first one.
+**Exit gate:** standalone plans are reproducible, entirely prechecked, and
+obey configured joint displacement and timing bounds.
 
-## Phase 7 — Bimanual constraint layer
+## Phase 5 - Executor, Monitor, And Checked Recovery
 
-New module: `agentic_v2/constraints/bimanual.py`.
-- [ ] `check_dual_arm_feasibility(left_pose, right_pose)` - joint IK feasibility must be checked on the **joint configuration**, not independently per arm (a real gap in v1 - self-collision was only caught reactively, mid-execution, never predicted).
-- [ ] Relative-pose-preservation constraint for tasks like `lift_pot`, once both arms hold the object: penalize/reject candidates where the EE-to-object relative transform would need to change a lot between consecutive steps (this directly targets the "grasped both handles, then lost the grip during lift" failure mode found in tonight's last real run).
+New modules: `agentic_v2/executor.py` and `monitor.py`.
 
-## Phase 8 — Handover / rendezvous planner
+- [ ] Add one explicit adapter from planned full joint states to RoboEval's
+      absolute joint-position action vector; test joint and gripper indexing.
+- [ ] Execute paths in short bounded chunks. Re-observe between chunks and
+      stop before issuing more actions when an invariant fails.
+- [ ] Monitor tracking error, collisions, allowed contacts, grasp state,
+      object displacement, EE-object relative transform, slip, task stage,
+      termination, and truncation.
+- [ ] Treat raw RoboEval success as an observed metric, not as permission to
+      hide unsafe or visibly failed behavior.
+- [ ] Invalidate cached plans and settle assumptions after every grasp,
+      release, unexpected contact, object displacement, or recovery.
+- [ ] Generalize v1 P19/P22 behavior into typed monitor events rather than
+      copying task-specific breakers.
+- [ ] Plan and collision-check every retreat. If no safe retreat exists, stop
+      with a structured failure instead of improvising Cartesian motion.
+- [ ] Produce an `ExecutionReport` containing executed samples, monitor events,
+      final state, failure code, benchmark metrics, and artifact paths.
+- [ ] Test interruption on tracking divergence, forbidden contact, displaced
+      object, lost grasp, and truncation.
 
-New module: `agentic_v2/skills/handover.py`.
-- [ ] Replace v1's `handover_midpoint = (left_ee + right_ee) / 2` heuristic with a real optimization: sample rendezvous region -> donor IK -> receiver IK -> dual-arm collision -> grasp compatibility -> pick the best point.
-- [ ] Reuse Phase 3/4/7 primitives - this phase is mostly composition, not new low-level machinery.
+**Exit gate:** a failed approach cannot close the gripper, a failed grasp
+cannot continue into transport, and bounded execution does not develop an
+uninterrupted oscillation.
 
-## Phase 9 — Skill library + re-attach the LLM
+## Phase 6 - Grasp Candidates And The Grasp Skill
 
-New modules: `agentic_v2/skills/{base,grasp,bimanual_grasp,lift,handover,transport,place}.py`, `agentic_v2/llm_planner.py`, `agentic_v2/prompts.py`.
-- [ ] Each skill exposes precondition/postcondition/failure-reason, and internally runs candidate-generate -> feasibility-check -> plan -> execute -> verify (Phases 3-8), never exposing raw offsets to the caller.
-- [ ] LLM prompt now only offers `skill` + semantic params (object, roles, goal) - no `ee_offset`/`steps`/`yaw`. This is the actual architecture change the whole plan is for; do it only after Phases 3-8 are independently tested, so a failure here can be attributed to *planning*, not *motion*.
-- [ ] `FeasibilityGate` rejection -> structured reason string back to the LLM (e.g. `"HANDOVER_REGION_EMPTY: no pose is reachable by both arms without self-collision"`) instead of v1's `"target not reached within tolerance"`.
+New modules: `agentic_v2/motion/candidate_generator.py` and
+`agentic_v2/skills/grasp.py`.
 
-## Phase 10 — Execution monitor, replanner, evaluator
+- [ ] Generate multiple pregrasp/grasp candidates with pose, approach axis,
+      required aperture, target contact set, and score.
+- [ ] Derive cube, rod, and block candidates from current object geometry.
+      Represent pot handles as measured environment affordances, not scripted
+      trajectories or guessed world offsets.
+- [ ] Include multiple valid approach orientations; do not assume one fixed
+      wrist yaw works across seeds.
+- [ ] Filter candidates by aperture, IK, joint limits, collision/contact policy,
+      and complete pregrasp-to-grasp path before execution.
+- [ ] Implement `Grasp` as preconditions -> candidate generation -> plan ->
+      open -> approach -> close -> verify hold -> checked retreat/postcondition.
+- [ ] Never close after a failed approach and never report success from finger
+      contact alone. Verification must include stable object-relative motion
+      over a short monitored lift or retreat.
+- [ ] Validate each object class with controlled reachable, blocked, too-wide,
+      and slip cases before running full tasks.
 
-New modules: `agentic_v2/{executor,monitor,replanner,evaluator}.py`.
-- [ ] Chunked execution with per-chunk invariant checks (object displacement, holding state) - this generalizes and replaces v1's ad hoc P19 (self-collision breaker) / P22 (object-bump breaker), making them a designed feature instead of a bolted-on patch.
-- [ ] `benchmark_success` vs `quality`/`behavior_quality` reported as separate top-level fields (v1's `quality_assessment` already does this split - keep it).
-- [ ] Optional: carry forward v1's P23 cross-trial memory idea (`summarize_trial_for_memory`) into v2's `memory.py`, now summarizing structured failure-reason codes instead of free-text messages.
+**Exit gate:** the skill either returns a verified stable hold or stops with a
+specific reason and a valid recovery state.
 
-## Phase 11 — Per-task validation (in this order)
+## Phase 7 - Bimanual Constraints, BimanualGrasp, And Lift
 
-1. `cube_handover` - best first test: exercises grasp, handover/rendezvous, dual-arm reachability, collision, release, without lift_pot's dual-grasp-then-lift complexity.
-2. `lift_pot` - dual grasp + bimanual relative-pose constraint (Phase 7) + synchronized transport.
-3. `stack_two_blocks` - grasp, transport, placement, optionally handoff (the 0.7m single-arm-carry problem v1's P15 found - v2's handover planner should let the LLM choose a handoff strategy for real, not just get a better-worded hint about one).
+New modules: `agentic_v2/constraints/bimanual.py`,
+`skills/bimanual_grasp.py`, and `skills/lift.py`.
 
-## Phase 12 — Ablation (the actual "results" section for your professor)
+- [ ] Solve paired targets into one combined joint configuration and validate
+      dual-arm self collision, environment collision, and object geometry.
+- [ ] Capture both `T_ee_object` transforms after verified grasps. Preserve
+      them within explicit translation/orientation tolerances during lift.
+- [ ] Synchronize paired paths by time, not by blindly matching array indices;
+      enforce bounded arm velocity difference and object tilt.
+- [ ] Implement deterministic `BimanualGrasp` and `Lift` skills with typed
+      preconditions, postconditions, and monitor invariants.
+- [ ] Test asymmetric reach, one-arm grasp loss, conflicting paired IK,
+      inter-arm collision, object tilt, and successful synchronized lift.
 
-Compare, same 3 tasks, same metrics (`success rate`, `subtask_progress`,
-`env_collision`, `self_collision`, `path_length`, `slip`):
+**Exit gate:** both grasps remain verified through a controlled lift, or both
+arms stop safely with the failing constraint identified.
 
-| Method | Feasibility Gate | Collision-aware Planner | Replan | LLM |
+## Phase 8 - Transport, Handover, And Place Skills
+
+New modules: `agentic_v2/skills/{transport,handover,place}.py`.
+
+- [x] Transport held objects with propagated geometry and preserved grasp
+      transforms at every path sample.
+- [x] Replace the v1 handover midpoint with sampled rendezvous candidates.
+      Check donor IK, receiver IK, combined-arm collision, held-object sweep,
+      receiver grasp compatibility, and both approach paths.
+- [x] Close and verify the receiver before releasing the donor. If verification
+      fails, preserve the donor hold and return a replannable failure state.
+- [x] Generate placement candidates from support geometry, object dimensions,
+      target contact policy, clearance, and predicted static stability.
+- [x] Verify placement only after release and settling. For stacking, require
+      the upper block to contact the lower block, not the table, and require
+      both grippers to release.
+- [x] Return structured failures using the `FailureCode` enum: empty
+      rendezvous regions as `HANDOVER_REGION_EMPTY`, blocked transport as
+      `PATH_BLOCKED`, incompatible grasps as `NO_VALID_GRASP`, unstable or
+      unreachable placement as `PLACEMENT_UNREACHABLE`, and a failed
+      release as `RELEASE_FAILED`.
+- [ ] Explicitly test the approximately 0.7 m transfer in `stack_two_blocks`
+      instead of assuming one arm can carry directly across the workspace.
+
+**Exit gate:** controlled tests can transport, transfer, and place objects
+without stale geometry, premature donor release, or false placement success.
+
+## Phase 9 - Deterministic End-To-End Gate (No LLM)
+
+- [x] Build fixed semantic skill sequences for all three tasks. These sequences
+      may choose skills and named objects, but may not contain poses, offsets,
+      joint values, timing, or seed-specific branches.
+- [ ] Validate in this order: `cube_handover`, `lift_pot`, then
+      `stack_two_blocks`.
+- [ ] Run each sequence on seeds `0..9` in fresh independent processes using
+      the same settings intended for the LLM evaluation.
+- [ ] Require at least 8/10 raw RoboEval successes for **each** task before
+      connecting GPT or Claude. Behavior-quality failures remain visible even
+      when the benchmark metric reports success.
+- [x] Save per-step state, selected candidates, rejected candidates, paths,
+      monitor events, metrics, final report, and both success/failure GIFs.
+- [ ] Fix deterministic motion or skill failures here. Do not ask an LLM to
+      compensate for an unreliable low-level stack.
+
+**Exit gate:** all three fixed semantic plans reach at least 8/10 raw success
+and failures are attributable from structured artifacts.
+
+## Phase 10 - Attach The Online LLM Planner
+
+New modules: `agentic_v2/llm_planner.py`, `prompts.py`, and `replanner.py`.
+
+- [x] Expose only a versioned semantic JSON schema: skill name, object,
+      left/right roles, symbolic goal, and optional strategy choice.
+- [x] Reject unknown skills and all low-level fields, including joint values,
+      poses, offsets, yaw, controller gains, step counts, and tolerances.
+- [x] Give the model the task goal, raw success condition, current typed state,
+      available skills, skill preconditions, prior action result, and compact
+      structured failure evidence.
+- [x] Compile every accepted semantic request through the same deterministic
+      candidate -> feasibility -> path -> execute -> verify pipeline from
+      Phases 2-8.
+- [x] Re-observe after each skill and ask the LLM for the next semantic action.
+      Replanning may change strategy, but cannot bypass safety checks.
+- [x] Keep cross-trial memory off by default. Within-trial history is allowed
+      and must be logged. Add memory later only as a named ablation.
+- [x] Log prompts, model responses, validated requests, token usage, latency,
+      failure codes, and replanning decisions without logging API keys.
+
+**Exit gate:** GPT/Claude acts only through semantic skills in a genuinely
+online observe-decide-execute-observe loop.
+
+## Phase 11 - Evaluation, Ablations, And Artifacts
+
+- [ ] Run every method on tasks `lift_pot`, `cube_handover`, and
+      `stack_two_blocks`, seeds `0..9`, with identical simulator settings.
+- [x] Start every trial in a fresh environment and every method in an
+      independent process. Do not carry messages, summaries, or memory between
+      trials unless the row is explicitly `+Memory`.
+- [x] Report raw `benchmark_success` and `subtask_progress` separately from
+      `behavior_quality`; never rename a quality pass as task success.
+- [x] Record collision counts by class, slip count, path length, execution
+      time, planning time, LLM calls/tokens/cost, replan count, terminal
+      failure code, and bimanual coordination metrics.
+- [x] Save machine-readable JSON/JSONL, aggregate CSV, run config, prompt and
+      response logs, trajectory data, and representative success/failure GIFs.
+- [x] Include confidence intervals and per-seed paired comparisons where the
+      same seeds are used; do not present only one aggregate percentage.
+
+Required comparison rows:
+
+| Method | Feasibility gate | Semantic LLM | Online replan | Cross-trial memory |
 | --- | --- | --- | --- | --- |
-| v1 (this session's endpoint, P23) | no | no | yes (text feedback) | yes |
-| v2-A | IK only | no | yes | yes |
-| v2-B | full | yes | yes | yes |
-| v2-C (ablation) | full | yes | **no** | fixed script |
-| v2-Full | full | yes | yes | yes |
+| v1-P22 independent | none | yes | text feedback only | off |
+| v1-P23 + Memory | none | yes | text feedback only | on |
+| v2-IK-only | IK only | yes | yes | off |
+| v2-Fixed | full | no, fixed semantic plan | no | off |
+| v2-Full-no-replan | full | yes | no | off |
+| v2-Full | full | yes | yes | off |
+| v2-Full + Memory | full | yes | yes | on |
 
-This table is the actual deliverable - it directly shows what each
-architectural piece contributes, which is a much stronger thing to hand your
-professor than a single success-rate number.
+The primary claim must compare `v1-P22 independent` with `v2-Full`.
+`v2-Fixed` measures the deterministic robotics layer, and `+Memory` is an
+optional ablation rather than part of the main method.
 
-## Reference repos - do you need to download anything
+**Exit gate:** all rows are reproducible from saved manifests and reports, and
+the result table can be regenerated without manually relabeling outcomes.
 
-Yes, worth getting these two locally (small, directly relevant, I can read
-their real solver code instead of reasoning from the paper abstract):
+## Phase 12 - Explicitly Deferred Work
 
-- **ReKep** (`github.com/huangwl18/ReKep`) - `ik_solver.py`, `subgoal_solver.py`, `path_solver.py`, `constraint_generation.py` map almost 1:1 onto Phases 4/5/7 above. Highest value.
-- **VoxPoser** (`github.com/huangwl18/VoxPoser`) - not for its code (different problem - value maps from vision), but `LMP.py` / `interfaces.py` / `planners.py` / `controllers.py` is a clean example of exactly the module split Phase 9 needs (LLM program / robot API / planner / controller kept separate).
+Do not start these items until the base-task v2 result table is complete:
 
-Lower priority, skip cloning for now (read about them, don't try to integrate):
-- **VLM-TAMP / kitchen-worlds** - PyBullet + PDDLStream, large and heavy; useful to *read* for the VLM-subgoal <-> TAMP-feasibility <-> replan loop shape, but porting its actual code to MuJoCo isn't practical.
-- **cuRobo** - GPU/CUDA, Isaac-adjacent dependency footprint; a good *future* swap-in for Phase 5's path planner once the naive version works, not a day-one dependency.
-- **LABOR-Agent** - small, directly bimanual, but its main contribution (LLM coordination/sequencing) is closer to what v1 already does; lower incremental value than ReKep/VoxPoser for *this* redesign specifically.
+- [ ] Position and orientation task variants.
+- [ ] Long-horizon RoboEval tasks beyond the selected three.
+- [ ] Vision-only scene parsing or learned perception.
+- [ ] RRT, CHOMP, ReKep-style trajectory optimization, cuRobo, or an Isaac
+      migration. cuRobo is especially a later Linux/CUDA integration.
+- [ ] PDDLStream or another symbolic task planner.
+- [ ] Learned grasp policies, OpenVLA, or direct low-level model control.
 
-Put whichever you clone in a location outside `roboeval/agentic_v2/` (e.g. a
-top-level `reference/` folder, gitignored) so they're readable but never
-mistaken for part of the actual submission.
+## Reference-Code Policy
 
-## Effort reality check
+- **ReKep** is available at `E:\djf\ReKep-main`. Read its constraint/subgoal/
+  path decomposition for architectural ideas, but do not claim its modules map
+  one-to-one onto RoboEval. Its local `ik_solver.py` uses Lula and its
+  `path_solver.py` optimizes end-effector control points against an SDF; both
+  differ from this MuJoCo joint-space implementation.
+- No license file was visible in the downloaded ReKep tree during review.
+  Therefore use ideas and independently implement them; do not copy source
+  code into RoboEval unless licensing is clarified.
+- **VoxPoser** is available at `E:\djf\VoxPoser-main`. Use its separation of
+  LLM interface, planner, controller, and environment as a design reference.
+  Its code is MIT-licensed; preserve the license and attribution if any code is
+  actually adapted.
+- Do not vendor either repository or make it a runtime dependency. Record any
+  adapted algorithm and source in a dedicated attribution note.
+- Treat VLM-TAMP, PDDLStream, cuRobo, and LABOR-Agent as reading material for
+  later scope, not as dependencies for the base-task milestone.
 
-This is not a few-hours patch like tonight's P22/P23 - each of Phases 3-9 is
-its own small project with its own testing checkpoint, matching the user's
-own "don't skip phases" instruction. Recommended: treat Phase 0-2 as the
-next concrete session (scaffold + types + the correctness fixes, all low
-risk, no new hard dependencies), and revisit scope/pace after that lands.
+## Definition Of Done
+
+The base-task v2 milestone is complete only when all items below are true:
+
+- [ ] v1 remains unchanged and both baseline commits are reproducible.
+- [ ] A semantic `SkillRequest` can traverse candidate generation, IK,
+      collision checking, planning, bounded execution, monitoring, and
+      postcondition verification without an LLM.
+- [ ] Planning tests prove there is no live MuJoCo mutation.
+- [ ] Every trajectory sample checks the combined robot, propagated held
+      objects, and a skill-specific allowed-contact policy.
+- [ ] Failed approach/grasp/transfer/place operations stop or run a checked
+      recovery; they cannot silently continue to the next skill.
+- [ ] Fixed semantic plans obtain at least 8/10 raw successes on every selected
+      task across seeds `0..9` before API evaluation begins.
+- [ ] GPT or Claude performs online observation and semantic replanning, never
+      low-level control, and every accepted request passes the same gate.
+- [ ] The complete evaluation matrix reports raw benchmark success separately
+      from quality metrics and includes logs, trajectories, configs, costs,
+      representative GIFs, and attributable failure codes.
+
+Completing only the API call, a visually plausible rollout, or a
+deterministic script does not by itself satisfy the professor's agentic-task
+objective.

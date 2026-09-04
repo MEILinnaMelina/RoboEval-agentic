@@ -1,0 +1,40 @@
+[
+  {
+    "is_replan": false,
+    "latency_seconds": 0.0,
+    "model": "fixed-semantic-v1",
+    "provider": "deterministic",
+    "raw_response": "",
+    "request": {
+      "goal": "stable_hold",
+      "object_name": "cube",
+      "roles": {
+        "right": "grasping_arm"
+      },
+      "skill": "grasp",
+      "strategy": null
+    },
+    "system_prompt": "",
+    "thought": "Execute the next fixed semantic gate step.",
+    "usage": {},
+    "user_prompt": ""
+  },
+  {
+    "is_replan": false,
+    "latency_seconds": 0.0,
+    "model": "fixed-semantic-v1",
+    "provider": "deterministic",
+    "raw_response": "",
+    "request": {
+      "goal": "transfer_to_other_arm",
+      "object_name": "cube",
+      "roles": {},
+      "skill": "handover",
+      "strategy": null
+    },
+    "system_prompt": "",
+    "thought": "Execute the next fixed semantic gate step.",
+    "usage": {},
+    "user_prompt": ""
+  }
+]

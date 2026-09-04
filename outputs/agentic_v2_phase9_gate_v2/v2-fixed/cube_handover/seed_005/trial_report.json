@@ -1,0 +1,5166 @@
+{
+  "artifacts": {
+    "planner_trace": "E:\\djf\\RoboEval-main\\outputs\\agentic_v2_phase9_gate_v2\\v2-fixed\\cube_handover\\seed_005\\planner_trace.json",
+    "planning_trace": "E:\\djf\\RoboEval-main\\outputs\\agentic_v2_phase9_gate_v2\\v2-fixed\\cube_handover\\seed_005\\planning_trace.json",
+    "run_config": "E:\\djf\\RoboEval-main\\outputs\\agentic_v2_phase9_gate_v2\\v2-fixed\\cube_handover\\seed_005\\run_config.json"
+  },
+  "behavior_quality": {
+    "checks": {
+      "exactly_one_final_holder": true,
+      "finite_robot_state": true,
+      "no_environment_collision": true,
+      "no_self_collision": true,
+      "no_slip": false
+    },
+    "passed": false
+  },
+  "benchmark_success": 0.0,
+  "failure_code": "HANDOVER_REGION_EMPTY",
+  "final_state": {
+    "action_shape": [
+      16
+    ],
+    "control_frequency": 20,
+    "metrics": {
+      "avg_cartesian_jerk": {
+        "left": 1.5535097463205623,
+        "right": 2.313754075467919
+      },
+      "avg_cartesian_path_length": 1.29391386567049,
+      "avg_joint_jerk": {
+        "left": 4.280492527052653,
+        "right": 5.195276837190461
+      },
+      "avg_joint_path_length": 8.183601440651977,
+      "avg_orientation_path_length": 5.480691297266995,
+      "bimanual_arm_velocity_difference": 0.3322064393770792,
+      "bimanual_gripper_vertical_difference": 0.0575127015313078,
+      "cartesian_path_length": {
+        "left": 1.2366500010494803,
+        "right": 1.3511777302914998
+      },
+      "completion_time": 5.608584403991699,
+      "env_collision_count": 0,
+      "joint_path_length": {
+        "left": 12.908419400095823,
+        "right": 3.4587834812081284
+      },
+      "orientation_path_length": {
+        "left": 10.083937266192013,
+        "right": 0.8774453283419782
+      },
+      "overall_avg_cartesian_jerk": 1.9336319108942408,
+      "overall_avg_joint_jerk": 4.737884682121557,
+      "overall_rms_cartesian_jerk": 6.142219263663798,
+      "overall_rms_joint_jerk": 18.458086877697706,
+      "rms_cartesian_jerk": {
+        "left": 5.0401829599829755,
+        "right": 7.074621593819883
+      },
+      "rms_joint_jerk": {
+        "left": 16.785994204427585,
+        "right": 19.99080641040266
+      },
+      "self_collision_count": 0,
+      "slip_count": 1,
+      "slip_count_per_object": {
+        "object_1": 1
+      },
+      "subtask_progress": 1.0,
+      "success": 0.0,
+      "target_distance": {
+        "cube to left gripper": 0.22332030226419217,
+        "cube to right gripper": 0.12596902507580185,
+        "lift distance": 0.13442068148778463
+      },
+      "task_stage_reached": {
+        "1": true,
+        "2": true
+      },
+      "task_success": 0.0,
+      "total_cartesian_path_length": 2.58782773134098,
+      "total_joint_path_length": 16.367202881303953,
+      "total_orientation_path_length": 10.96138259453399
+    },
+    "objects": {
+      "cube": {
+        "aabb_center": [
+          0.5532205948087887,
+          -0.14118384226087688,
+          1.039778190498943
+        ],
+        "angular_velocity": [
+          -0.06660953455265102,
+          0.14432565184421847,
+          -0.0029358249590459625
+        ],
+        "contacts": [
+          "robot:right:finger"
+        ],
+        "held_by": [
+          "right"
+        ],
+        "linear_velocity": [
+          0.002065730694271626,
+          -0.006574537091957491,
+          -0.07234173855976012
+        ],
+        "name": "cube",
+        "pose": {
+          "position": [
+            0.5620192677349327,
+            -0.01878371430675973,
+            1.1043206814877846
+          ],
+          "quaternion_wxyz": [
+            0.9997589863201265,
+            -0.009084793167847511,
+            0.01928842639696343,
+            0.005233776110951028
+          ]
+        },
+        "size": [
+          0.24161018077244212,
+          0.5123533202626439,
+          0.17976026319513383
+        ]
+      }
+    },
+    "robot": {
+      "arms": {
+        "left": {
+          "ee_pose": {
+            "position": [
+              0.5052467422634388,
+              0.19661685752146518,
+              1.0884640926039029
+            ],
+            "quaternion_wxyz": [
+              0.4589523968517834,
+              0.5071521378826228,
+              -0.5338804999841835,
+              0.49712273957416847
+            ]
+          },
+          "gripper_aperture_m": 0.0799,
+          "gripper_command": 0.0,
+          "holding": [],
+          "joint_positions": [
+            -1.17864191532135,
+            -0.7838056087493896,
+            0.9213558435440063,
+            -2.5218186378479004,
+            -1.094906210899353,
+            2.239884614944458,
+            -0.35873258113861084
+          ],
+          "joint_velocities": [
+            0.0016516047762706876,
+            -0.0012075796257704496,
+            0.01957029476761818,
+            -0.028343623504042625,
+            0.01589219830930233,
+            -0.00370987830683589,
+            -0.0012835029046982527
+          ],
+          "side": "left"
+        },
+        "right": {
+          "ee_pose": {
+            "position": [
+              0.5697109417848841,
+              -0.017121222307027964,
+              1.230043668841761
+            ],
+            "quaternion_wxyz": [
+              0.028855033975958757,
+              0.7069545311286239,
+              -0.7066064399692202,
+              -0.009487724963265923
+            ]
+          },
+          "gripper_aperture_m": 0.0365,
+          "gripper_command": 1.0,
+          "holding": [
+            "cube"
+          ],
+          "joint_positions": [
+            0.2805802822113037,
+            0.01019604504108429,
+            0.2625293731689453,
+            -1.5308905839920044,
+            0.0019240053370594978,
+            1.4801498651504517,
+            -0.2425977736711502
+          ],
+          "joint_velocities": [
+            -0.002408486558124423,
+            0.07358838617801666,
+            -0.0032832741271704435,
+            -0.07273910939693451,
+            -0.0015423779841512442,
+            -0.014816448092460632,
+            -0.002762947930023074
+          ],
+          "side": "right"
+        }
+      },
+      "joint_positions": [
+        -1.17864191532135,
+        -0.7838056087493896,
+        0.9213558435440063,
+        -2.5218186378479004,
+        -1.094906210899353,
+        2.239884614944458,
+        -0.35873258113861084,
+        0.2805802822113037,
+        0.01019604504108429,
+        0.2625293731689453,
+        -1.5308905839920044,
+        0.0019240053370594978,
+        1.4801498651504517,
+        -0.2425977736711502
+      ],
+      "joint_velocities": [
+        0.0016516047762706876,
+        -0.0012075796257704496,
+        0.01957029476761818,
+        -0.028343623504042625,
+        0.01589219830930233,
+        -0.00370987830683589,
+        -0.0012835029046982527,
+        -0.002408486558124423,
+        0.07358838617801666,
+        -0.0032832741271704435,
+        -0.07273910939693451,
+        -0.0015423779841512442,
+        -0.014816448092460632,
+        -0.002762947930023074
+      ]
+    },
+    "seed": 5,
+    "task_key": "cube_handover",
+    "task_name": "CubeHandover"
+  },
+  "metadata": {
+    "planner_model": "fixed-semantic-v1",
+    "planner_provider": "deterministic",
+    "runtime": {
+      "deterministic_pipeline_seconds": 4.646556700026849,
+      "executed_trajectory_points": 476,
+      "llm_calls": 0,
+      "llm_cost_usd": null,
+      "llm_planning_seconds": 0.0,
+      "llm_usage": {},
+      "monitor_failure_counts": {
+        "HELD_OBJECT_COLLISION": 1,
+        "SLIP_DETECTED": 1
+      },
+      "motion_plans": 10,
+      "replan_count": 0,
+      "trial_elapsed_seconds": 5.701530899998033
+    },
+    "schema": "roboeval.agentic_v2.skill_request.v1"
+  },
+  "method": "v2-fixed",
+  "metrics": {
+    "avg_cartesian_jerk": {
+      "left": 1.5535097463205623,
+      "right": 2.313754075467919
+    },
+    "avg_cartesian_path_length": 1.29391386567049,
+    "avg_joint_jerk": {
+      "left": 4.280492527052653,
+      "right": 5.195276837190461
+    },
+    "avg_joint_path_length": 8.183601440651977,
+    "avg_orientation_path_length": 5.480691297266995,
+    "bimanual_arm_velocity_difference": 0.3322064393770792,
+    "bimanual_gripper_vertical_difference": 0.0575127015313078,
+    "cartesian_path_length": {
+      "left": 1.2366500010494803,
+      "right": 1.3511777302914998
+    },
+    "completion_time": 5.608584403991699,
+    "deterministic_pipeline_seconds": 4.646556700026849,
+    "env_collision_count": 0,
+    "executed_trajectory_points": 476,
+    "joint_path_length": {
+      "left": 12.908419400095823,
+      "right": 3.4587834812081284
+    },
+    "llm_calls": 0,
+    "llm_cost_usd": null,
+    "llm_planning_seconds": 0.0,
+    "llm_usage": {},
+    "monitor_failure_counts": {
+      "HELD_OBJECT_COLLISION": 1,
+      "SLIP_DETECTED": 1
+    },
+    "motion_plans": 10,
+    "orientation_path_length": {
+      "left": 10.083937266192013,
+      "right": 0.8774453283419782
+    },
+    "overall_avg_cartesian_jerk": 1.9336319108942408,
+    "overall_avg_joint_jerk": 4.737884682121557,
+    "overall_rms_cartesian_jerk": 6.142219263663798,
+    "overall_rms_joint_jerk": 18.458086877697706,
+    "replan_count": 0,
+    "rms_cartesian_jerk": {
+      "left": 5.0401829599829755,
+      "right": 7.074621593819883
+    },
+    "rms_joint_jerk": {
+      "left": 16.785994204427585,
+      "right": 19.99080641040266
+    },
+    "self_collision_count": 0,
+    "slip_count": 1,
+    "slip_count_per_object": {
+      "object_1": 1
+    },
+    "subtask_progress": 1.0,
+    "success": 0.0,
+    "target_distance": {
+      "cube to left gripper": 0.22332030226419217,
+      "cube to right gripper": 0.12596902507580185,
+      "lift distance": 0.13442068148778463
+    },
+    "task_stage_reached": {
+      "1": true,
+      "2": true
+    },
+    "task_success": 0.0,
+    "total_cartesian_path_length": 2.58782773134098,
+    "total_joint_path_length": 16.367202881303953,
+    "total_orientation_path_length": 10.96138259453399,
+    "trial_elapsed_seconds": 5.701530899998033
+  },
+  "seed": 5,
+  "skill_results": [
+    {
+      "diagnostics": {
+        "attachment": {
+          "ee_to_object": {
+            "position": [
+              -0.0015633814781914283,
+              0.0007554156454837035,
+              0.12597200159820088
+            ],
+            "quaternion_wxyz": [
+              0.007749050507130121,
+              -0.7047468141571982,
+              0.709414878879718,
+              0.0015523451912409884
+            ]
+          },
+          "object_name": "cube",
+          "side": "right"
+        },
+        "candidate": "cube_right_top_0"
+      },
+      "execution_reports": [
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": false,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 17,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 0.4443326366447522,
+                "right": 0.4443326366447522
+              },
+              "avg_cartesian_path_length": 0.004352451123460116,
+              "avg_joint_jerk": {
+                "left": 0.5888083633626432,
+                "right": 0.5888083633626424
+              },
+              "avg_joint_path_length": 0.00578140858745577,
+              "avg_orientation_path_length": 0.008816102919319922,
+              "bimanual_arm_velocity_difference": 1.1642567510945328e-16,
+              "bimanual_gripper_vertical_difference": 0.0,
+              "cartesian_path_length": {
+                "left": 0.004352451123460116,
+                "right": 0.004352451123460116
+              },
+              "completion_time": 0.0967872142791748,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.00578140858745577,
+                "right": 0.00578140858745577
+              },
+              "orientation_path_length": {
+                "left": 0.008816102919319922,
+                "right": 0.008816102919319922
+              },
+              "overall_avg_cartesian_jerk": 0.4443326366447522,
+              "overall_avg_joint_jerk": 0.5888083633626428,
+              "overall_rms_cartesian_jerk": 0.8597296422335262,
+              "overall_rms_joint_jerk": 1.1382788539528672,
+              "rms_cartesian_jerk": {
+                "left": 0.8597296422335262,
+                "right": 0.8597296422335262
+              },
+              "rms_joint_jerk": {
+                "left": 1.138278853952868,
+                "right": 1.138278853952866
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.4191932992542159,
+                "cube to right gripper": 0.4192459607253029,
+                "lift distance": 9.834077724646395e-05
+              },
+              "task_stage_reached": {
+                "1": false,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.008704902246920231,
+              "total_joint_path_length": 0.01156281717491154,
+              "total_orientation_path_length": 0.017632205838639843
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4999999984017722,
+                  3.69565489322099e-14,
+                  0.984971758394315
+                ],
+                "angular_velocity": [
+                  2.8415039568196214e-13,
+                  -1.031845231220382e-08,
+                  1.7883397725283554e-12
+                ],
+                "contacts": [
+                  "scene:table/collider_001"
+                ],
+                "held_by": [],
+                "linear_velocity": [
+                  -2.0654279605141225e-10,
+                  4.945451455758606e-14,
+                  -2.0631027115029393e-10
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.49999999696998865,
+                    4.0251499022758675e-14,
+                    0.9699983407772464
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    1.1332104365042439e-13,
+                    -4.157466300261723e-09,
+                    7.281561511130951e-13
+                  ]
+                },
+                "size": [
+                  0.040000003196455636,
+                  0.20000000000007392,
+                  0.07005648321137026
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6561027422481815,
+                      0.2999632054626672,
+                      1.2177422214783287
+                    ],
+                    "quaternion_wxyz": [
+                      0.005102561784153832,
+                      0.7070547641559586,
+                      -0.7071236579571436,
+                      -0.00486381587947382
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.2827370571576466e-07,
+                    0.006600686814635992,
+                    -1.504094484516827e-06,
+                    -1.577138066291809,
+                    -0.0003369509649928659,
+                    1.5696440935134888,
+                    -0.785300076007843
+                  ],
+                  "joint_velocities": [
+                    6.316827949603976e-08,
+                    6.422957994800527e-06,
+                    5.666872127108036e-08,
+                    -7.250886483234353e-06,
+                    -4.3097574575767794e-07,
+                    -1.1417480436648475e-06,
+                    -2.378889751852853e-09
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.6561027422481815,
+                      -0.3000367945373328,
+                      1.2177422214783287
+                    ],
+                    "quaternion_wxyz": [
+                      0.005102561784153832,
+                      0.7070547641559586,
+                      -0.7071236579571436,
+                      -0.00486381587947382
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.2827370571576466e-07,
+                    0.006600686814635992,
+                    -1.504094484516827e-06,
+                    -1.577138066291809,
+                    -0.0003369509649928659,
+                    1.5696440935134888,
+                    -0.785300076007843
+                  ],
+                  "joint_velocities": [
+                    6.316827949603976e-08,
+                    6.422957994800527e-06,
+                    5.666872127108036e-08,
+                    -7.250886483234353e-06,
+                    -4.3097574575767794e-07,
+                    -1.1417480436648475e-06,
+                    -2.378889751852853e-09
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.2827370571576466e-07,
+                0.006600686814635992,
+                -1.504094484516827e-06,
+                -1.577138066291809,
+                -0.0003369509649928659,
+                1.5696440935134888,
+                -0.785300076007843,
+                2.2827370571576466e-07,
+                0.006600686814635992,
+                -1.504094484516827e-06,
+                -1.577138066291809,
+                -0.0003369509649928659,
+                1.5696440935134888,
+                -0.785300076007843
+              ],
+              "joint_velocities": [
+                6.316827949603976e-08,
+                6.422957994800527e-06,
+                5.666872127108036e-08,
+                -7.250886483234353e-06,
+                -4.3097574575767794e-07,
+                -1.1417480436648475e-06,
+                -2.378889751852853e-09,
+                6.316827949603976e-08,
+                6.422957994800527e-06,
+                5.666872127108036e-08,
+                -7.250886483234353e-06,
+                -4.3097574575767794e-07,
+                -1.1417480436648475e-06,
+                -2.378889751852853e-09
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "open_right_gripper",
+          "subtask_progress": 0.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": false,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 33,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.253648719556696,
+                "right": 2.6094781280107795
+              },
+              "avg_cartesian_path_length": 0.18302618923828723,
+              "avg_joint_jerk": {
+                "left": 1.672834451836485,
+                "right": 4.760811530270406
+              },
+              "avg_joint_path_length": 0.4318967795949137,
+              "avg_orientation_path_length": 0.03938158579638712,
+              "bimanual_arm_velocity_difference": 0.2698655879146487,
+              "bimanual_gripper_vertical_difference": 0.010530397009080565,
+              "cartesian_path_length": {
+                "left": 0.011298351467029361,
+                "right": 0.3547540270095451
+              },
+              "completion_time": 0.3209967613220215,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.01502759234984032,
+                "right": 0.8487659668399871
+              },
+              "orientation_path_length": {
+                "left": 0.02291351072290828,
+                "right": 0.05584966086986595
+              },
+              "overall_avg_cartesian_jerk": 1.9315634237837378,
+              "overall_avg_joint_jerk": 3.2168229910534456,
+              "overall_rms_cartesian_jerk": 4.9511219999508125,
+              "overall_rms_joint_jerk": 7.18837962378022,
+              "rms_cartesian_jerk": {
+                "left": 4.716481973332172,
+                "right": 5.175134385890527
+              },
+              "rms_joint_jerk": {
+                "left": 6.2953557678400145,
+                "right": 7.9821111861136576
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.4157761889593108,
+                "cube to right gripper": 0.20791247740483818,
+                "lift distance": 9.83404353188666e-05
+              },
+              "task_stage_reached": {
+                "1": false,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.36605237847657446,
+              "total_joint_path_length": 0.8637935591898274,
+              "total_orientation_path_length": 0.07876317159277424
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.49999999805948975,
+                  1.1195905313954313e-13,
+                  0.984971758394315
+                ],
+                "angular_velocity": [
+                  2.8427318921985206e-13,
+                  -1.0408327285986477e-08,
+                  1.788350443225241e-12
+                ],
+                "contacts": [
+                  "scene:table/collider_001"
+                ],
+                "held_by": [],
+                "linear_velocity": [
+                  -2.0834025304946846e-10,
+                  4.9452442141273366e-14,
+                  -2.0812126457958794e-10
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4999999966277104,
+                    1.218485910688588e-13,
+                    0.9699983404353189
+                  ],
+                  "quaternion_wxyz": [
+                    1.0,
+                    3.47773618537961e-13,
+                    -1.2707254290656074e-08,
+                    2.2035713588811366e-12
+                  ]
+                },
+                "size": [
+                  0.04000000388102054,
+                  0.20000000000022394,
+                  0.07005648321137026
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6576341431459256,
+                      0.2999253727316236,
+                      1.2109673964339513
+                    ],
+                    "quaternion_wxyz": [
+                      0.010203391999910029,
+                      0.707002895755878,
+                      -0.7070701265116077,
+                      -0.009727917524232337
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.282715030332838e-07,
+                    0.01324031688272953,
+                    -5.079840775579214e-06,
+                    -1.583463191986084,
+                    -0.0006710869492962956,
+                    1.568515419960022,
+                    -0.7853000164031982
+                  ],
+                  "joint_velocities": [
+                    2.2794698420480763e-11,
+                    8.432831100080307e-10,
+                    1.7831677107116306e-11,
+                    -1.324484855125263e-09,
+                    -9.402280343184799e-11,
+                    -1.4609936871412543e-10,
+                    -1.0799871196995325e-12
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5008521385872022,
+                      -0.0002292677191665474,
+                      1.1779089451456393
+                    ],
+                    "quaternion_wxyz": [
+                      0.005820791909943484,
+                      0.7072431032080344,
+                      -0.7069440307210354,
+                      -0.0018570875333718513
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    0.3017977476119995,
+                    -0.1979520171880722,
+                    0.3053337633609772,
+                    -1.9008193016052246,
+                    0.06117527559399605,
+                    1.699416160583496,
+                    -0.19288213551044464
+                  ],
+                  "joint_velocities": [
+                    0.004520025569945574,
+                    -0.0035446786787360907,
+                    0.004307564347982407,
+                    -0.005557244643568993,
+                    0.001006159232929349,
+                    0.0023780891206115484,
+                    0.010671877302229404
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.282715030332838e-07,
+                0.01324031688272953,
+                -5.079840775579214e-06,
+                -1.583463191986084,
+                -0.0006710869492962956,
+                1.568515419960022,
+                -0.7853000164031982,
+                0.3017977476119995,
+                -0.1979520171880722,
+                0.3053337633609772,
+                -1.9008193016052246,
+                0.06117527559399605,
+                1.699416160583496,
+                -0.19288213551044464
+              ],
+              "joint_velocities": [
+                2.2794698420480763e-11,
+                8.432831100080307e-10,
+                1.7831677107116306e-11,
+                -1.324484855125263e-09,
+                -9.402280343184799e-11,
+                -1.4609936871412543e-10,
+                -1.0799871196995325e-12,
+                0.004520025569945574,
+                -0.0035446786787360907,
+                0.004307564347982407,
+                -0.005557244643568993,
+                0.001006159232929349,
+                0.0023780891206115484,
+                0.010671877302229404
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_right_top_0_pregrasp",
+          "subtask_progress": 0.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": false,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 22,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.620686840168161,
+                "right": 2.7766470381366144
+              },
+              "avg_cartesian_path_length": 0.226490987122789,
+              "avg_joint_jerk": {
+                "left": 2.1648182813393184,
+                "right": 5.802053695140888
+              },
+              "avg_joint_path_length": 0.5797372839612697,
+              "avg_orientation_path_length": 0.05661958824176627,
+              "bimanual_arm_velocity_difference": 0.24882730148870033,
+              "bimanual_gripper_vertical_difference": 0.02948288650252488,
+              "cartesian_path_length": {
+                "left": 0.018268951277413976,
+                "right": 0.43471302296816405
+              },
+              "completion_time": 0.4833335876464844,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.024320984462063152,
+                "right": 1.1351535834604762
+              },
+              "orientation_path_length": {
+                "left": 0.03706658257187612,
+                "right": 0.07617259391165643
+              },
+              "overall_avg_cartesian_jerk": 2.1986669391523876,
+              "overall_avg_joint_jerk": 3.983435988240103,
+              "overall_rms_cartesian_jerk": 5.3930873031468245,
+              "overall_rms_joint_jerk": 8.10785625736356,
+              "rms_cartesian_jerk": {
+                "left": 5.503274100172223,
+                "right": 5.280601812019213
+              },
+              "rms_joint_jerk": {
+                "left": 7.3506641125046075,
+                "right": 8.800136549240342
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.4123973301337661,
+                "cube to right gripper": 0.12810165514614683,
+                "lift distance": 9.834020571364288e-05
+              },
+              "task_stage_reached": {
+                "1": false,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.452981974245578,
+              "total_joint_path_length": 1.1594745679225393,
+              "total_orientation_path_length": 0.11323917648353254
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4999999978296482,
+                  1.6197460039890643e-13,
+                  0.984971758394315
+                ],
+                "angular_velocity": [
+                  2.842785461112494e-13,
+                  -1.0468678818785521e-08,
+                  1.7883504401611864e-12
+                ],
+                "contacts": [
+                  "scene:table/collider_001"
+                ],
+                "held_by": [],
+                "linear_velocity": [
+                  -2.095472440010983e-10,
+                  4.9449185487067974e-14,
+                  -2.0931684510305966e-10
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4999999963978716,
+                    1.7624471482236027e-13,
+                    0.9699983402057136
+                  ],
+                  "quaternion_wxyz": [
+                    0.9999999999999999,
+                    5.041197677918177e-13,
+                    -1.8448445167555532e-08,
+                    3.187180744493349e-12
+                  ]
+                },
+                "size": [
+                  0.04000000434070361,
+                  0.20000000000032397,
+                  0.07005648321137026
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6590964142167446,
+                      0.2998865214912308,
+                      1.2041520546043034
+                    ],
+                    "quaternion_wxyz": [
+                      0.01532325877176306,
+                      0.7069162346578503,
+                      -0.7069802982299522,
+                      -0.014611393926273157
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.2769324914406752e-07,
+                    0.019937194883823395,
+                    -1.0460552402946632e-05,
+                    -1.589799404144287,
+                    -0.0010048161493614316,
+                    1.5673993825912476,
+                    -0.7852999567985535
+                  ],
+                  "joint_velocities": [
+                    5.795272706166088e-09,
+                    4.135625886192429e-07,
+                    4.6651669194375245e-09,
+                    -4.908218897980987e-07,
+                    -3.0482468105219596e-08,
+                    -6.79731471109335e-08,
+                    -2.1611727685222348e-10
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.4996655662221203,
+                      -0.0003273008268858432,
+                      1.0980991406786555
+                    ],
+                    "quaternion_wxyz": [
+                      0.006026771760164808,
+                      0.7071891625223807,
+                      -0.7069964544017542,
+                      -0.0017832263997918012
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    0.30994072556495667,
+                    -0.19264443218708038,
+                    0.31025412678718567,
+                    -2.0991036891937256,
+                    0.06340356916189194,
+                    1.9023202657699585,
+                    -0.19226491451263428
+                  ],
+                  "joint_velocities": [
+                    0.00035411090357229114,
+                    -0.0003888938226737082,
+                    0.00014539240510202944,
+                    -0.008027358911931515,
+                    0.00014322229253593832,
+                    0.009345264174044132,
+                    2.7633725039777346e-05
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.2769324914406752e-07,
+                0.019937194883823395,
+                -1.0460552402946632e-05,
+                -1.589799404144287,
+                -0.0010048161493614316,
+                1.5673993825912476,
+                -0.7852999567985535,
+                0.30994072556495667,
+                -0.19264443218708038,
+                0.31025412678718567,
+                -2.0991036891937256,
+                0.06340356916189194,
+                1.9023202657699585,
+                -0.19226491451263428
+              ],
+              "joint_velocities": [
+                5.795272706166088e-09,
+                4.135625886192429e-07,
+                4.6651669194375245e-09,
+                -4.908218897980987e-07,
+                -3.0482468105219596e-08,
+                -6.79731471109335e-08,
+                -2.1611727685222348e-10,
+                0.00035411090357229114,
+                -0.0003888938226737082,
+                0.00014539240510202944,
+                -0.008027358911931515,
+                0.00014322229253593832,
+                0.009345264174044132,
+                2.7633725039777346e-05
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_right_top_0_approach",
+          "subtask_progress": 0.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 21,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.8325127816728712,
+                "right": 3.2205780927951126
+              },
+              "avg_cartesian_path_length": 0.23199618013048404,
+              "avg_joint_jerk": {
+                "left": 2.4497547757320355,
+                "right": 7.347017114301534
+              },
+              "avg_joint_path_length": 0.5905829591166248,
+              "avg_orientation_path_length": 0.0706375256830428,
+              "bimanual_arm_velocity_difference": 0.19369384213703358,
+              "bimanual_gripper_vertical_difference": 0.045765409546404685,
+              "cartesian_path_length": {
+                "left": 0.02526322781589251,
+                "right": 0.43872913244507555
+              },
+              "completion_time": 0.6285617351531982,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.03366062044835917,
+                "right": 1.1475052977848905
+              },
+              "orientation_path_length": {
+                "left": 0.05127355657433243,
+                "right": 0.09000149479175318
+              },
+              "overall_avg_cartesian_jerk": 2.526545437233992,
+              "overall_avg_joint_jerk": 4.898385945016784,
+              "overall_rms_cartesian_jerk": 6.4727621013000185,
+              "overall_rms_joint_jerk": 12.05144050471299,
+              "rms_cartesian_jerk": {
+                "left": 5.909063691064261,
+                "right": 6.991156180131989
+              },
+              "rms_joint_jerk": {
+                "left": 7.898102274408045,
+                "right": 15.10279500424555
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.4096512692814031,
+                "cube to right gripper": 0.12598396723829947,
+                "lift distance": 0.00021317744739735023
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.4639923602609681,
+              "total_joint_path_length": 1.1811659182332497,
+              "total_orientation_path_length": 0.1412750513660856
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4986989365886423,
+                  5.395637223928884e-05,
+                  0.984949029450688
+                ],
+                "angular_velocity": [
+                  0.003229140334331389,
+                  0.0023475609089693705,
+                  -0.0017411051445966027
+                ],
+                "contacts": [
+                  "robot:right:finger",
+                  "scene:table/collider_001"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -0.0001705398152584706,
+                  -9.833906217325539e-05,
+                  0.0002984736329081479
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.49823046766352125,
+                    5.7203844448840383e-05,
+                    0.9701131774473973
+                  ],
+                  "quaternion_wxyz": [
+                    0.9999915808836912,
+                    0.0004963951887073925,
+                    -0.0006107801715601831,
+                    0.004027244856556684
+                  ]
+                },
+                "size": [
+                  0.04260212682271547,
+                  0.20037824895797343,
+                  0.07010194109862411
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6604882420657999,
+                      0.29984665492761026,
+                      1.1972978206104876
+                    ],
+                    "quaternion_wxyz": [
+                      0.020461233905212917,
+                      0.7067944130455662,
+                      -0.7068537496590538,
+                      -0.019513384831586825
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.2674021238344721e-07,
+                    0.026690853759646416,
+                    -1.765806518960744e-05,
+                    -1.5961456298828125,
+                    -0.0013380813179537654,
+                    1.5662962198257446,
+                    -0.7852998971939087
+                  ],
+                  "joint_velocities": [
+                    9.498688058329208e-09,
+                    7.331468054871948e-07,
+                    7.288803338667549e-09,
+                    -8.407631639784086e-07,
+                    -5.146764081587207e-08,
+                    -1.1515646747284336e-07,
+                    -3.4645000757116406e-10
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5004865521875832,
+                      -0.0005189525441141369,
+                      1.096075624738394
+                    ],
+                    "quaternion_wxyz": [
+                      0.0069721074719256496,
+                      0.7076026629669857,
+                      -0.7065746806405662,
+                      -0.0014428295506841377
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0364,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.3095043897628784,
+                    -0.18945294618606567,
+                    0.3101474642753601,
+                    -2.1007368564605713,
+                    0.06136740371584892,
+                    1.9052820205688477,
+                    -0.19340020418167114
+                  ],
+                  "joint_velocities": [
+                    -0.00037365243770182133,
+                    -0.0012389945331960917,
+                    -0.0010942806256935,
+                    -0.0006691380403935909,
+                    0.004046962596476078,
+                    -0.0001376077125314623,
+                    4.920520950690843e-05
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.2674021238344721e-07,
+                0.026690853759646416,
+                -1.765806518960744e-05,
+                -1.5961456298828125,
+                -0.0013380813179537654,
+                1.5662962198257446,
+                -0.7852998971939087,
+                0.3095043897628784,
+                -0.18945294618606567,
+                0.3101474642753601,
+                -2.1007368564605713,
+                0.06136740371584892,
+                1.9052820205688477,
+                -0.19340020418167114
+              ],
+              "joint_velocities": [
+                9.498688058329208e-09,
+                7.331468054871948e-07,
+                7.288803338667549e-09,
+                -8.407631639784086e-07,
+                -5.146764081587207e-08,
+                -1.1515646747284336e-07,
+                -3.4645000757116406e-10,
+                -0.00037365243770182133,
+                -0.0012389945331960917,
+                -0.0010942806256935,
+                -0.0006691380403935909,
+                0.004046962596476078,
+                -0.0001376077125314623,
+                4.920520950690843e-05
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "close_right_gripper",
+          "subtask_progress": 0.5,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 15,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 2.078112535808887,
+                "right": 3.1188562946088765
+              },
+              "avg_cartesian_path_length": 0.24361993016788086,
+              "avg_joint_jerk": {
+                "left": 2.780204719883712,
+                "right": 7.557368174218281
+              },
+              "avg_joint_path_length": 0.635794949609352,
+              "avg_orientation_path_length": 0.08866593800220457,
+              "bimanual_arm_velocity_difference": 0.17867695022774638,
+              "bimanual_gripper_vertical_difference": 0.051524641303525534,
+              "cartesian_path_length": {
+                "left": 0.03227822004516475,
+                "right": 0.454961640290597
+              },
+              "completion_time": 0.7818222045898438,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.043042916532725906,
+                "right": 1.228546982685978
+              },
+              "orientation_path_length": {
+                "left": 0.06552868261893866,
+                "right": 0.11180319338547048
+              },
+              "overall_avg_cartesian_jerk": 2.598484415208882,
+              "overall_avg_joint_jerk": 5.168786447050997,
+              "overall_rms_cartesian_jerk": 6.457590142991228,
+              "overall_rms_joint_jerk": 11.863954797773097,
+              "rms_cartesian_jerk": {
+                "left": 6.327307061427893,
+                "right": 6.585296216581274
+              },
+              "rms_joint_jerk": {
+                "left": 8.463015383813108,
+                "right": 14.487381319636384
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.4003148680863156,
+                "cube to right gripper": 0.1259849514673518,
+                "lift distance": 0.01609355408278257
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.4872398603357617,
+              "total_joint_path_length": 1.271589899218704,
+              "total_orientation_path_length": 0.17733187600440914
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4972999586855149,
+                  -0.0008393686161887598,
+                  0.984949029450688
+                ],
+                "angular_velocity": [
+                  -0.0005882307579789959,
+                  0.0011660945859180705,
+                  -4.3324571067461596e-05
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -0.0002380456702449193,
+                  -0.00013899640449274034,
+                  0.0019679779146640278
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4956374874575009,
+                    -0.0016141518095291268,
+                    0.9859935540827826
+                  ],
+                  "quaternion_wxyz": [
+                    0.9999495362033106,
+                    -0.004353888326052778,
+                    0.008349201496372959,
+                    0.0035013622493582745
+                  ]
+                },
+                "size": [
+                  0.04540008262897016,
+                  0.20216489893482953,
+                  0.07010194109862411
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6618080317279679,
+                      0.29980577323113344,
+                      1.1904082615191665
+                    ],
+                    "quaternion_wxyz": [
+                      0.025614949624486974,
+                      0.7066370968865938,
+                      -0.7066901592759821,
+                      -0.024431668831839507
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.0939937428465782e-07,
+                    0.03349902480840683,
+                    -2.6695135602494702e-05,
+                    -1.602499008178711,
+                    -0.0016707148170098662,
+                    1.565206527709961,
+                    -0.7852997779846191
+                  ],
+                  "joint_velocities": [
+                    1.6412913339536317e-07,
+                    2.0941022739862092e-05,
+                    1.1350653039698955e-07,
+                    -2.169836443499662e-05,
+                    -1.2438316616680822e-06,
+                    -3.2191035188589012e-06,
+                    -5.30558663669467e-09
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5002829684460709,
+                      -0.0009592180591652248,
+                      1.1118911258004232
+                    ],
+                    "quaternion_wxyz": [
+                      0.01668367453255844,
+                      0.7076156286070318,
+                      -0.706387411791972,
+                      -0.004312959193647568
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.3078058362007141,
+                    -0.1903407871723175,
+                    0.3084872364997864,
+                    -2.0567128658294678,
+                    0.06237032264471054,
+                    1.8402327299118042,
+                    -0.19472084939479828
+                  ],
+                  "joint_velocities": [
+                    -0.00019521186186466366,
+                    -0.0003401240974199027,
+                    -0.0002130825159838423,
+                    0.005074354819953442,
+                    0.00011951497435802594,
+                    -0.007081387564539909,
+                    -0.0001235637755598873
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.0939937428465782e-07,
+                0.03349902480840683,
+                -2.6695135602494702e-05,
+                -1.602499008178711,
+                -0.0016707148170098662,
+                1.565206527709961,
+                -0.7852997779846191,
+                0.3078058362007141,
+                -0.1903407871723175,
+                0.3084872364997864,
+                -2.0567128658294678,
+                0.06237032264471054,
+                1.8402327299118042,
+                -0.19472084939479828
+              ],
+              "joint_velocities": [
+                1.6412913339536317e-07,
+                2.0941022739862092e-05,
+                1.1350653039698955e-07,
+                -2.169836443499662e-05,
+                -1.2438316616680822e-06,
+                -3.2191035188589012e-06,
+                -5.30558663669467e-09,
+                -0.00019521186186466366,
+                -0.0003401240974199027,
+                -0.0002130825159838423,
+                0.005074354819953442,
+                0.00011951497435802594,
+                -0.007081387564539909,
+                -0.0001235637755598873
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_right_top_0_verification_lift",
+          "subtask_progress": 0.5,
+          "success": true
+        }
+      ],
+      "failure_code": null,
+      "message": "verified right grasp of cube",
+      "request": {
+        "goal": "stable_hold",
+        "object_name": "cube",
+        "roles": {
+          "right": "grasping_arm"
+        },
+        "skill": "grasp",
+        "strategy": null
+      },
+      "state": {
+        "action_shape": [
+          16
+        ],
+        "control_frequency": 20,
+        "metrics": {
+          "avg_cartesian_jerk": {
+            "left": 2.078112535808887,
+            "right": 3.1188562946088765
+          },
+          "avg_cartesian_path_length": 0.24361993016788086,
+          "avg_joint_jerk": {
+            "left": 2.780204719883712,
+            "right": 7.557368174218281
+          },
+          "avg_joint_path_length": 0.635794949609352,
+          "avg_orientation_path_length": 0.08866593800220457,
+          "bimanual_arm_velocity_difference": 0.17867695022774638,
+          "bimanual_gripper_vertical_difference": 0.051524641303525534,
+          "cartesian_path_length": {
+            "left": 0.03227822004516475,
+            "right": 0.454961640290597
+          },
+          "completion_time": 0.7818222045898438,
+          "env_collision_count": 0,
+          "joint_path_length": {
+            "left": 0.043042916532725906,
+            "right": 1.228546982685978
+          },
+          "orientation_path_length": {
+            "left": 0.06552868261893866,
+            "right": 0.11180319338547048
+          },
+          "overall_avg_cartesian_jerk": 2.598484415208882,
+          "overall_avg_joint_jerk": 5.168786447050997,
+          "overall_rms_cartesian_jerk": 6.457590142991228,
+          "overall_rms_joint_jerk": 11.863954797773097,
+          "rms_cartesian_jerk": {
+            "left": 6.327307061427893,
+            "right": 6.585296216581274
+          },
+          "rms_joint_jerk": {
+            "left": 8.463015383813108,
+            "right": 14.487381319636384
+          },
+          "self_collision_count": 0,
+          "slip_count": 0,
+          "slip_count_per_object": {
+            "object_1": 0
+          },
+          "subtask_progress": 0.5,
+          "success": 0.0,
+          "target_distance": {
+            "cube to left gripper": 0.4003148680863156,
+            "cube to right gripper": 0.1259849514673518,
+            "lift distance": 0.01609355408278257
+          },
+          "task_stage_reached": {
+            "1": true,
+            "2": false
+          },
+          "task_success": 0.0,
+          "total_cartesian_path_length": 0.4872398603357617,
+          "total_joint_path_length": 1.271589899218704,
+          "total_orientation_path_length": 0.17733187600440914
+        },
+        "objects": {
+          "cube": {
+            "aabb_center": [
+              0.4972999586855149,
+              -0.0008393686161887598,
+              0.984949029450688
+            ],
+            "angular_velocity": [
+              -0.0005882307579789959,
+              0.0011660945859180705,
+              -4.3324571067461596e-05
+            ],
+            "contacts": [
+              "robot:right:finger"
+            ],
+            "held_by": [
+              "right"
+            ],
+            "linear_velocity": [
+              -0.0002380456702449193,
+              -0.00013899640449274034,
+              0.0019679779146640278
+            ],
+            "name": "cube",
+            "pose": {
+              "position": [
+                0.4956374874575009,
+                -0.0016141518095291268,
+                0.9859935540827826
+              ],
+              "quaternion_wxyz": [
+                0.9999495362033106,
+                -0.004353888326052778,
+                0.008349201496372959,
+                0.0035013622493582745
+              ]
+            },
+            "size": [
+              0.04540008262897016,
+              0.20216489893482953,
+              0.07010194109862411
+            ]
+          }
+        },
+        "robot": {
+          "arms": {
+            "left": {
+              "ee_pose": {
+                "position": [
+                  0.6618080317279679,
+                  0.29980577323113344,
+                  1.1904082615191665
+                ],
+                "quaternion_wxyz": [
+                  0.025614949624486974,
+                  0.7066370968865938,
+                  -0.7066901592759821,
+                  -0.024431668831839507
+                ]
+              },
+              "gripper_aperture_m": 0.08,
+              "gripper_command": 0.0,
+              "holding": [],
+              "joint_positions": [
+                2.0939937428465782e-07,
+                0.03349902480840683,
+                -2.6695135602494702e-05,
+                -1.602499008178711,
+                -0.0016707148170098662,
+                1.565206527709961,
+                -0.7852997779846191
+              ],
+              "joint_velocities": [
+                1.6412913339536317e-07,
+                2.0941022739862092e-05,
+                1.1350653039698955e-07,
+                -2.169836443499662e-05,
+                -1.2438316616680822e-06,
+                -3.2191035188589012e-06,
+                -5.30558663669467e-09
+              ],
+              "side": "left"
+            },
+            "right": {
+              "ee_pose": {
+                "position": [
+                  0.5002829684460709,
+                  -0.0009592180591652248,
+                  1.1118911258004232
+                ],
+                "quaternion_wxyz": [
+                  0.01668367453255844,
+                  0.7076156286070318,
+                  -0.706387411791972,
+                  -0.004312959193647568
+                ]
+              },
+              "gripper_aperture_m": 0.0365,
+              "gripper_command": 1.0,
+              "holding": [
+                "cube"
+              ],
+              "joint_positions": [
+                0.3078058362007141,
+                -0.1903407871723175,
+                0.3084872364997864,
+                -2.0567128658294678,
+                0.06237032264471054,
+                1.8402327299118042,
+                -0.19472084939479828
+              ],
+              "joint_velocities": [
+                -0.00019521186186466366,
+                -0.0003401240974199027,
+                -0.0002130825159838423,
+                0.005074354819953442,
+                0.00011951497435802594,
+                -0.007081387564539909,
+                -0.0001235637755598873
+              ],
+              "side": "right"
+            }
+          },
+          "joint_positions": [
+            2.0939937428465782e-07,
+            0.03349902480840683,
+            -2.6695135602494702e-05,
+            -1.602499008178711,
+            -0.0016707148170098662,
+            1.565206527709961,
+            -0.7852997779846191,
+            0.3078058362007141,
+            -0.1903407871723175,
+            0.3084872364997864,
+            -2.0567128658294678,
+            0.06237032264471054,
+            1.8402327299118042,
+            -0.19472084939479828
+          ],
+          "joint_velocities": [
+            1.6412913339536317e-07,
+            2.0941022739862092e-05,
+            1.1350653039698955e-07,
+            -2.169836443499662e-05,
+            -1.2438316616680822e-06,
+            -3.2191035188589012e-06,
+            -5.30558663669467e-09,
+            -0.00019521186186466366,
+            -0.0003401240974199027,
+            -0.0002130825159838423,
+            0.005074354819953442,
+            0.00011951497435802594,
+            -0.007081387564539909,
+            -0.0001235637755598873
+          ]
+        },
+        "seed": 5,
+        "task_key": "cube_handover",
+        "task_name": "CubeHandover"
+      },
+      "success": true
+    },
+    {
+      "diagnostics": {
+        "attempts": [
+          {
+            "candidate": "cube_left_rendezvous_1_0",
+            "failure": "GRASP_FAILED",
+            "holders": [
+              "right"
+            ],
+            "stage": "receiver_close"
+          },
+          {
+            "candidate": "cube_left_rendezvous_1_1",
+            "failure": "GRASP_FAILED",
+            "holders": [
+              "right"
+            ],
+            "stage": "receiver_close"
+          },
+          {
+            "failure": "HELD_OBJECT_COLLISION",
+            "rendezvous": 1
+          },
+          {
+            "failure": "SLIP_DETECTED",
+            "rendezvous": 2
+          }
+        ]
+      },
+      "execution_reports": [
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 24,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 2.1058231181537375,
+                "right": 3.3186482688478613
+              },
+              "avg_cartesian_path_length": 0.2953800074348901,
+              "avg_joint_jerk": {
+                "left": 2.8193965761987463,
+                "right": 7.861949151238532
+              },
+              "avg_joint_path_length": 0.817150375768688,
+              "avg_orientation_path_length": 0.10700254927576293,
+              "bimanual_arm_velocity_difference": 0.18769790995034039,
+              "bimanual_gripper_vertical_difference": 0.04875867318677728,
+              "cartesian_path_length": {
+                "left": 0.039316869474104454,
+                "right": 0.5514431453956758
+              },
+              "completion_time": 1.0529859066009521,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.05247225430005167,
+                "right": 1.5818284972373242
+              },
+              "orientation_path_length": {
+                "left": 0.0798381577316733,
+                "right": 0.13416694081985256
+              },
+              "overall_avg_cartesian_jerk": 2.7122356935007996,
+              "overall_avg_joint_jerk": 5.340672863718639,
+              "overall_rms_cartesian_jerk": 6.733032575045082,
+              "overall_rms_joint_jerk": 11.913364716768745,
+              "rms_cartesian_jerk": {
+                "left": 6.393007895584519,
+                "right": 7.056692239302379
+              },
+              "rms_joint_jerk": {
+                "left": 8.556938174463188,
+                "right": 14.513281049711518
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.3626320427236615,
+                "cube to right gripper": 0.1259976976450386,
+                "lift distance": 0.10104015920061227
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.5907600148697802,
+              "total_joint_path_length": 1.634300751537376,
+              "total_orientation_path_length": 0.21400509855152586
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4962214165066071,
+                  -0.001586394888961,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -0.0005856970690289892,
+                  0.0011474607241606124,
+                  -9.701649252964929e-05
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -0.0003503545463546811,
+                  -0.0002206911960379304,
+                  0.0026214971027760455
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4946289667047497,
+                    -0.0010169515448197868,
+                    1.0709401592006123
+                  ],
+                  "quaternion_wxyz": [
+                    0.9998070822759832,
+                    -0.00906232848097636,
+                    0.017189073013295378,
+                    0.002864996026467976
+                  ]
+                },
+                "size": [
+                  0.047557166986785804,
+                  0.203658951480374,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6630552354577012,
+                      0.2997638886744481,
+                      1.1834811586669636
+                    ],
+                    "quaternion_wxyz": [
+                      0.030786374239190516,
+                      0.7064438461689987,
+                      -0.7064890691234149,
+                      -0.029368121837926347
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.0918282928050758e-07,
+                    0.040364820510149,
+                    -3.7558416806859896e-05,
+                    -1.608862280845642,
+                    -0.002002882771193981,
+                    1.5641299486160278,
+                    -0.7852996587753296
+                  ],
+                  "joint_velocities": [
+                    2.1883090894903034e-09,
+                    1.4168220729970926e-07,
+                    1.5096057737196134e-09,
+                    -1.6495307875175058e-07,
+                    -1.0377497083879916e-08,
+                    -1.9652169669370778e-08,
+                    -8.031725284851632e-11
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5014891054321082,
+                      0.0007916769787917563,
+                      1.196737961929259
+                    ],
+                    "quaternion_wxyz": [
+                      0.02623710451349255,
+                      0.7070152130780394,
+                      -0.7066747151203044,
+                      -0.007207623228176382
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.2789798378944397,
+                    -0.17337293922901154,
+                    0.3268972635269165,
+                    -1.8173657655715942,
+                    0.0599142350256443,
+                    1.5986237525939941,
+                    -0.18936941027641296
+                  ],
+                  "joint_velocities": [
+                    -0.001063444884493947,
+                    0.0010476075112819672,
+                    0.0006894918042235076,
+                    0.008272169157862663,
+                    -0.00011820546933449805,
+                    -0.00898763444274664,
+                    0.00019610175513662398
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.0918282928050758e-07,
+                0.040364820510149,
+                -3.7558416806859896e-05,
+                -1.608862280845642,
+                -0.002002882771193981,
+                1.5641299486160278,
+                -0.7852996587753296,
+                0.2789798378944397,
+                -0.17337293922901154,
+                0.3268972635269165,
+                -1.8173657655715942,
+                0.0599142350256443,
+                1.5986237525939941,
+                -0.18936941027641296
+              ],
+              "joint_velocities": [
+                2.1883090894903034e-09,
+                1.4168220729970926e-07,
+                1.5096057737196134e-09,
+                -1.6495307875175058e-07,
+                -1.0377497083879916e-08,
+                -1.9652169669370778e-08,
+                -8.031725284851632e-11,
+                -0.001063444884493947,
+                0.0010476075112819672,
+                0.0006894918042235076,
+                0.008272169157862663,
+                -0.00011820546933449805,
+                -0.00898763444274664,
+                0.00019610175513662398
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "transport_cube",
+          "subtask_progress": 0.5,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 17,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 2.2279516346247723,
+                "right": 3.3993602454796648
+              },
+              "avg_cartesian_path_length": 0.3033263206845821,
+              "avg_joint_jerk": {
+                "left": 2.9851521977960083,
+                "right": 7.651305139267503
+              },
+              "avg_joint_path_length": 0.8284784238407913,
+              "avg_orientation_path_length": 0.12421194908759542,
+              "bimanual_arm_velocity_difference": 0.16673033853571584,
+              "bimanual_gripper_vertical_difference": 0.044521370371189854,
+              "cartesian_path_length": {
+                "left": 0.04637543743533188,
+                "right": 0.5602772039338323
+              },
+              "completion_time": 1.1860649585723877,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 0.061943993995504605,
+                "right": 1.595012853686078
+              },
+              "orientation_path_length": {
+                "left": 0.09419468240847635,
+                "right": 0.1542292157667145
+              },
+              "overall_avg_cartesian_jerk": 2.8136559400522185,
+              "overall_avg_joint_jerk": 5.318228668531756,
+              "overall_rms_cartesian_jerk": 7.016755778363492,
+              "overall_rms_joint_jerk": 12.028877567105326,
+              "rms_cartesian_jerk": {
+                "left": 6.594574305671228,
+                "right": 7.414938505029948
+              },
+              "rms_joint_jerk": {
+                "left": 8.833097008914763,
+                "right": 14.538369519307198
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.3650190005450592,
+                "cube to right gripper": 0.1260011069346317,
+                "lift distance": 0.09244708534512891
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.6066526413691642,
+              "total_joint_path_length": 1.6569568476815826,
+              "total_orientation_path_length": 0.24842389817519084
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.49596150106384157,
+                  -0.001586394888961,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -7.711693172706418e-06,
+                  1.3618456182391184e-05,
+                  1.3271160184312832e-06
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -1.1619450086295423e-06,
+                  -4.044995948176215e-07,
+                  -7.162349068230139e-06
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4935985218708672,
+                    -0.002088076502567507,
+                    1.062347085345129
+                  ],
+                  "quaternion_wxyz": [
+                    0.9995623050307246,
+                    -0.01382920241872669,
+                    0.025983252900952613,
+                    0.002970200466604357
+                  ]
+                },
+                "size": [
+                  0.048076997872316896,
+                  0.203658951480374,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.6642282113368574,
+                      0.2997210002116215,
+                      1.1765209047810332
+                    ],
+                    "quaternion_wxyz": [
+                      0.03597256036795021,
+                      0.7062143948097825,
+                      -0.706250198330458,
+                      -0.034319977013622396
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    2.0241519393948693e-07,
+                    0.04728525131940842,
+                    -5.027497172704898e-05,
+                    -1.6152317523956299,
+                    -0.0023343719076365232,
+                    1.5630671977996826,
+                    -0.78529953956604
+                  ],
+                  "joint_velocities": [
+                    6.546911635041397e-08,
+                    7.056793492665747e-06,
+                    4.0696971126408243e-08,
+                    -7.303058737306856e-06,
+                    -4.2412514744682994e-07,
+                    -9.944099019776331e-07,
+                    -2.0749781892703822e-09
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5026680636466582,
+                      0.0009260233232583973,
+                      1.1879852068010375
+                    ],
+                    "quaternion_wxyz": [
+                      0.03585552687586385,
+                      0.7068673815063214,
+                      -0.7063655238971029,
+                      -0.010031590323681751
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.2789797782897949,
+                    -0.16541068255901337,
+                    0.3276384770870209,
+                    -1.827619194984436,
+                    0.05953798070549965,
+                    1.5964994430541992,
+                    -0.18936787545681
+                  ],
+                  "joint_velocities": [
+                    6.188037104948307e-07,
+                    6.101005055825226e-06,
+                    1.1918024256374338e-06,
+                    -9.458862223254982e-06,
+                    -3.977641540586774e-07,
+                    -3.497210059322242e-07,
+                    4.702591649419219e-09
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                2.0241519393948693e-07,
+                0.04728525131940842,
+                -5.027497172704898e-05,
+                -1.6152317523956299,
+                -0.0023343719076365232,
+                1.5630671977996826,
+                -0.78529953956604,
+                0.2789797782897949,
+                -0.16541068255901337,
+                0.3276384770870209,
+                -1.827619194984436,
+                0.05953798070549965,
+                1.5964994430541992,
+                -0.18936787545681
+              ],
+              "joint_velocities": [
+                6.546911635041397e-08,
+                7.056793492665747e-06,
+                4.0696971126408243e-08,
+                -7.303058737306856e-06,
+                -4.2412514744682994e-07,
+                -9.944099019776331e-07,
+                -2.0749781892703822e-09,
+                6.188037104948307e-07,
+                6.101005055825226e-06,
+                1.1918024256374338e-06,
+                -9.458862223254982e-06,
+                -3.977641540586774e-07,
+                -3.497210059322242e-07,
+                4.702591649419219e-09
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "open_left_gripper",
+          "subtask_progress": 0.5,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 130,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.410957296322206,
+                "right": 2.0393642100174074
+              },
+              "avg_cartesian_path_length": 0.4935754386572576,
+              "avg_joint_jerk": {
+                "left": 1.9839520051567874,
+                "right": 4.4091312135585214
+              },
+              "avg_joint_path_length": 2.9276443892793202,
+              "avg_orientation_path_length": 1.8283106570149175,
+              "bimanual_arm_velocity_difference": 0.32973817180278453,
+              "bimanual_gripper_vertical_difference": 0.0460319888308382,
+              "cartesian_path_length": {
+                "left": 0.4180600695280227,
+                "right": 0.5690908077864925
+              },
+              "completion_time": 2.3459715843200684,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 4.247093432508176,
+                "right": 1.6081953460504643
+              },
+              "orientation_path_length": {
+                "left": 3.4823913600736605,
+                "right": 0.17422995395617427
+              },
+              "overall_avg_cartesian_jerk": 1.7251607531698068,
+              "overall_avg_joint_jerk": 3.1965416093576544,
+              "overall_rms_cartesian_jerk": 5.548777978659697,
+              "overall_rms_joint_jerk": 9.29967221854612,
+              "rms_cartesian_jerk": {
+                "left": 5.193402858219443,
+                "right": 5.8827239324275356
+              },
+              "rms_joint_jerk": {
+                "left": 6.976586725638971,
+                "right": 11.148768739391588
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.25370331668749657,
+                "cube to right gripper": 0.12600130556792355,
+                "lift distance": 0.083912203473129
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 0.9871508773145152,
+              "total_joint_path_length": 5.8552887785586405,
+              "total_orientation_path_length": 3.656621314029835
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4951902848809302,
+                  -0.0018773468800543647,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  1.5721356586536666e-11,
+                  -2.243192323592685e-10,
+                  -1.4342804085087231e-12
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  9.804377254344614e-11,
+                  -1.1193465683960375e-10,
+                  1.238520976712451e-09
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4924635306408128,
+                    -0.003224420365945266,
+                    1.053812203473129
+                  ],
+                  "quaternion_wxyz": [
+                    0.9992177392672267,
+                    -0.018587383718686425,
+                    0.03476992454545081,
+                    0.0030775066678281194
+                  ]
+                },
+                "size": [
+                  0.04961943023813964,
+                  0.20424085546256074,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.49397726833039085,
+                      0.25010002778105006,
+                      1.0675891939813493
+                    ],
+                    "quaternion_wxyz": [
+                      0.49853288872152646,
+                      0.498200110551402,
+                      0.5014451092532174,
+                      -0.5018111309203591
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.2910704612731934,
+                    -1.214751124382019,
+                    1.1241710186004639,
+                    -2.622560977935791,
+                    -0.6659910082817078,
+                    2.3896701335906982,
+                    2.500095844268799
+                  ],
+                  "joint_velocities": [
+                    -0.0011552826035767794,
+                    -0.001188355847261846,
+                    0.001008297665975988,
+                    -0.0008168035419657826,
+                    -0.0006237565539777279,
+                    0.0008180029108189046,
+                    0.003137005493044853
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5037331742245684,
+                      0.000992901197574475,
+                      1.1792376328610574
+                    ],
+                    "quaternion_wxyz": [
+                      0.045438012680673,
+                      0.7066504556040115,
+                      -0.7059853467497741,
+                      -0.012853434283308918
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.2789797782897949,
+                    -0.15739305317401886,
+                    0.3283436596393585,
+                    -1.8378475904464722,
+                    0.05915428325533867,
+                    1.5944640636444092,
+                    -0.1893659234046936
+                  ],
+                  "joint_velocities": [
+                    1.2544122785659536e-15,
+                    4.231161319749599e-13,
+                    -1.8389105613681594e-13,
+                    -1.6206198709400876e-13,
+                    2.144983843321846e-12,
+                    -2.530095816015432e-13,
+                    -2.0106912825262196e-13
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.2910704612731934,
+                -1.214751124382019,
+                1.1241710186004639,
+                -2.622560977935791,
+                -0.6659910082817078,
+                2.3896701335906982,
+                2.500095844268799,
+                0.2789797782897949,
+                -0.15739305317401886,
+                0.3283436596393585,
+                -1.8378475904464722,
+                0.05915428325533867,
+                1.5944640636444092,
+                -0.1893659234046936
+              ],
+              "joint_velocities": [
+                -0.0011552826035767794,
+                -0.001188355847261846,
+                0.001008297665975988,
+                -0.0008168035419657826,
+                -0.0006237565539777279,
+                0.0008180029108189046,
+                0.003137005493044853,
+                1.2544122785659536e-15,
+                4.231161319749599e-13,
+                -1.8389105613681594e-13,
+                -1.6206198709400876e-13,
+                2.144983843321846e-12,
+                -2.530095816015432e-13,
+                -2.0106912825262196e-13
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_left_rendezvous_1_0_pregrasp",
+          "subtask_progress": 0.5,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 22,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.4784306132087672,
+                "right": 2.1117131505885984
+              },
+              "avg_cartesian_path_length": 0.5340500450820983,
+              "avg_joint_jerk": {
+                "left": 2.491063803865777,
+                "right": 4.4186242392534565
+              },
+              "avg_joint_path_length": 3.0961245884728523,
+              "avg_orientation_path_length": 1.845534258316074,
+              "bimanual_arm_velocity_difference": 0.3223915719506933,
+              "bimanual_gripper_vertical_difference": 0.050273118256235524,
+              "cartesian_path_length": {
+                "left": 0.49021917682958477,
+                "right": 0.5778809133346119
+              },
+              "completion_time": 2.574737310409546,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 4.570876955064785,
+                "right": 1.6213722218809201
+              },
+              "orientation_path_length": {
+                "left": 3.4969085292374955,
+                "right": 0.19415998739465276
+              },
+              "overall_avg_cartesian_jerk": 1.7950718818986826,
+              "overall_avg_joint_jerk": 3.454844021559617,
+              "overall_rms_cartesian_jerk": 5.611495213546552,
+              "overall_rms_joint_jerk": 9.516043808954073,
+              "rms_cartesian_jerk": {
+                "left": 5.081192194383305,
+                "right": 6.09583816608101
+              },
+              "rms_joint_jerk": {
+                "left": 7.375851565398171,
+                "right": 11.256420089579086
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 0.5,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.1854732804046094,
+                "cube to right gripper": 0.12600151163774592,
+                "lift distance": 0.07543657242431823
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": false
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.0681000901641966,
+              "total_joint_path_length": 6.192249176945705,
+              "total_orientation_path_length": 3.691068516632148
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.49436324530823256,
+                  -0.002545073627494475,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -4.303940378507873e-07,
+                  7.504208435218841e-07,
+                  9.781633352600674e-08
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -7.624325913766896e-08,
+                  -1.8326081517666198e-08,
+                  -4.155288239380738e-07
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4912256452661882,
+                    -0.0044201461645336105,
+                    1.0453365724243182
+                  ],
+                  "quaternion_wxyz": [
+                    0.9987749851516285,
+                    -0.02331993719629805,
+                    0.04352654680007127,
+                    0.003185794749550769
+                  ]
+                },
+                "size": [
+                  0.05127350938353492,
+                  0.20557630895744095,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.4943717061940226,
+                      0.1796345019809092,
+                      1.0680153409257704
+                    ],
+                    "quaternion_wxyz": [
+                      0.49841862831909867,
+                      0.4980744623584648,
+                      0.5012259466053033,
+                      -0.5022681070309483
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.4978073835372925,
+                    -1.1955608129501343,
+                    1.0999153852462769,
+                    -2.624122142791748,
+                    -0.7705051898956299,
+                    2.5979502201080322,
+                    2.5652480125427246
+                  ],
+                  "joint_velocities": [
+                    -0.008664964698255062,
+                    0.0007824327913112938,
+                    -0.0011514171492308378,
+                    0.00034312752541154623,
+                    -0.004694548435509205,
+                    0.00950155034661293,
+                    0.002914471784606576
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5046843389042549,
+                      0.0009926469591211105,
+                      1.1705002499476085
+                    ],
+                    "quaternion_wxyz": [
+                      0.054980368608901806,
+                      0.7063652259384673,
+                      -0.7055350536508468,
+                      -0.01567210012806806
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.2789797782897949,
+                    -0.1493224948644638,
+                    0.32901236414909363,
+                    -1.8480467796325684,
+                    0.058763232082128525,
+                    1.5925182104110718,
+                    -0.18936356902122498
+                  ],
+                  "joint_velocities": [
+                    4.956326193905625e-08,
+                    3.54142429159765e-07,
+                    7.392664258532022e-08,
+                    -5.74518708162941e-07,
+                    -3.06763965340906e-08,
+                    5.153262705448469e-08,
+                    6.769685922947133e-10
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.4978073835372925,
+                -1.1955608129501343,
+                1.0999153852462769,
+                -2.624122142791748,
+                -0.7705051898956299,
+                2.5979502201080322,
+                2.5652480125427246,
+                0.2789797782897949,
+                -0.1493224948644638,
+                0.32901236414909363,
+                -1.8480467796325684,
+                0.058763232082128525,
+                1.5925182104110718,
+                -0.18936356902122498
+              ],
+              "joint_velocities": [
+                -0.008664964698255062,
+                0.0007824327913112938,
+                -0.0011514171492308378,
+                0.00034312752541154623,
+                -0.004694548435509205,
+                0.00950155034661293,
+                0.002914471784606576,
+                4.956326193905625e-08,
+                3.54142429159765e-07,
+                7.392664258532022e-08,
+                -5.74518708162941e-07,
+                -3.06763965340906e-08,
+                5.153262705448469e-08,
+                6.769685922947133e-10
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_left_rendezvous_1_0_approach",
+          "subtask_progress": 0.5,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 21,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.7677606345097185,
+                "right": 2.4484855690925733
+              },
+              "avg_cartesian_path_length": 0.5534298800683595,
+              "avg_joint_jerk": {
+                "left": 3.6555552245487144,
+                "right": 4.906826429809348
+              },
+              "avg_joint_path_length": 3.146574003206832,
+              "avg_orientation_path_length": 1.9066346911409453,
+              "bimanual_arm_velocity_difference": 0.3041201943497878,
+              "bimanual_gripper_vertical_difference": 0.053418905465160066,
+              "cartesian_path_length": {
+                "left": 0.5089560022129744,
+                "right": 0.5979037579237445
+              },
+              "completion_time": 2.745041847229004,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 4.640580532770367,
+                "right": 1.6525674736432963
+              },
+              "orientation_path_length": {
+                "left": 3.5797215870907646,
+                "right": 0.23354779519112587
+              },
+              "overall_avg_cartesian_jerk": 2.108123101801146,
+              "overall_avg_joint_jerk": 4.281190827179031,
+              "overall_rms_cartesian_jerk": 6.156352031574382,
+              "overall_rms_joint_jerk": 11.448649926569209,
+              "rms_cartesian_jerk": {
+                "left": 5.504881543822164,
+                "right": 6.745192351729204
+              },
+              "rms_joint_jerk": {
+                "left": 10.71430988775649,
+                "right": 12.138646296494095
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.18784119320566134,
+                "cube to right gripper": 0.12596215044838063,
+                "lift distance": 0.067197590058381
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.106859760136719,
+              "total_joint_path_length": 6.293148006413664,
+              "total_orientation_path_length": 3.8132693822818906
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4942096850340636,
+                  -0.006479063017397806,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -0.00021066854812119753,
+                  0.01046159285553662,
+                  0.023694830034035747
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -0.010864112868324324,
+                  0.008941401837322636,
+                  -0.0011124510057166858
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4908040594866386,
+                    -0.006800930179290397,
+                    1.037097590058381
+                  ],
+                  "quaternion_wxyz": [
+                    0.9983084994436702,
+                    -0.02843392629666619,
+                    0.05048642504352121,
+                    -0.00477207085114039
+                  ]
+                },
+                "size": [
+                  0.05229414108502034,
+                  0.2134442877372476,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.49301641424305886,
+                      0.17890900674232435,
+                      1.0652265551998186
+                    ],
+                    "quaternion_wxyz": [
+                      0.4953941537821152,
+                      0.4976514978473136,
+                      0.5004542585417479,
+                      -0.5064317863209779
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0005,
+                  "gripper_command": 1.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.498088002204895,
+                    -1.1981827020645142,
+                    1.1052531003952026,
+                    -2.628843069076538,
+                    -0.7709152102470398,
+                    2.5924932956695557,
+                    2.5652105808258057
+                  ],
+                  "joint_velocities": [
+                    0.0032994342036545277,
+                    -3.7064248317619786e-05,
+                    0.004367844667285681,
+                    0.011504579335451126,
+                    -0.0009480002336204052,
+                    0.057937271893024445,
+                    0.0005469360039569438
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5062836762236477,
+                      0.00013084555981532353,
+                      1.1619126344094468
+                    ],
+                    "quaternion_wxyz": [
+                      0.06408878109685105,
+                      0.7052926229506531,
+                      -0.7057787763995508,
+                      -0.01820063001274517
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0364,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.27814170718193054,
+                    -0.14099842309951782,
+                    0.3285551965236664,
+                    -1.8578792810440063,
+                    0.0576275996863842,
+                    1.5913389921188354,
+                    -0.18908432126045227
+                  ],
+                  "joint_velocities": [
+                    0.009809253737330437,
+                    -0.0022177156060934067,
+                    0.012779991142451763,
+                    -0.003552815178409219,
+                    0.008248263038694859,
+                    -0.007125284988433123,
+                    -0.0028549886774271727
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.498088002204895,
+                -1.1981827020645142,
+                1.1052531003952026,
+                -2.628843069076538,
+                -0.7709152102470398,
+                2.5924932956695557,
+                2.5652105808258057,
+                0.27814170718193054,
+                -0.14099842309951782,
+                0.3285551965236664,
+                -1.8578792810440063,
+                0.0576275996863842,
+                1.5913389921188354,
+                -0.18908432126045227
+              ],
+              "joint_velocities": [
+                0.0032994342036545277,
+                -3.7064248317619786e-05,
+                0.004367844667285681,
+                0.011504579335451126,
+                -0.0009480002336204052,
+                0.057937271893024445,
+                0.0005469360039569438,
+                0.009809253737330437,
+                -0.0022177156060934067,
+                0.012779991142451763,
+                -0.003552815178409219,
+                0.008248263038694859,
+                -0.007125284988433123,
+                -0.0028549886774271727
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "close_left_gripper",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": true
+            },
+            "passed": true
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 17,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.7550646370463132,
+                "right": 2.522236561768767
+              },
+              "avg_cartesian_path_length": 0.5591850655438817,
+              "avg_joint_jerk": {
+                "left": 3.69644877260457,
+                "right": 4.9539054613057605
+              },
+              "avg_joint_path_length": 3.1568086019641086,
+              "avg_orientation_path_length": 1.9200778256352962,
+              "bimanual_arm_velocity_difference": 0.28918712770677585,
+              "bimanual_gripper_vertical_difference": 0.055315126236077955,
+              "cartesian_path_length": {
+                "left": 0.5117171422316313,
+                "right": 0.606652988856132
+              },
+              "completion_time": 2.8665506839752197,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 4.647880751932787,
+                "right": 1.6657364519954303
+              },
+              "orientation_path_length": {
+                "left": 3.5868147732267404,
+                "right": 0.25334087804385175
+              },
+              "overall_avg_cartesian_jerk": 2.1386505994075398,
+              "overall_avg_joint_jerk": 4.325177116955165,
+              "overall_rms_cartesian_jerk": 6.214840478944775,
+              "overall_rms_joint_jerk": 11.538339249691512,
+              "rms_cartesian_jerk": {
+                "left": 5.4387977698717815,
+                "right": 6.9041989525142435
+              },
+              "rms_joint_jerk": {
+                "left": 10.78638150813238,
+                "right": 12.244203495653085
+              },
+              "self_collision_count": 0,
+              "slip_count": 0,
+              "slip_count_per_object": {
+                "object_1": 0
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.19029609315509372,
+                "cube to right gripper": 0.12595859056077288,
+                "lift distance": 0.05884876290840224
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.1183701310877634,
+              "total_joint_path_length": 6.313617203928217,
+              "total_orientation_path_length": 3.8401556512705923
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4934792686085019,
+                  -0.006479063017397806,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -7.379916697975438e-06,
+                  1.340218299817686e-05,
+                  9.798660381938102e-07
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -1.363588007364634e-06,
+                  -6.947577438704837e-07,
+                  -7.024230008298357e-06
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4893648986789591,
+                    -0.008111076128257282,
+                    1.0287487629084022
+                  ],
+                  "quaternion_wxyz": [
+                    0.9976883779798291,
+                    -0.03317195749419052,
+                    0.05912514204479171,
+                    -0.0046625377386609245
+                  ]
+                },
+                "size": [
+                  0.05375497393614381,
+                  0.2134442877372476,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.49270881005843986,
+                      0.17913936960387525,
+                      1.0624932720898375
+                    ],
+                    "quaternion_wxyz": [
+                      0.49392075209936487,
+                      0.49566786417862474,
+                      0.5015525877942235,
+                      -0.5087245430909697
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.498088002204895,
+                    -1.2008026838302612,
+                    1.1109968423843384,
+                    -2.6324665546417236,
+                    -0.7714174389839172,
+                    2.592693567276001,
+                    2.5652265548706055
+                  ],
+                  "joint_velocities": [
+                    -1.765296815392503e-07,
+                    -4.618811999534955e-06,
+                    9.139915164269041e-06,
+                    -5.446705472422764e-06,
+                    -6.596827120119997e-07,
+                    3.2685383644093235e-07,
+                    5.432767480328948e-08
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5070103284595437,
+                      -1.0503519152181562e-07,
+                      1.1532012337229358
+                    ],
+                    "quaternion_wxyz": [
+                      0.07354316393816969,
+                      0.7048777893881638,
+                      -0.7051927800923009,
+                      -0.021020180087494986
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0364,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.27814164757728577,
+                    -0.13282105326652527,
+                    0.3291468024253845,
+                    -1.8680106401443481,
+                    0.05722901225090027,
+                    1.5895718336105347,
+                    -0.18908195197582245
+                  ],
+                  "joint_velocities": [
+                    4.775279194291215e-07,
+                    6.645940629823599e-06,
+                    8.355771683454805e-07,
+                    -9.172749741992448e-06,
+                    -4.891114144811581e-07,
+                    2.5116258939306135e-07,
+                    9.554585567173035e-09
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.498088002204895,
+                -1.2008026838302612,
+                1.1109968423843384,
+                -2.6324665546417236,
+                -0.7714174389839172,
+                2.592693567276001,
+                2.5652265548706055,
+                0.27814164757728577,
+                -0.13282105326652527,
+                0.3291468024253845,
+                -1.8680106401443481,
+                0.05722901225090027,
+                1.5895718336105347,
+                -0.18908195197582245
+              ],
+              "joint_velocities": [
+                -1.765296815392503e-07,
+                -4.618811999534955e-06,
+                9.139915164269041e-06,
+                -5.446705472422764e-06,
+                -6.596827120119997e-07,
+                3.2685383644093235e-07,
+                5.432767480328948e-08,
+                4.775279194291215e-07,
+                6.645940629823599e-06,
+                8.355771683454805e-07,
+                -9.172749741992448e-06,
+                -4.891114144811581e-07,
+                2.5116258939306135e-07,
+                9.554585567173035e-09
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "open_left_gripper",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 118,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.506825687855043,
+                "right": 2.3288987667928778
+              },
+              "avg_cartesian_path_length": 0.6275141561689432,
+              "avg_joint_jerk": {
+                "left": 3.765658223144568,
+                "right": 5.6878982355323195
+              },
+              "avg_joint_path_length": 4.822049427293797,
+              "avg_orientation_path_length": 3.6184775711005255,
+              "bimanual_arm_velocity_difference": 0.3141599925304487,
+              "bimanual_gripper_vertical_difference": 0.061606621163410064,
+              "cartesian_path_length": {
+                "left": 0.5922078424852617,
+                "right": 0.6628204698526249
+              },
+              "completion_time": 3.962919235229492,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 7.722243072673388,
+                "right": 1.9218557819142048
+              },
+              "orientation_path_length": {
+                "left": 6.722833998184031,
+                "right": 0.51412114401702
+              },
+              "overall_avg_cartesian_jerk": 1.9178622273239605,
+              "overall_avg_joint_jerk": 4.726778229338444,
+              "overall_rms_cartesian_jerk": 6.026306179651305,
+              "overall_rms_joint_jerk": 18.025596836875682,
+              "rms_cartesian_jerk": {
+                "left": 4.9655671746676,
+                "right": 6.92646193779123
+              },
+              "rms_joint_jerk": {
+                "left": 13.00620200988514,
+                "right": 21.92448384635827
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.26288904681400743,
+                "cube to right gripper": 0.12593626817410966,
+                "lift distance": 0.05054826734550666
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.2550283123378865,
+              "total_joint_path_length": 9.644098854587593,
+              "total_orientation_path_length": 7.236955142201051
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4763861299995707,
+                  0.0008958054922117292,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -2.0479175966077923e-11,
+                  2.2028865193985838e-10,
+                  6.71991572561595e-12
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -1.2765706840518896e-10,
+                  6.066874914925549e-11,
+                  -8.683879943950834e-10
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.48784250728675344,
+                    -0.008989296987408838,
+                    1.0204482673455066
+                  ],
+                  "quaternion_wxyz": [
+                    0.9969953380469174,
+                    -0.036919190651608515,
+                    0.06775092542242629,
+                    0.006861587188691724
+                  ]
+                },
+                "size": [
+                  0.0879412511540062,
+                  0.2281940247564667,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.49395448393194175,
+                      0.24945295568203904,
+                      1.068207001744644
+                    ],
+                    "quaternion_wxyz": [
+                      0.5017362857967029,
+                      0.5010899563117889,
+                      -0.4982718619681186,
+                      0.49889348238797726
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.1038932800292969,
+                    -0.8913574814796448,
+                    1.01918363571167,
+                    -2.578259229660034,
+                    -1.013225793838501,
+                    2.1403019428253174,
+                    -0.4086732864379883
+                  ],
+                  "joint_velocities": [
+                    0.00044333451660349965,
+                    0.00036187563091516495,
+                    -0.0001229799527209252,
+                    5.771389987785369e-05,
+                    -0.00027719751233235,
+                    -0.0005293141002766788,
+                    -0.003468120004981756
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5076234318917773,
+                      -0.00019700384015686884,
+                      1.1445101641736803
+                    ],
+                    "quaternion_wxyz": [
+                      0.08295204368584815,
+                      0.7043972981460103,
+                      -0.7045391636334496,
+                      -0.02383215725907568
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.27814164757728577,
+                    -0.12459488213062286,
+                    0.3297017812728882,
+                    -1.8781065940856934,
+                    0.05681754648685455,
+                    1.5878911018371582,
+                    -0.189078226685524
+                  ],
+                  "joint_velocities": [
+                    1.3591402309165446e-12,
+                    -5.464398464966047e-13,
+                    1.698998255451889e-12,
+                    1.6187279381491004e-13,
+                    -1.5874206463206697e-11,
+                    5.163099114913194e-12,
+                    7.613336502031165e-13
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.1038932800292969,
+                -0.8913574814796448,
+                1.01918363571167,
+                -2.578259229660034,
+                -1.013225793838501,
+                2.1403019428253174,
+                -0.4086732864379883,
+                0.27814164757728577,
+                -0.12459488213062286,
+                0.3297017812728882,
+                -1.8781065940856934,
+                0.05681754648685455,
+                1.5878911018371582,
+                -0.189078226685524
+              ],
+              "joint_velocities": [
+                0.00044333451660349965,
+                0.00036187563091516495,
+                -0.0001229799527209252,
+                5.771389987785369e-05,
+                -0.00027719751233235,
+                -0.0005293141002766788,
+                -0.003468120004981756,
+                1.3591402309165446e-12,
+                -5.464398464966047e-13,
+                1.698998255451889e-12,
+                1.6187279381491004e-13,
+                -1.5874206463206697e-11,
+                5.163099114913194e-12,
+                7.613336502031165e-13
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_left_rendezvous_1_1_pregrasp",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 20,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.5696498407254942,
+                "right": 2.3693899389214375
+              },
+              "avg_cartesian_path_length": 0.6675112812953858,
+              "avg_joint_jerk": {
+                "left": 4.049952916294328,
+                "right": 5.658175636290383
+              },
+              "avg_joint_path_length": 4.977014566439324,
+              "avg_orientation_path_length": 3.6347789427541572,
+              "bimanual_arm_velocity_difference": 0.31068659497930295,
+              "bimanual_gripper_vertical_difference": 0.06192361694438686,
+              "cartesian_path_length": {
+                "left": 0.6635189619584725,
+                "right": 0.6715036006322992
+              },
+              "completion_time": 4.185831546783447,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 8.019037698905453,
+                "right": 1.934991433973195
+              },
+              "orientation_path_length": {
+                "left": 6.735818710912087,
+                "right": 0.5337391745962282
+              },
+              "overall_avg_cartesian_jerk": 1.9695198898234658,
+              "overall_avg_joint_jerk": 4.854064276292355,
+              "overall_rms_cartesian_jerk": 6.0599557661964925,
+              "overall_rms_joint_jerk": 17.83898056564633,
+              "rms_cartesian_jerk": {
+                "left": 4.9310515476607355,
+                "right": 7.009340797166941
+              },
+              "rms_joint_jerk": {
+                "left": 12.989965894602893,
+                "right": 21.626817641531744
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.19845848994415632,
+                "cube to right gripper": 0.12593649504502813,
+                "lift distance": 0.042330840481075604
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.3350225625907717,
+              "total_joint_path_length": 9.954029132878649,
+              "total_orientation_path_length": 7.2695578855083145
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4763861299995707,
+                  0.0008958054922117292,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -1.2890314361726105e-06,
+                  -2.4126443962792817e-07,
+                  2.539693952254058e-07
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -2.2495400135743127e-07,
+                  -1.554684297892301e-07,
+                  -1.3220185764501786e-06
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.4862080622475371,
+                    -0.010404925043876856,
+                    1.0122308404810756
+                  ],
+                  "quaternion_wxyz": [
+                    0.9961900053590652,
+                    -0.04149308652034387,
+                    0.07638778477432773,
+                    0.0069787771845658325
+                  ]
+                },
+                "size": [
+                  0.0879412511540062,
+                  0.2281940247564667,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.4939732086860255,
+                      0.17990394199636225,
+                      1.0679803683496076
+                    ],
+                    "quaternion_wxyz": [
+                      0.5013829318038424,
+                      0.5016953455116352,
+                      -0.4985430550527449,
+                      0.4983690984064123
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.2660696506500244,
+                    -0.8396401405334473,
+                    0.9746460318565369,
+                    -2.573315143585205,
+                    -1.175280213356018,
+                    2.2884364128112793,
+                    -0.32700279355049133
+                  ],
+                  "joint_velocities": [
+                    -0.008479713462293148,
+                    0.0026925967540591955,
+                    -0.0023314389400184155,
+                    0.0007372382679022849,
+                    -0.009135737083852291,
+                    0.008434330113232136,
+                    0.0045662508346140385
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.508123704876255,
+                      -0.0004584519245721744,
+                      1.1358462645384466
+                    ],
+                    "quaternion_wxyz": [
+                      0.0923071753602105,
+                      0.7038524408623739,
+                      -0.703819273197746,
+                      -0.02663752136544725
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.27814164757728577,
+                    -0.11632348597049713,
+                    0.3302192687988281,
+                    -1.8881607055664062,
+                    0.05639899894595146,
+                    1.5863010883331299,
+                    -0.1890740841627121
+                  ],
+                  "joint_velocities": [
+                    1.292016236220661e-07,
+                    1.2416155641403748e-06,
+                    1.767938613284059e-07,
+                    -1.6926843500186806e-06,
+                    -9.183060001305421e-08,
+                    2.0323587079928984e-07,
+                    2.0938644151868857e-09
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.2660696506500244,
+                -0.8396401405334473,
+                0.9746460318565369,
+                -2.573315143585205,
+                -1.175280213356018,
+                2.2884364128112793,
+                -0.32700279355049133,
+                0.27814164757728577,
+                -0.11632348597049713,
+                0.3302192687988281,
+                -1.8881607055664062,
+                0.05639899894595146,
+                1.5863010883331299,
+                -0.1890740841627121
+              ],
+              "joint_velocities": [
+                -0.008479713462293148,
+                0.0026925967540591955,
+                -0.0023314389400184155,
+                0.0007372382679022849,
+                -0.009135737083852291,
+                0.008434330113232136,
+                0.0045662508346140385,
+                1.292016236220661e-07,
+                1.2416155641403748e-06,
+                1.767938613284059e-07,
+                -1.6926843500186806e-06,
+                -9.183060001305421e-08,
+                2.0323587079928984e-07,
+                2.0938644151868857e-09
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "cube_left_rendezvous_1_1_approach",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 21,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.5544115464158148,
+                "right": 2.4012861828974397
+              },
+              "avg_cartesian_path_length": 0.6733335214059865,
+              "avg_joint_jerk": {
+                "left": 3.996068397032653,
+                "right": 5.619283411582444
+              },
+              "avg_joint_path_length": 4.9869158155694855,
+              "avg_orientation_path_length": 3.6477183412825167,
+              "bimanual_arm_velocity_difference": 0.29781901213331957,
+              "bimanual_gripper_vertical_difference": 0.06194921584902631,
+              "cartesian_path_length": {
+                "left": 0.6665149383361221,
+                "right": 0.6801521044758508
+              },
+              "completion_time": 4.336467027664185,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 8.025723238058433,
+                "right": 1.9481083930805374
+              },
+              "orientation_path_length": {
+                "left": 6.742174479878761,
+                "right": 0.553262202686272
+              },
+              "overall_avg_cartesian_jerk": 1.9778488646566272,
+              "overall_avg_joint_jerk": 4.8076759043075485,
+              "overall_rms_cartesian_jerk": 6.077581595659848,
+              "overall_rms_joint_jerk": 17.59545987685347,
+              "rms_cartesian_jerk": {
+                "left": 4.8781516726946785,
+                "right": 7.076555119688726
+              },
+              "rms_joint_jerk": {
+                "left": 12.818575301650956,
+                "right": 21.32802250073421
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.20180500275769958,
+                "cube to right gripper": 0.12593677990732677,
+                "lift distance": 0.03418937476358064
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.346667042811973,
+              "total_joint_path_length": 9.973831631138971,
+              "total_orientation_path_length": 7.295436682565033
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4763861299995707,
+                  0.0007853987342046065,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -7.331483908275916e-07,
+                  -1.2091223902681906e-05,
+                  1.5214765614170487e-07
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  3.91384366721406e-08,
+                  -3.1708551648971636e-07,
+                  -8.417062647021551e-07
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.48447926180513506,
+                    -0.011873075956876514,
+                    1.0040893747635806
+                  ],
+                  "quaternion_wxyz": [
+                    0.9952938956393711,
+                    -0.04603282198591011,
+                    0.08497460064712342,
+                    0.0070963263651140085
+                  ]
+                },
+                "size": [
+                  0.0879412511540062,
+                  0.22841483827248094,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.4932836766669591,
+                      0.18028985796581382,
+                      1.0650905898596734
+                    ],
+                    "quaternion_wxyz": [
+                      0.5028870631980897,
+                      0.5033519268415991,
+                      -0.4969746750498035,
+                      0.49674702995789755
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0,
+                  "gripper_command": 1.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.2660696506500244,
+                    -0.8405066132545471,
+                    0.9789170026779175,
+                    -2.578369379043579,
+                    -1.1753501892089844,
+                    2.2888224124908447,
+                    -0.32701873779296875
+                  ],
+                  "joint_velocities": [
+                    -2.5701357486695997e-08,
+                    -2.62790990745998e-07,
+                    8.584456736571155e-07,
+                    -9.46786542499467e-07,
+                    -2.3057278308868945e-09,
+                    8.462122735863886e-08,
+                    8.199205203673898e-10
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5085119093007079,
+                      -0.0007836287687789448,
+                      1.127213412013999
+                    ],
+                    "quaternion_wxyz": [
+                      0.10160556601934936,
+                      0.7032443627215267,
+                      -0.7030342987940438,
+                      -0.029435522306368138
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.27814164757728577,
+                    -0.10800865292549133,
+                    0.3306991159915924,
+                    -1.8981701135635376,
+                    0.05597342923283577,
+                    1.5848020315170288,
+                    -0.18906952440738678
+                  ],
+                  "joint_velocities": [
+                    7.748958807951567e-08,
+                    7.190276392066153e-07,
+                    9.694673508420237e-08,
+                    -9.59068643169303e-07,
+                    -5.134638669801461e-08,
+                    1.566717884315949e-07,
+                    5.039120232197547e-10
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.2660696506500244,
+                -0.8405066132545471,
+                0.9789170026779175,
+                -2.578369379043579,
+                -1.1753501892089844,
+                2.2888224124908447,
+                -0.32701873779296875,
+                0.27814164757728577,
+                -0.10800865292549133,
+                0.3306991159915924,
+                -1.8981701135635376,
+                0.05597342923283577,
+                1.5848020315170288,
+                -0.18906952440738678
+              ],
+              "joint_velocities": [
+                -2.5701357486695997e-08,
+                -2.62790990745998e-07,
+                8.584456736571155e-07,
+                -9.46786542499467e-07,
+                -2.3057278308868945e-09,
+                8.462122735863886e-08,
+                8.199205203673898e-10,
+                7.748958807951567e-08,
+                7.190276392066153e-07,
+                9.694673508420237e-08,
+                -9.59068643169303e-07,
+                -5.134638669801461e-08,
+                1.566717884315949e-07,
+                5.039120232197547e-10
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "close_left_gripper",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [],
+          "executed_points": 17,
+          "failure_code": null,
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.5513165650206426,
+                "right": 2.4490996054976577
+              },
+              "avg_cartesian_path_length": 0.6791293844421753,
+              "avg_joint_jerk": {
+                "left": 3.9725248087943648,
+                "right": 5.626943765716662
+              },
+              "avg_joint_path_length": 4.996798635020949,
+              "avg_orientation_path_length": 3.660598272748928,
+              "bimanual_arm_velocity_difference": 0.28821377344769206,
+              "bimanual_gripper_vertical_difference": 0.06178246797129051,
+              "cartesian_path_length": {
+                "left": 0.6694955159297398,
+                "right": 0.6887632529546107
+              },
+              "completion_time": 4.461495876312256,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 8.032394139433208,
+                "right": 1.96120313060869
+              },
+              "orientation_path_length": {
+                "left": 6.748512469095295,
+                "right": 0.5726840764025615
+              },
+              "overall_avg_cartesian_jerk": 2.00020808525915,
+              "overall_avg_joint_jerk": 4.7997342872555135,
+              "overall_rms_cartesian_jerk": 6.115878519690856,
+              "overall_rms_joint_jerk": 17.432581016101174,
+              "rms_cartesian_jerk": {
+                "left": 4.845297927314636,
+                "right": 7.164567546669688
+              },
+              "rms_joint_jerk": {
+                "left": 12.697858313781412,
+                "right": 21.131828032827507
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.20528385877812189,
+                "cube to right gripper": 0.12593711388368936,
+                "lift distance": 0.026127449013843673
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 1.3582587688843506,
+              "total_joint_path_length": 9.993597270041898,
+              "total_orientation_path_length": 7.321196545497856
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.4763861299995707,
+                  -6.493802054002851e-06,
+                  1.021656925016985
+                ],
+                "angular_velocity": [
+                  -7.162263970766487e-06,
+                  -2.2320032379497737e-05,
+                  1.1280932484026908e-06
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  -1.0221524353855631e-06,
+                  -1.4218705280165029e-06,
+                  -7.156312065780833e-06
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.48265840971815405,
+                    -0.013392162836210789,
+                    0.9960274490138437
+                  ],
+                  "quaternion_wxyz": [
+                    0.9943091436412487,
+                    -0.050536498717287465,
+                    0.0935058664253129,
+                    0.007214021961157418
+                  ]
+                },
+                "size": [
+                  0.0879412511540062,
+                  0.22999862334499815,
+                  0.14351773223121778
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.4925781172121384,
+                      0.1806737269692506,
+                      1.0622202922227904
+                    ],
+                    "quaternion_wxyz": [
+                      0.5043895485599079,
+                      0.5049917755521497,
+                      -0.49539743900302574,
+                      0.495132171604172
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.2660696506500244,
+                    -0.8413829803466797,
+                    0.9831874966621399,
+                    -2.5834028720855713,
+                    -1.1754188537597656,
+                    2.289212942123413,
+                    -0.32703468203544617
+                  ],
+                  "joint_velocities": [
+                    -1.7186739853514155e-07,
+                    -1.924825710375444e-06,
+                    6.819755071774125e-06,
+                    -7.627884770045057e-06,
+                    -4.748110526975324e-08,
+                    6.741524316566938e-07,
+                    2.1444910291990027e-09
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5087889487762691,
+                      -0.0011716421344939183,
+                      1.1186162350249
+                    ],
+                    "quaternion_wxyz": [
+                      0.11084348260224339,
+                      0.7025742909868157,
+                      -0.7021856060713587,
+                      -0.032225186348228664
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.278141587972641,
+                    -0.09965292364358902,
+                    0.33114105463027954,
+                    -1.9081308841705322,
+                    0.055540960282087326,
+                    1.5833940505981445,
+                    -0.18906456232070923
+                  ],
+                  "joint_velocities": [
+                    5.470503765536705e-07,
+                    7.131917755032191e-06,
+                    7.732173230579065e-07,
+                    -8.933089702622965e-06,
+                    -4.56313756558302e-07,
+                    7.638791998942907e-07,
+                    7.722787742636683e-09
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.2660696506500244,
+                -0.8413829803466797,
+                0.9831874966621399,
+                -2.5834028720855713,
+                -1.1754188537597656,
+                2.289212942123413,
+                -0.32703468203544617,
+                0.278141587972641,
+                -0.09965292364358902,
+                0.33114105463027954,
+                -1.9081308841705322,
+                0.055540960282087326,
+                1.5833940505981445,
+                -0.18906456232070923
+              ],
+              "joint_velocities": [
+                -1.7186739853514155e-07,
+                -1.924825710375444e-06,
+                6.819755071774125e-06,
+                -7.627884770045057e-06,
+                -4.748110526975324e-08,
+                6.741524316566938e-07,
+                2.1444910291990027e-09,
+                5.470503765536705e-07,
+                7.131917755032191e-06,
+                7.732173230579065e-07,
+                -8.933089702622965e-06,
+                -4.56313756558302e-07,
+                7.638791998942907e-07,
+                7.722787742636683e-09
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "open_left_gripper",
+          "subtask_progress": 1.0,
+          "success": true
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": false,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [
+            {
+              "code": "HELD_OBJECT_COLLISION",
+              "details": {
+                "contacts": [
+                  {
+                    "allowed": false,
+                    "distance": -3.9693328800552256e-05,
+                    "first": "robot:left:finger",
+                    "geom1_id": 70,
+                    "geom1_name": "panda nohand_left/panda hand_left/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": false,
+                    "distance": -3.3936615842566445e-05,
+                    "first": "robot:left:finger",
+                    "geom1_id": 70,
+                    "geom1_name": "panda nohand_left/panda hand_left/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.0003381422715049988,
+                    "first": "robot:right:finger",
+                    "geom1_id": 143,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.00024721074445197455,
+                    "first": "robot:right:finger",
+                    "geom1_id": 143,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.00041492015243826133,
+                    "first": "robot:right:finger",
+                    "geom1_id": 143,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.0003254063916671382,
+                    "first": "robot:right:finger",
+                    "geom1_id": 143,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_left",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.0005213454307442008,
+                    "first": "robot:right:finger",
+                    "geom1_id": 147,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_right",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.0003395051906755272,
+                    "first": "robot:right:finger",
+                    "geom1_id": 147,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_right",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  },
+                  {
+                    "allowed": true,
+                    "distance": -0.0003747973424828105,
+                    "first": "robot:right:finger",
+                    "geom1_id": 147,
+                    "geom1_name": "panda nohand_right/panda hand_right/fingertip_pad_collision_right",
+                    "geom2_id": 157,
+                    "geom2_name": "cube/mesh",
+                    "kind": "held_object",
+                    "second": "object:cube"
+                  }
+                ]
+              },
+              "message": "2 live forbidden contact(s)",
+              "step": 90
+            }
+          ],
+          "executed_points": 91,
+          "failure_code": "HELD_OBJECT_COLLISION",
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.4655834128844327,
+                "right": 2.2359339038583115
+              },
+              "avg_cartesian_path_length": 1.2914914317064823,
+              "avg_joint_jerk": {
+                "left": 3.8031975494898274,
+                "right": 5.045579334846873
+              },
+              "avg_joint_path_length": 8.179358625762017,
+              "avg_orientation_path_length": 5.474969858322514,
+              "bimanual_arm_velocity_difference": 0.3326449599888468,
+              "bimanual_gripper_vertical_difference": 0.05737397731562042,
+              "cartesian_path_length": {
+                "left": 1.235099416280485,
+                "right": 1.3478834471324799
+              },
+              "completion_time": 5.503652334213257,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 12.904550618120107,
+                "right": 3.454166633403927
+              },
+              "orientation_path_length": {
+                "left": 10.079627916719932,
+                "right": 0.8703117999250959
+              },
+              "overall_avg_cartesian_jerk": 1.8507586583713722,
+              "overall_avg_joint_jerk": 4.42438844216835,
+              "overall_rms_cartesian_jerk": 5.771442205169844,
+              "overall_rms_joint_jerk": 16.216237203404305,
+              "rms_cartesian_jerk": {
+                "left": 4.528417424800672,
+                "right": 6.790620434245546
+              },
+              "rms_joint_jerk": {
+                "left": 11.863837964601524,
+                "right": 19.62605530471743
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.22314261141739913,
+                "cube to right gripper": 0.12591976084311446,
+                "lift distance": 0.13763461342255212
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 2.5829828634129646,
+              "total_joint_path_length": 16.358717251524034,
+              "total_orientation_path_length": 10.949939716645028
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.5532205948087887,
+                  -0.14118384226087688,
+                  1.039778190498943
+                ],
+                "angular_velocity": [
+                  -0.006424291736920074,
+                  0.0032620847593650597,
+                  0.02291628796250296
+                ],
+                "contacts": [
+                  "robot:left:finger",
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "left",
+                  "right"
+                ],
+                "linear_velocity": [
+                  -0.05161338777095927,
+                  0.07671639412145709,
+                  0.006706272726282731
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.5622089523843811,
+                    -0.018702834994236087,
+                    1.107534613422552
+                  ],
+                  "quaternion_wxyz": [
+                    0.9998313322995231,
+                    -0.007532887188355927,
+                    0.016092048919632174,
+                    0.004648496997564453
+                  ]
+                },
+                "size": [
+                  0.24161018077244212,
+                  0.5123533202626439,
+                  0.17976026319513383
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.505490838765522,
+                      0.19639596215758814,
+                      1.0899793269955824
+                    ],
+                    "quaternion_wxyz": [
+                      0.4578411464874419,
+                      0.5061118003193763,
+                      -0.5352993653909193,
+                      0.4976815443359575
+                    ]
+                  },
+                  "gripper_aperture_m": 0.08,
+                  "gripper_command": 0.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    -1.178487777709961,
+                    -0.783457338809967,
+                    0.9191840291023254,
+                    -2.5191433429718018,
+                    -1.0932893753051758,
+                    2.239315986633301,
+                    -0.35884103178977966
+                  ],
+                  "joint_velocities": [
+                    -0.3420506417751312,
+                    -0.2272716909646988,
+                    0.26658812165260315,
+                    -0.27572670578956604,
+                    -0.32418495416641235,
+                    0.19528739154338837,
+                    0.1233627051115036
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5690986502954374,
+                      -0.017486573470795932,
+                      1.233259865227383
+                    ],
+                    "quaternion_wxyz": [
+                      0.025466814802639664,
+                      0.7069586270161282,
+                      -0.706746545264302,
+                      -0.00838223050582988
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.28037014603614807,
+                    0.0072024245746433735,
+                    0.26227831840515137,
+                    -1.5275135040283203,
+                    0.0021640334744006395,
+                    1.4809929132461548,
+                    -0.24286989867687225
+                  ],
+                  "joint_velocities": [
+                    0.08648790419101715,
+                    -0.0026444746181368828,
+                    0.08294454216957092,
+                    0.01576404646039009,
+                    0.0036967345513403416,
+                    -0.02527555823326111,
+                    0.15760396420955658
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.178487777709961,
+                -0.783457338809967,
+                0.9191840291023254,
+                -2.5191433429718018,
+                -1.0932893753051758,
+                2.239315986633301,
+                -0.35884103178977966,
+                0.28037014603614807,
+                0.0072024245746433735,
+                0.26227831840515137,
+                -1.5275135040283203,
+                0.0021640334744006395,
+                1.4809929132461548,
+                -0.24286989867687225
+              ],
+              "joint_velocities": [
+                -0.3420506417751312,
+                -0.2272716909646988,
+                0.26658812165260315,
+                -0.27572670578956604,
+                -0.32418495416641235,
+                0.19528739154338837,
+                0.1233627051115036,
+                0.08648790419101715,
+                -0.0026444746181368828,
+                0.08294454216957092,
+                0.01576404646039009,
+                0.0036967345513403416,
+                -0.02527555823326111,
+                0.15760396420955658
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "transport_cube",
+          "subtask_progress": 1.0,
+          "success": false
+        },
+        {
+          "artifacts": {},
+          "behavior_quality": {
+            "checks": {
+              "exactly_one_final_holder": true,
+              "finite_robot_state": true,
+              "no_environment_collision": true,
+              "no_self_collision": true,
+              "no_slip": false
+            },
+            "passed": false
+          },
+          "benchmark_success": 0.0,
+          "events": [
+            {
+              "code": "SLIP_DETECTED",
+              "details": {},
+              "message": "left lost cube",
+              "step": 0
+            }
+          ],
+          "executed_points": 1,
+          "failure_code": "SLIP_DETECTED",
+          "final_state": {
+            "action_shape": [
+              16
+            ],
+            "control_frequency": 20,
+            "metrics": {
+              "avg_cartesian_jerk": {
+                "left": 1.5535097463205623,
+                "right": 2.313754075467919
+              },
+              "avg_cartesian_path_length": 1.29391386567049,
+              "avg_joint_jerk": {
+                "left": 4.280492527052653,
+                "right": 5.195276837190461
+              },
+              "avg_joint_path_length": 8.183601440651977,
+              "avg_orientation_path_length": 5.480691297266995,
+              "bimanual_arm_velocity_difference": 0.3322064393770792,
+              "bimanual_gripper_vertical_difference": 0.0575127015313078,
+              "cartesian_path_length": {
+                "left": 1.2366500010494803,
+                "right": 1.3511777302914998
+              },
+              "completion_time": 5.608584403991699,
+              "env_collision_count": 0,
+              "joint_path_length": {
+                "left": 12.908419400095823,
+                "right": 3.4587834812081284
+              },
+              "orientation_path_length": {
+                "left": 10.083937266192013,
+                "right": 0.8774453283419782
+              },
+              "overall_avg_cartesian_jerk": 1.9336319108942408,
+              "overall_avg_joint_jerk": 4.737884682121557,
+              "overall_rms_cartesian_jerk": 6.142219263663798,
+              "overall_rms_joint_jerk": 18.458086877697706,
+              "rms_cartesian_jerk": {
+                "left": 5.0401829599829755,
+                "right": 7.074621593819883
+              },
+              "rms_joint_jerk": {
+                "left": 16.785994204427585,
+                "right": 19.99080641040266
+              },
+              "self_collision_count": 0,
+              "slip_count": 1,
+              "slip_count_per_object": {
+                "object_1": 1
+              },
+              "subtask_progress": 1.0,
+              "success": 0.0,
+              "target_distance": {
+                "cube to left gripper": 0.22332030226419217,
+                "cube to right gripper": 0.12596902507580185,
+                "lift distance": 0.13442068148778463
+              },
+              "task_stage_reached": {
+                "1": true,
+                "2": true
+              },
+              "task_success": 0.0,
+              "total_cartesian_path_length": 2.58782773134098,
+              "total_joint_path_length": 16.367202881303953,
+              "total_orientation_path_length": 10.96138259453399
+            },
+            "objects": {
+              "cube": {
+                "aabb_center": [
+                  0.5532205948087887,
+                  -0.14118384226087688,
+                  1.039778190498943
+                ],
+                "angular_velocity": [
+                  -0.06660953455265102,
+                  0.14432565184421847,
+                  -0.0029358249590459625
+                ],
+                "contacts": [
+                  "robot:right:finger"
+                ],
+                "held_by": [
+                  "right"
+                ],
+                "linear_velocity": [
+                  0.002065730694271626,
+                  -0.006574537091957491,
+                  -0.07234173855976012
+                ],
+                "name": "cube",
+                "pose": {
+                  "position": [
+                    0.5620192677349327,
+                    -0.01878371430675973,
+                    1.1043206814877846
+                  ],
+                  "quaternion_wxyz": [
+                    0.9997589863201265,
+                    -0.009084793167847511,
+                    0.01928842639696343,
+                    0.005233776110951028
+                  ]
+                },
+                "size": [
+                  0.24161018077244212,
+                  0.5123533202626439,
+                  0.17976026319513383
+                ]
+              }
+            },
+            "robot": {
+              "arms": {
+                "left": {
+                  "ee_pose": {
+                    "position": [
+                      0.5052467422634388,
+                      0.19661685752146518,
+                      1.0884640926039029
+                    ],
+                    "quaternion_wxyz": [
+                      0.4589523968517834,
+                      0.5071521378826228,
+                      -0.5338804999841835,
+                      0.49712273957416847
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0799,
+                  "gripper_command": 0.0,
+                  "holding": [],
+                  "joint_positions": [
+                    -1.17864191532135,
+                    -0.7838056087493896,
+                    0.9213558435440063,
+                    -2.5218186378479004,
+                    -1.094906210899353,
+                    2.239884614944458,
+                    -0.35873258113861084
+                  ],
+                  "joint_velocities": [
+                    0.0016516047762706876,
+                    -0.0012075796257704496,
+                    0.01957029476761818,
+                    -0.028343623504042625,
+                    0.01589219830930233,
+                    -0.00370987830683589,
+                    -0.0012835029046982527
+                  ],
+                  "side": "left"
+                },
+                "right": {
+                  "ee_pose": {
+                    "position": [
+                      0.5697109417848841,
+                      -0.017121222307027964,
+                      1.230043668841761
+                    ],
+                    "quaternion_wxyz": [
+                      0.028855033975958757,
+                      0.7069545311286239,
+                      -0.7066064399692202,
+                      -0.009487724963265923
+                    ]
+                  },
+                  "gripper_aperture_m": 0.0365,
+                  "gripper_command": 1.0,
+                  "holding": [
+                    "cube"
+                  ],
+                  "joint_positions": [
+                    0.2805802822113037,
+                    0.01019604504108429,
+                    0.2625293731689453,
+                    -1.5308905839920044,
+                    0.0019240053370594978,
+                    1.4801498651504517,
+                    -0.2425977736711502
+                  ],
+                  "joint_velocities": [
+                    -0.002408486558124423,
+                    0.07358838617801666,
+                    -0.0032832741271704435,
+                    -0.07273910939693451,
+                    -0.0015423779841512442,
+                    -0.014816448092460632,
+                    -0.002762947930023074
+                  ],
+                  "side": "right"
+                }
+              },
+              "joint_positions": [
+                -1.17864191532135,
+                -0.7838056087493896,
+                0.9213558435440063,
+                -2.5218186378479004,
+                -1.094906210899353,
+                2.239884614944458,
+                -0.35873258113861084,
+                0.2805802822113037,
+                0.01019604504108429,
+                0.2625293731689453,
+                -1.5308905839920044,
+                0.0019240053370594978,
+                1.4801498651504517,
+                -0.2425977736711502
+              ],
+              "joint_velocities": [
+                0.0016516047762706876,
+                -0.0012075796257704496,
+                0.01957029476761818,
+                -0.028343623504042625,
+                0.01589219830930233,
+                -0.00370987830683589,
+                -0.0012835029046982527,
+                -0.002408486558124423,
+                0.07358838617801666,
+                -0.0032832741271704435,
+                -0.07273910939693451,
+                -0.0015423779841512442,
+                -0.014816448092460632,
+                -0.002762947930023074
+              ]
+            },
+            "seed": 5,
+            "task_key": "cube_handover",
+            "task_name": "CubeHandover"
+          },
+          "plan_name": "transport_cube",
+          "subtask_progress": 1.0,
+          "success": false
+        }
+      ],
+      "failure_code": "HANDOVER_REGION_EMPTY",
+      "message": "no collision-free verified handover candidate",
+      "request": {
+        "goal": "transfer_to_other_arm",
+        "object_name": "cube",
+        "roles": {},
+        "skill": "handover",
+        "strategy": null
+      },
+      "state": {
+        "action_shape": [
+          16
+        ],
+        "control_frequency": 20,
+        "metrics": {
+          "avg_cartesian_jerk": {
+            "left": 1.5535097463205623,
+            "right": 2.313754075467919
+          },
+          "avg_cartesian_path_length": 1.29391386567049,
+          "avg_joint_jerk": {
+            "left": 4.280492527052653,
+            "right": 5.195276837190461
+          },
+          "avg_joint_path_length": 8.183601440651977,
+          "avg_orientation_path_length": 5.480691297266995,
+          "bimanual_arm_velocity_difference": 0.3322064393770792,
+          "bimanual_gripper_vertical_difference": 0.0575127015313078,
+          "cartesian_path_length": {
+            "left": 1.2366500010494803,
+            "right": 1.3511777302914998
+          },
+          "completion_time": 5.608584403991699,
+          "env_collision_count": 0,
+          "joint_path_length": {
+            "left": 12.908419400095823,
+            "right": 3.4587834812081284
+          },
+          "orientation_path_length": {
+            "left": 10.083937266192013,
+            "right": 0.8774453283419782
+          },
+          "overall_avg_cartesian_jerk": 1.9336319108942408,
+          "overall_avg_joint_jerk": 4.737884682121557,
+          "overall_rms_cartesian_jerk": 6.142219263663798,
+          "overall_rms_joint_jerk": 18.458086877697706,
+          "rms_cartesian_jerk": {
+            "left": 5.0401829599829755,
+            "right": 7.074621593819883
+          },
+          "rms_joint_jerk": {
+            "left": 16.785994204427585,
+            "right": 19.99080641040266
+          },
+          "self_collision_count": 0,
+          "slip_count": 1,
+          "slip_count_per_object": {
+            "object_1": 1
+          },
+          "subtask_progress": 1.0,
+          "success": 0.0,
+          "target_distance": {
+            "cube to left gripper": 0.22332030226419217,
+            "cube to right gripper": 0.12596902507580185,
+            "lift distance": 0.13442068148778463
+          },
+          "task_stage_reached": {
+            "1": true,
+            "2": true
+          },
+          "task_success": 0.0,
+          "total_cartesian_path_length": 2.58782773134098,
+          "total_joint_path_length": 16.367202881303953,
+          "total_orientation_path_length": 10.96138259453399
+        },
+        "objects": {
+          "cube": {
+            "aabb_center": [
+              0.5532205948087887,
+              -0.14118384226087688,
+              1.039778190498943
+            ],
+            "angular_velocity": [
+              -0.06660953455265102,
+              0.14432565184421847,
+              -0.0029358249590459625
+            ],
+            "contacts": [
+              "robot:right:finger"
+            ],
+            "held_by": [
+              "right"
+            ],
+            "linear_velocity": [
+              0.002065730694271626,
+              -0.006574537091957491,
+              -0.07234173855976012
+            ],
+            "name": "cube",
+            "pose": {
+              "position": [
+                0.5620192677349327,
+                -0.01878371430675973,
+                1.1043206814877846
+              ],
+              "quaternion_wxyz": [
+                0.9997589863201265,
+                -0.009084793167847511,
+                0.01928842639696343,
+                0.005233776110951028
+              ]
+            },
+            "size": [
+              0.24161018077244212,
+              0.5123533202626439,
+              0.17976026319513383
+            ]
+          }
+        },
+        "robot": {
+          "arms": {
+            "left": {
+              "ee_pose": {
+                "position": [
+                  0.5052467422634388,
+                  0.19661685752146518,
+                  1.0884640926039029
+                ],
+                "quaternion_wxyz": [
+                  0.4589523968517834,
+                  0.5071521378826228,
+                  -0.5338804999841835,
+                  0.49712273957416847
+                ]
+              },
+              "gripper_aperture_m": 0.0799,
+              "gripper_command": 0.0,
+              "holding": [],
+              "joint_positions": [
+                -1.17864191532135,
+                -0.7838056087493896,
+                0.9213558435440063,
+                -2.5218186378479004,
+                -1.094906210899353,
+                2.239884614944458,
+                -0.35873258113861084
+              ],
+              "joint_velocities": [
+                0.0016516047762706876,
+                -0.0012075796257704496,
+                0.01957029476761818,
+                -0.028343623504042625,
+                0.01589219830930233,
+                -0.00370987830683589,
+                -0.0012835029046982527
+              ],
+              "side": "left"
+            },
+            "right": {
+              "ee_pose": {
+                "position": [
+                  0.5697109417848841,
+                  -0.017121222307027964,
+                  1.230043668841761
+                ],
+                "quaternion_wxyz": [
+                  0.028855033975958757,
+                  0.7069545311286239,
+                  -0.7066064399692202,
+                  -0.009487724963265923
+                ]
+              },
+              "gripper_aperture_m": 0.0365,
+              "gripper_command": 1.0,
+              "holding": [
+                "cube"
+              ],
+              "joint_positions": [
+                0.2805802822113037,
+                0.01019604504108429,
+                0.2625293731689453,
+                -1.5308905839920044,
+                0.0019240053370594978,
+                1.4801498651504517,
+                -0.2425977736711502
+              ],
+              "joint_velocities": [
+                -0.002408486558124423,
+                0.07358838617801666,
+                -0.0032832741271704435,
+                -0.07273910939693451,
+                -0.0015423779841512442,
+                -0.014816448092460632,
+                -0.002762947930023074
+              ],
+              "side": "right"
+            }
+          },
+          "joint_positions": [
+            -1.17864191532135,
+            -0.7838056087493896,
+            0.9213558435440063,
+            -2.5218186378479004,
+            -1.094906210899353,
+            2.239884614944458,
+            -0.35873258113861084,
+            0.2805802822113037,
+            0.01019604504108429,
+            0.2625293731689453,
+            -1.5308905839920044,
+            0.0019240053370594978,
+            1.4801498651504517,
+            -0.2425977736711502
+          ],
+          "joint_velocities": [
+            0.0016516047762706876,
+            -0.0012075796257704496,
+            0.01957029476761818,
+            -0.028343623504042625,
+            0.01589219830930233,
+            -0.00370987830683589,
+            -0.0012835029046982527,
+            -0.002408486558124423,
+            0.07358838617801666,
+            -0.0032832741271704435,
+            -0.07273910939693451,
+            -0.0015423779841512442,
+            -0.014816448092460632,
+            -0.002762947930023074
+          ]
+        },
+        "seed": 5,
+        "task_key": "cube_handover",
+        "task_name": "CubeHandover"
+      },
+      "success": false
+    }
+  ],
+  "subtask_progress": 1.0,
+  "task_key": "cube_handover"
+}

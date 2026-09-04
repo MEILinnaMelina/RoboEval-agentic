@@ -1,0 +1,38 @@
+[
+  {
+    "is_replan": false,
+    "latency_seconds": 0.0,
+    "model": "fixed-semantic-v1",
+    "provider": "deterministic",
+    "raw_response": "",
+    "request": {
+      "goal": "stable_hold",
+      "object_name": "block_0",
+      "roles": {},
+      "skill": "grasp",
+      "strategy": "nearest_arm"
+    },
+    "system_prompt": "",
+    "thought": "Execute the next fixed semantic gate step.",
+    "usage": {},
+    "user_prompt": ""
+  },
+  {
+    "is_replan": false,
+    "latency_seconds": 0.0,
+    "model": "fixed-semantic-v1",
+    "provider": "deterministic",
+    "raw_response": "",
+    "request": {
+      "goal": "transfer_for_opposite_workspace",
+      "object_name": "block_0",
+      "roles": {},
+      "skill": "handover",
+      "strategy": null
+    },
+    "system_prompt": "",
+    "thought": "Execute the next fixed semantic gate step.",
+    "usage": {},
+    "user_prompt": ""
+  }
+]
