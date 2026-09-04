@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import json
 import os
+import time
 from time import perf_counter
 from typing import Any, Mapping, Protocol
 
@@ -165,22 +166,56 @@ class AnthropicTextPlanner:
         return raw, _usage_dict(getattr(response, "usage", None))
 
 
+_RETRYABLE_ERROR_NAMES = frozenset(
+    {
+        "APIConnectionError",
+        "APITimeoutError",
+        "RateLimitError",
+        "InternalServerError",
+        "ServiceUnavailableError",
+        "OverloadedError",
+        "DeadlineExceededError",
+    }
+)
+
+
+def _is_retryable(error: Exception) -> bool:
+    # Both openai and anthropic raise similarly-named exceptions for
+    # transient network/server problems; match by name instead of importing
+    # both SDKs unconditionally (each client is already lazily imported).
+    return type(error).__name__ in _RETRYABLE_ERROR_NAMES
+
+
 def request_from_client(
     client: TextPlannerClient,
     system_prompt: str,
     user_prompt: str,
     *,
     is_replan: bool = False,
+    max_attempts: int = 4,
+    backoff_seconds: float = 2.0,
 ) -> PlannerDecision:
     started = perf_counter()
-    raw, usage = client.complete(system_prompt, user_prompt)
-    return parse_semantic_response(
-        raw,
-        provider=client.provider,
-        model=client.model,
-        latency_seconds=perf_counter() - started,
-        usage=usage,
-        system_prompt=system_prompt,
-        user_prompt=user_prompt,
-        is_replan=is_replan,
-    )
+    for attempt in range(max_attempts):
+        try:
+            raw, usage = client.complete(system_prompt, user_prompt)
+        except Exception as error:
+            # Only retry transient connection/server errors - a malformed
+            # or schema-invalid response is real signal about model
+            # behavior and should surface immediately, not be masked by
+            # retrying into a possibly-identical bad response.
+            if not _is_retryable(error) or attempt == max_attempts - 1:
+                raise
+            time.sleep(backoff_seconds * (2**attempt))
+            continue
+        return parse_semantic_response(
+            raw,
+            provider=client.provider,
+            model=client.model,
+            latency_seconds=perf_counter() - started,
+            usage=usage,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            is_replan=is_replan,
+        )
+    raise AssertionError("unreachable: loop always returns or raises")
