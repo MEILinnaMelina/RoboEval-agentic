@@ -213,6 +213,31 @@ class AgentRunResult:
         return data
 
 
+def summarize_trial_for_memory(result: "AgentRunResult") -> str:
+    """One-paragraph summary of a finished trial for the *next* trial's prompt.
+
+    Trials are otherwise fully independent (fresh env, fresh planner
+    conversation) - this is the only thing that carries across them. Not a
+    substitute for real learning (no weights change), just a cheap way to
+    let a later trial avoid repeating a known-bad approach.
+    """
+    if result.completed:
+        return f"Trial succeeded (task_success={result.final_task_success})."
+
+    checks = result.quality_assessment.get("checks", {})
+    failed_checks = [name for name, check in checks.items() if not check.get("passed")]
+    attempts = []
+    for record in result.steps[-3:]:
+        action = record.action
+        outcome = record.result
+        attempts.append(f"{action.get('primitive')}({action.get('args')}) -> {outcome.get('message')}")
+    return (
+        f"Trial failed (task_success={result.final_task_success}). "
+        f"Failed checks: {failed_checks}. "
+        f"Last attempts: {'; '.join(attempts) if attempts else 'none'}."
+    )
+
+
 class PlannerClient(Protocol):
     """Minimal interface implemented by concrete LLM providers."""
 
@@ -804,6 +829,7 @@ class LLMAgent:
         *,
         execute_primitives: bool = True,
         success_threshold: float = 1.0,
+        prior_trial_notes: list[str] | None = None,
     ) -> None:
         self.task_key = task_key
         self.spec = TASK_SPECS[task_key]
@@ -818,6 +844,7 @@ class LLMAgent:
         )
         self.execute_primitives = execute_primitives
         self.success_threshold = success_threshold
+        self.prior_trial_notes = prior_trial_notes or []
 
     def run(self, *, max_steps: int = 8, step_callback: Any | None = None) -> AgentRunResult:
         records: list[AgentStepRecord] = []
@@ -843,6 +870,7 @@ class LLMAgent:
                 self.spec,
                 state_summary,
                 history=records,
+                prior_trial_notes=self.prior_trial_notes,
             )
             raw_response = self.planner.plan(
                 system_prompt=system_prompt,
@@ -1026,6 +1054,7 @@ def build_task_prompt(
     state_summary: dict[str, Any],
     *,
     history: list[AgentStepRecord] | None = None,
+    prior_trial_notes: list[str] | None = None,
 ) -> tuple[str, str]:
     """Build the system and user prompts for one planner step."""
 
@@ -1076,11 +1105,13 @@ def build_task_prompt(
             "If the previous primitive failed or recovery_feedback/quality_check_failed hints appear, adapt (different side, larger/smaller ee_offset, more steps) rather than repeating the same args.",
             "Object positions/sizes and available_symbolic_targets (fixed handle/affordance offsets) are the only geometry you get - use ee_offset to grasp/approach any object at any point you choose.",
             "grippers[side].aperture_m is how wide that gripper can currently open (max ~0.08m) - a grasp point needs the object's cross-section at that point to fit within it.",
+            "lessons_from_previous_trials (if any) summarizes what happened on earlier, independent attempts at this same task - use them to avoid repeating a mistake, but this is a fresh attempt with its own state, not a continuation.",
             "Call settle before finish once you believe the task is done, to confirm it holds up under physics; only call finish once quality_assessment.passed is true or no non-finish primitive can plausibly help anymore.",
         ],
         "allowed_primitives": PRIMITIVE_SCHEMAS,
         "symbolic_targets": SYMBOLIC_TARGETS,
         "robot_poses": ROBOT_POSES,
+        "lessons_from_previous_trials": prior_trial_notes or [],
         "state": state_summary,
         "recent_history": compact_history,
         "required_response_format": {

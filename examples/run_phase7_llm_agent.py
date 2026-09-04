@@ -17,7 +17,7 @@ import imageio.v2 as imageio
 import numpy as np
 from absl import logging as absl_logging
 
-from roboeval.agentic.llm_agent import LLMAgent, make_planner
+from roboeval.agentic.llm_agent import LLMAgent, make_planner, summarize_trial_for_memory
 from roboeval.agentic.primitives import PrimitiveController
 from roboeval.agentic.state import collect_env_state
 from roboeval.agentic.task_specs import TASK_SPECS, make_task_env
@@ -144,6 +144,7 @@ def run_one(
     task_key: str,
     trial_index: int,
     args: argparse.Namespace,
+    prior_trial_notes: list[str] | None = None,
 ) -> dict[str, Any]:
     trial_dir = args.output_dir / task_key / f"trial_{trial_index:03d}"
     trial_dir.mkdir(parents=True, exist_ok=True)
@@ -184,7 +185,14 @@ def run_one(
             reasoning_effort=args.reasoning_effort if args.provider == "openai" else None,
             max_output_tokens=args.max_output_tokens,
         )
-        agent = LLMAgent(task_key, env, controller, planner, execute_primitives=True)
+        agent = LLMAgent(
+            task_key,
+            env,
+            controller,
+            planner,
+            execute_primitives=True,
+            prior_trial_notes=prior_trial_notes,
+        )
 
         def after_agent_step(record: Any, next_state: dict[str, Any]) -> None:
             step_diagnostics.append(
@@ -258,6 +266,7 @@ def run_one(
             "case_log_path": str(case_path),
             "trajectory_gif": trajectory_gif,
             "failed_step": None if success else first_failed_step(report),
+            "memory_note": summarize_trial_for_memory(result),
         }
     finally:
         env.close()
@@ -329,10 +338,21 @@ def main() -> None:
 
     records = []
     for task_key in task_keys(args.task):
+        # Trials are otherwise fully independent (fresh env, fresh planner
+        # conversation) - this is the only thing carried from one trial to
+        # the next, and only within the same task. See
+        # summarize_trial_for_memory() / prior_trial_notes.
+        prior_trial_notes: list[str] = []
         for trial_index in range(1, args.trials + 1):
             print(f"[phase7] {task_key} trial {trial_index}/{args.trials}", flush=True)
-            record = run_one(task_key=task_key, trial_index=trial_index, args=args)
+            record = run_one(
+                task_key=task_key,
+                trial_index=trial_index,
+                args=args,
+                prior_trial_notes=prior_trial_notes,
+            )
             records.append(record)
+            prior_trial_notes.append(f"Trial {trial_index}: {record['memory_note']}")
             status = "success" if record["success"] else "failure"
             print(
                 f"[phase7] {task_key} trial {trial_index}: {status}, "
