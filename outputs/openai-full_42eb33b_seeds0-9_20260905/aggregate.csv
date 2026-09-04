@@ -1,0 +1,4 @@
+method,task_key,trials,successes,success_rate,success_ci95_low,success_ci95_high,mean_subtask_progress,mean_env_collision_count,mean_self_collision_count,mean_slip_count,mean_path_length,mean_execution_time_s,mean_llm_planning_time_s,mean_llm_calls,mean_llm_cost_usd,mean_replans,behavior_quality_rate
+v2-full,cube_handover,10,10,1.0,0.7224672001371107,0.9999999999999999,1.0,0.0,0.0,0.0,1.3461726531739595,9.205326339998283,6.8706145199961615,2.0,,0.0,1
+v2-full,lift_pot,10,10,1.0,0.7224672001371107,0.9999999999999999,1.0,0.0,0.0,0.0,1.3012266270718649,11.302270279997902,9.023755150001671,3.0,,1.0,1
+v2-full,stack_two_blocks,10,10,1.0,0.7224672001371107,0.9999999999999999,0.6666666666666666,1.0,0.0,0.0,1.984088037396821,31.054008289997,27.14204682998825,6.9,,3.4,0

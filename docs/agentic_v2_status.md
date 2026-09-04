@@ -106,11 +106,33 @@ first run also lost 5/9 trials to `APIConnectionError`, since fixed with
 a transient-error retry in `llm_planner.py`. No cost-per-million flags
 were set, so `llm_cost_usd` is null in those; token counts are recorded.
 
-**Formal run in progress at `42eb33b`**: `v2-full` (full feasibility gate,
-online replan, no memory), 3 tasks x seeds 0-9, OpenAI `gpt-5.6-terra`,
-output `outputs/openai-full_42eb33b_seeds0-9_20260905`. Results will be
-recorded here when it finishes; until then no API claim beyond the
-informal runs above is verified.
+**Formal run at `42eb33b` - 30/30**: `v2-full` (full feasibility gate,
+online replan, no cross-trial memory), 3 tasks x seeds 0-9, OpenAI
+`gpt-5.6-terra`, 0 connection errors, ~303k tokens total. Summary in
+`results/openai-full_42eb33b_seeds0-9_20260905.json`; full traces in
+`outputs/openai-full_42eb33b_seeds0-9_20260905`.
+
+| Task | `benchmark_success` | mean LLM calls | mean replans | env/self collisions, slip |
+|---|---|---|---|---|
+| `cube_handover` | 10/10 | 2.0 | 0.0 | 0 / 0 / 0 |
+| `lift_pot` | 10/10 | 3.0 | 1.0 | 0 / 0 / 0 |
+| `stack_two_blocks` | 10/10 | 6.9 | 3.4 | 1 / 0 / 0 |
+
+`stack_two_blocks` is the only task where the LLM genuinely replans: it
+first requests a direct cross-workspace `place`, which the feasibility
+gate rejects, and then chooses `handover` followed by `place` - the
+0.7 m single-arm-carry problem the plan anticipated, resolved online
+rather than by a scripted hint. Its behavior-quality rate is 0/10 for
+the same reason as the deterministic gate (one fingertip-table graze at
+the regrasp close, counted by RoboEval's `env_collision_count`).
+
+Not yet run: the other ablation rows in `METHOD_SPECS` (`v2-ik-only`,
+`v2-fixed` via the API launcher, `v2-full-no-replan`, `v2-full-memory`)
+and the two frozen v1 baselines (`v1-p22-independent`, `v1-p23-memory`,
+which need `--v1-p22-root`/`--v1-p23-root` worktrees checked out at
+`d9198fa`/`337d0f0`). The deterministic 10/10 gate results above are the
+`v2-fixed` row's numbers in substance, but were produced by the gate
+launcher, not the API matrix launcher.
 
 ## Experiment naming convention
 

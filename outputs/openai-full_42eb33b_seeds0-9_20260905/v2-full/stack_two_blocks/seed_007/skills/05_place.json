@@ -1,0 +1,2731 @@
+{
+  "decision": {
+    "is_replan": true,
+    "latency_seconds": 7.626116599974921,
+    "model": "gpt-5.6-terra",
+    "provider": "openai",
+    "raw_response": "{\"schema_version\":\"roboeval.agentic_v2.skill_request.v1\",\"thought\":\"The elevated left-held block_1 can be placed directly onto the table-supported block_0, avoiding the repeatedly failing right-arm acquisition; this is sufficient for the required stacked, released final state.\",\"request\":{\"skill\":\"place\",\"object\":\"block_1\",\"roles\":{\"left\":\"block_1\",\"right\":null,\"donor\":null,\"receiver\":null},\"goal\":\"on:block_0\",\"strategy\":\"direct_stack_from_left\"}}",
+    "request": {
+      "goal": "on:block_0",
+      "object_name": "block_1",
+      "roles": {
+        "left": "block_1"
+      },
+      "skill": "place",
+      "strategy": "direct_stack_from_left"
+    },
+    "system_prompt": "You are the semantic task planner for a bimanual RoboEval agent. Choose exactly one skill request. Deterministic robotics code alone chooses poses, offsets, joint values, trajectories, gains, tolerances, and step counts. Never output any of those low-level fields. Return only one JSON object matching the supplied schema. Re-observe failures, change semantic strategy when useful, and never declare success unless the raw benchmark metric supports it.",
+    "thought": "The elevated left-held block_1 can be placed directly onto the table-supported block_0, avoiding the repeatedly failing right-arm acquisition; this is sufficient for the required stacked, released final state.",
+    "usage": {
+      "input_tokens": 2955,
+      "input_tokens_details": {
+        "cache_write_tokens": 2952,
+        "cached_tokens": 0
+      },
+      "output_tokens": 329,
+      "output_tokens_details": {
+        "reasoning_tokens": 211
+      },
+      "total_tokens": 3284
+    },
+    "user_prompt": "{\"available_skills\":{\"bimanual_grasp\":\"The named object exists and supports a two-arm grasp.\",\"finish\":\"Use only when raw benchmark success is already observed or no recovery remains.\",\"grasp\":\"The named object exists and is not already held by the chosen arm.\",\"handover\":\"Exactly one arm currently holds the named object.\",\"lift\":\"The named object is held by one or both arms.\",\"place\":\"The named object is held and goal names a support as on:<object>.\",\"transport\":\"The named object is held; goal is a symbolic region.\"},\"cross_trial_memory\":[],\"current_state\":{\"metrics\":{\"avg_cartesian_jerk\":{\"left\":3.3804492972596343,\"right\":2.2266487702020927},\"avg_cartesian_path_length\":0.16743626124023547,\"avg_joint_jerk\":{\"left\":9.191297965725715,\"right\":2.9811649051903935},\"avg_joint_path_length\":0.6170677759793802,\"avg_orientation_path_length\":0.10237654245322392,\"bimanual_arm_velocity_difference\":0.14367499283974225,\"bimanual_gripper_vertical_difference\":0.05137232180204043,\"cartesian_path_length\":{\"left\":0.29555565527691435,\"right\":0.039316867203556566},\"completion_time\":19.108298778533936,\"env_collision_count\":0,\"joint_path_length\":{\"left\":1.1816633004806283,\"right\":0.0524722514781322},\"orientation_path_length\":{\"left\":0.1249149591349064,\"right\":0.07983812577154142},\"overall_avg_cartesian_jerk\":2.8035490337308633,\"overall_avg_joint_jerk\":6.086231435458053,\"overall_rms_cartesian_jerk\":7.270069149382474,\"overall_rms_joint_jerk\":15.987980597627411,\"rms_cartesian_jerk\":{\"left\":7.905202968704256,\"right\":6.573855557980798},\"rms_joint_jerk\":{\"left\":20.828073537334387,\"right\":8.798999937698154},\"self_collision_count\":0,\"slip_count\":0,\"slip_count_per_object\":{\"object_1\":0,\"object_2\":0},\"subtask_progress\":0.3333333333333333,\"success\":0.0,\"target_distance\":{\"block_0-gripper_Left\":0.7363008990979262,\"block_0-gripper_Right\":0.22809464225183854,\"block_1-gripper_Left\":0.1255323145660765,\"block_1-gripper_Right\":0.6617968575948852,\"cube 1 lift distance\":9.870696677649615e-05,\"cube 2 lift distance\":0.10521657677643104},\"task_stage_reached\":{\"1\":true,\"2\":false,\"3\":false},\"task_success\":0.0,\"total_cartesian_path_length\":0.33487252248047095,\"total_joint_path_length\":1.2341355519587605,\"total_orientation_path_length\":0.20475308490644784},\"objects\":{\"block_0\":{\"angular_velocity\":[-2.0987002647077318e-13,-1.0621066861299901e-08,1.9474903337822495e-13],\"contacts\":[\"scene:table\"],\"held_by\":[],\"linear_velocity\":[-2.124199786188031e-10,2.0362301922919603e-15,-2.124075963218196e-10],\"pose\":{\"position\":[0.4999999958381143,-0.3500000000003623,0.9699987069667765],\"quaternion_wxyz\":[0.9999999999999994,-1.3808420316646543e-11,-3.244664610936919e-08,-2.1723335189415936e-11]},\"size\":[0.04000000546062049,0.04000000000284254,0.07005613810499178]},\"block_1\":{\"angular_velocity\":[-0.0001002361847820959,0.0017282002405350303,-4.336153505511256e-05],\"contacts\":[\"robot:left:finger\"],\"held_by\":[\"left\"],\"linear_velocity\":[-0.0005336681859620368,-5.518478893615058e-05,0.0027046380766290114],\"pose\":{\"position\":[0.49412204704043866,0.3489791174489505,1.075116576776431],\"quaternion_wxyz\":[0.9998037474557832,-0.001367857769908629,0.019701973036723632,-0.0015581389392997247]},\"size\":[0.04707517999113098,0.041137577541247417,0.14601623535712216]}},\"robot\":{\"arms\":{\"left\":{\"ee_pose\":{\"position\":[0.502261690618941,0.34932567786676255,1.2003842425909106],\"quaternion_wxyz\":[0.02241199531605144,0.7064318000354265,-0.7071739441994419,-0.018889865273878405]},\"gripper_aperture_m\":0.0365,\"holding\":[\"block_1\"]},\"right\":{\"ee_pose\":{\"position\":[0.5630552345170585,-0.30023611136210926,1.1834811607814522],\"quaternion_wxyz\":[0.030786372789131117,0.7064438461729218,-0.7064890692326087,-0.029368120636843773]},\"gripper_aperture_m\":0.08,\"holding\":[]}},\"joint_positions\":[0.04555141553282738,-0.1508248895406723,0.04750834405422211,-1.793707013130188,0.007591384928673506,1.5844194889068604,-0.6923621892929077,2.0910735543111514e-07,0.040364816784858704,-3.755847501452081e-05,-1.608862280845642,-0.002002882305532694,1.5641299486160278,-0.7852996587753296],\"joint_velocities\":[-3.5728313378058374e-05,0.0012558057205751538,-2.4363380362046883e-05,0.008839922957122326,-4.965994958183728e-05,-0.009841286577284336,3.893064786097966e-05,2.1883090894903034e-09,1.4168220729970926e-07,1.5096058847419158e-09,-1.6495307875175058e-07,-1.0377497083879916e-08,-1.965216789301394e-08,-8.031574710853917e-11]},\"seed\":7,\"task_key\":\"stack_two_blocks\"},\"last_result\":{\"diagnostics\":{},\"failure_code\":\"ENV_COLLISION\",\"message\":\"failed to open before approach\",\"request\":{\"goal\":\"stable_hold\",\"object\":\"block_0\",\"roles\":{\"right\":\"block_0\"},\"skill\":\"grasp\",\"strategy\":\"right arm grasps block_0 after left-arm clearance recovery\"},\"success\":false},\"output_schema\":{\"additionalProperties\":false,\"properties\":{\"request\":{\"additionalProperties\":false,\"properties\":{\"goal\":{\"type\":\"string\"},\"object\":{\"type\":[\"string\",\"null\"]},\"roles\":{\"additionalProperties\":false,\"properties\":{\"donor\":{\"type\":[\"string\",\"null\"]},\"left\":{\"type\":[\"string\",\"null\"]},\"receiver\":{\"type\":[\"string\",\"null\"]},\"right\":{\"type\":[\"string\",\"null\"]}},\"required\":[\"left\",\"right\",\"donor\",\"receiver\"],\"type\":\"object\"},\"skill\":{\"enum\":[\"grasp\",\"bimanual_grasp\",\"lift\",\"transport\",\"handover\",\"place\",\"finish\"],\"type\":\"string\"},\"strategy\":{\"type\":[\"string\",\"null\"]}},\"required\":[\"skill\",\"object\",\"roles\",\"goal\",\"strategy\"],\"type\":\"object\"},\"schema_version\":{\"enum\":[\"roboeval.agentic_v2.skill_request.v1\"],\"type\":\"string\"},\"thought\":{\"type\":\"string\"}},\"required\":[\"schema_version\",\"thought\",\"request\"],\"type\":\"object\"},\"rules\":[\"Use only named objects present in current_state.\",\"Roles may identify left/right or donor/receiver, but the live hold state is authoritative.\",\"Use symbolic goals such as stable_hold, handover_region, task_success_height, or on:<object>.\",\"Do not repeat an unchanged failed request without a semantic recovery reason.\"],\"schema_version\":\"roboeval.agentic_v2.skill_request.v1\",\"task\":{\"key\":\"stack_two_blocks\",\"stage_meaning\":{\"1\":\"at least one block has been held\",\"2\":\"the other block has also been held\",\"3\":\"blocks have stacked contact without upper-table contact\"},\"success_condition\":\"One block rests on the table, the other contacts only that block, and neither gripper holds a block.\"},\"within_trial_history\":[{\"request\":{\"goal\":\"stable_hold\",\"object\":\"block_1\",\"roles\":{\"left\":\"block_1\"},\"skill\":\"grasp\",\"strategy\":\"left arm grasps the nearby block_1 for subsequent lifting and stacking\"},\"result\":{\"diagnostics\":{\"attachment\":{\"ee_to_object\":{\"position\":[-0.0002688850195093906,0.00044896144521883175,0.12551648726701237],\"quaternion_wxyz\":[-0.010312085714257882,0.7075625087180624,-0.706523499233063,-0.008573341022726083]},\"object_name\":\"block_1\",\"side\":\"left\"},\"candidate\":\"block_1_left_top_0\"},\"failure_code\":null,\"message\":\"verified left grasp of block_1\",\"success\":true},\"thought\":\"Begin by grasping the block closest to the left arm; neither block is held and the task requires both to be handled.\"},{\"request\":{\"goal\":\"stable_hold\",\"object\":\"block_0\",\"roles\":{\"right\":\"block_0\"},\"skill\":\"grasp\",\"strategy\":\"right arm grasps block_0 while left maintains its verified hold on block_1\"},\"result\":{\"diagnostics\":{},\"failure_code\":\"ENV_COLLISION\",\"message\":\"failed to open before approach\",\"success\":false},\"thought\":\"Block_1 is securely held by the left arm. To satisfy the next task stage and enable stacking, grasp the table-supported block_0 with the free right arm.\"},{\"request\":{\"goal\":\"task_success_height\",\"object\":\"block_1\",\"roles\":{\"left\":\"block_1\"},\"skill\":\"lift\",\"strategy\":\"lift the verified left-held block_1 to clear workspace for a recovered right-arm grasp of block_0\"},\"result\":{\"diagnostics\":{},\"failure_code\":\"INVALID_REQUEST\",\"message\":\"unknown lift strategy 'lift the verified left-held block_1 to clear workspace for a recovered right-arm grasp of block_0'\",\"success\":false},\"thought\":\"The free-right grasp of block_0 failed during approach setup. Raise the securely held block_1 with the left arm first, creating a safer bimanual workspace before retrying acquisition of block_0.\"},{\"request\":{\"goal\":\"task_success_height\",\"object\":\"block_1\",\"roles\":{\"left\":\"block_1\"},\"skill\":\"lift\"},\"result\":{\"diagnostics\":{\"actual_rise\":0.08970714982649641,\"benchmark_success\":0.0,\"requested_height\":0.1},\"failure_code\":null,\"message\":\"lifted block_1 using ('left',)\",\"success\":true},\"thought\":\"The left arm has a verified hold on block_1, and the prior lift was rejected solely because its free-form strategy was unsupported. Retry the valid lift semantic request without that unsupported strategy.\"},{\"request\":{\"goal\":\"stable_hold\",\"object\":\"block_0\",\"roles\":{\"right\":\"block_0\"},\"skill\":\"grasp\",\"strategy\":\"right arm grasps block_0 after left-arm clearance recovery\"},\"result\":{\"diagnostics\":{},\"failure_code\":\"ENV_COLLISION\",\"message\":\"failed to open before approach\",\"success\":false},\"thought\":\"Block_1 is now elevated and securely held by the left arm, which provides clearance after the earlier right-arm approach collision. Acquire the table-supported block_0 with the free right arm to reach the second handling stage.\"}]}"
+  },
+  "planning_trace": [
+    {
+      "constraints": {
+        "allowed_contacts": {
+          "penetration_tolerance": 0.012,
+          "rules": [
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:right:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "object:block_1",
+              "penetration_tolerance": null,
+              "second": "object:block_0"
+            }
+          ]
+        },
+        "held_objects": [
+          {
+            "ee_to_object": {
+              "position": [
+                -0.0002736241424684538,
+                0.0008119716162175439,
+                0.12552939031254584
+              ],
+              "quaternion_wxyz": [
+                -0.007538009732111138,
+                0.7077978602948948,
+                -0.7063501624965226,
+                -0.005900450184817174
+              ]
+            },
+            "object_name": "block_1",
+            "side": "left"
+          }
+        ],
+        "maximum_object_tilt": null,
+        "orientation_tolerance": 0.35,
+        "position_tolerance": 0.06
+      },
+      "elapsed_seconds": 0.01659389998530969,
+      "execution": null,
+      "ik": {
+        "accepted": [],
+        "rejected": [
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020657983217020632,
+                  "position_error": 0.14960321185308129,
+                  "solver_error_norm": 0.1702611950701019,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7155845505510394,
+              0.7980701167393274,
+              -0.6040160029274433,
+              -0.4667943986028061,
+              0.3963919874860775,
+              1.1978262703139884,
+              -1.797390665038508,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020657983217020632,
+            "position_error": 0.14960321185308129,
+            "score": Infinity,
+            "seed_name": "current"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020657983217020632,
+                  "position_error": 0.14960321185308129,
+                  "solver_error_norm": 0.1702611950701019,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7155845505510394,
+              0.7980701167393274,
+              -0.6040160029274433,
+              -0.4667943986028061,
+              0.3963919874860775,
+              1.1978262703139884,
+              -1.797390665038508,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020657983217020632,
+            "position_error": 0.14960321185308129,
+            "score": Infinity,
+            "seed_name": "initial"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020654220627334272,
+                  "position_error": 0.14949694324373922,
+                  "solver_error_norm": 0.17015116387107349,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7449163892478097,
+              0.7844453287652486,
+              -0.4957754100754162,
+              -0.4693902040751304,
+              0.3130071671582752,
+              1.2055895327323478,
+              -1.7806896066838145,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020654220627334272,
+            "position_error": 0.14949694324373922,
+            "score": Infinity,
+            "seed_name": "joint_midpoint"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.015695739461957955,
+                  "position_error": 0.29987638775290554,
+                  "solver_error_norm": 0.3155721272148635,
+                  "solver_success": false,
+                  "steps": 26
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 26,
+            "joint_positions": [
+              2.4601375490001187,
+              -1.263744251007829,
+              0.9392036230129928,
+              -0.5306856464374831,
+              -1.2254269106354911,
+              -0.9928275310364622,
+              1.1321798620570798,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.015695739461957955,
+            "position_error": 0.29987638775290554,
+            "score": Infinity,
+            "seed_name": "perturbation_1"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020678416557544453,
+                  "position_error": 0.1495062054934845,
+                  "solver_error_norm": 0.17018462205102894,
+                  "solver_success": false,
+                  "steps": 6
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 6,
+            "joint_positions": [
+              -0.7409755711326249,
+              0.7850844021334668,
+              -0.5080531930448035,
+              -0.47062846610153836,
+              0.32196738069717884,
+              1.205474025098998,
+              -1.7827345471061062,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020678416557544453,
+            "position_error": 0.1495062054934845,
+            "score": Infinity,
+            "seed_name": "perturbation_2"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020709340820658523,
+                  "position_error": 0.14970274031727154,
+                  "solver_error_norm": 0.17041208113793008,
+                  "solver_success": false,
+                  "steps": 10
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 10,
+            "joint_positions": [
+              -0.691895048959245,
+              0.8093882686433276,
+              -0.692525377461536,
+              -0.4677669879577448,
+              0.46482594705439106,
+              1.1916709435254949,
+              -1.8111837811847564,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020709340820658523,
+            "position_error": 0.14970274031727154,
+            "score": Infinity,
+            "seed_name": "perturbation_3"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020716531451812768,
+                  "position_error": 0.1494148047436854,
+                  "solver_error_norm": 0.17013133619549817,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7731577876484496,
+              0.7720278963800725,
+              -0.39480117495279177,
+              -0.4751623981018211,
+              0.23596298865106713,
+              1.2129941875878452,
+              -1.765048850816952,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020716531451812768,
+            "position_error": 0.1494148047436854,
+            "score": Infinity,
+            "seed_name": "perturbation_4"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020640265072238134,
+                  "position_error": 0.14942877286656814,
+                  "solver_error_norm": 0.17006903793880626,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7702416636651296,
+              0.7758420724039629,
+              -0.40884553380181876,
+              -0.4701704971856848,
+              0.2474897654490108,
+              1.2101186337093175,
+              -1.7669780691751817,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020640265072238134,
+            "position_error": 0.14942877286656814,
+            "score": Infinity,
+            "seed_name": "perturbation_5"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02070435384031193,
+                  "position_error": 0.1499230678744489,
+                  "solver_error_norm": 0.1706274217147608,
+                  "solver_success": false,
+                  "steps": 12
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 12,
+            "joint_positions": [
+              -1.110096042326897,
+              0.8162826501519511,
+              0.7243578201753795,
+              -0.4597429435406917,
+              -0.5985001875823646,
+              1.1732716837182293,
+              -1.5922063552993615,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02070435384031193,
+            "position_error": 0.1499230678744489,
+            "score": Infinity,
+            "seed_name": "perturbation_6"
+          }
+        ],
+        "report": {
+          "contacts": [],
+          "diagnostics": {
+            "failures": [
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE"
+            ]
+          },
+          "failure_code": "IK_UNREACHABLE",
+          "feasible": false,
+          "message": "no feasible IK candidate from 9 seed(s)"
+        }
+      },
+      "name": "block_1_on_block_0_0_preplace",
+      "path": null,
+      "targets": {
+        "left": {
+          "position": [
+            0.5081396394166164,
+            -0.34965343958255024,
+            1.283302559512313
+          ],
+          "quaternion_wxyz": [
+            -0.022411995316051432,
+            -0.7064318000354266,
+            0.7071739441994418,
+            0.01888986527387841
+          ]
+        }
+      }
+    },
+    {
+      "constraints": {
+        "allowed_contacts": {
+          "penetration_tolerance": 0.012,
+          "rules": [
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:right:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "object:block_1",
+              "penetration_tolerance": null,
+              "second": "object:block_0"
+            }
+          ]
+        },
+        "held_objects": [
+          {
+            "ee_to_object": {
+              "position": [
+                -0.0002736241424684538,
+                0.0008119716162175439,
+                0.12552939031254584
+              ],
+              "quaternion_wxyz": [
+                -0.007538009732111138,
+                0.7077978602948948,
+                -0.7063501624965226,
+                -0.005900450184817174
+              ]
+            },
+            "object_name": "block_1",
+            "side": "left"
+          }
+        ],
+        "maximum_object_tilt": null,
+        "orientation_tolerance": 0.35,
+        "position_tolerance": 0.06
+      },
+      "elapsed_seconds": 0.01575370001955889,
+      "execution": null,
+      "ik": {
+        "accepted": [],
+        "rejected": [
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021148665486184468,
+                  "position_error": 0.1527348915470096,
+                  "solver_error_norm": 0.17388355703319405,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7085798791771827,
+              0.7981326531873394,
+              -0.603741274296642,
+              -0.47119022747159195,
+              0.39571009996711043,
+              1.2021194794979357,
+              -1.7920427603908582,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021148665486184468,
+            "position_error": 0.1527348915470096,
+            "score": Infinity,
+            "seed_name": "current"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021148665486184468,
+                  "position_error": 0.1527348915470096,
+                  "solver_error_norm": 0.17388355703319405,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7085798791771827,
+              0.7981326531873394,
+              -0.603741274296642,
+              -0.47119022747159195,
+              0.39571009996711043,
+              1.2021194794979357,
+              -1.7920427603908582,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021148665486184468,
+            "position_error": 0.1527348915470096,
+            "score": Infinity,
+            "seed_name": "initial"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021164380137043717,
+                  "position_error": 0.15262915548924444,
+                  "solver_error_norm": 0.17379353562628816,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7374933077619915,
+              0.7841289330494701,
+              -0.49686188778286233,
+              -0.4746256764854002,
+              0.3132574390546218,
+              1.2102432381260633,
+              -1.77551357990698,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021164380137043717,
+            "position_error": 0.15262915548924444,
+            "score": Infinity,
+            "seed_name": "joint_midpoint"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.015934719976430093,
+                  "position_error": 0.30321576503287645,
+                  "solver_error_norm": 0.31915048500930654,
+                  "solver_success": false,
+                  "steps": 24
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 24,
+            "joint_positions": [
+              2.464837929743509,
+              -1.2663334850645191,
+              0.9353493025144963,
+              -0.53030839206624,
+              -1.2196599459321182,
+              -0.9932978172051381,
+              1.1391796317421434,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.015934719976430093,
+            "position_error": 0.30321576503287645,
+            "score": Infinity,
+            "seed_name": "perturbation_1"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02109150320299132,
+                  "position_error": 0.15264140157915704,
+                  "solver_error_norm": 0.17373290478214834,
+                  "solver_success": false,
+                  "steps": 6
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 6,
+            "joint_positions": [
+              -0.7361705201551305,
+              0.787850438043659,
+              -0.5072775220474431,
+              -0.4694863072262612,
+              0.32249550922307807,
+              1.2073364266078916,
+              -1.7767174908043675,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02109150320299132,
+            "position_error": 0.15264140157915704,
+            "score": Infinity,
+            "seed_name": "perturbation_2"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021118639995399126,
+                  "position_error": 0.15282740750825327,
+                  "solver_error_norm": 0.17394604750365236,
+                  "solver_success": false,
+                  "steps": 10
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 10,
+            "joint_positions": [
+              -0.6895236303375423,
+              0.810971827499235,
+              -0.6831656631237293,
+              -0.4664561405756205,
+              0.4589576427908043,
+              1.194146784660765,
+              -1.8037671021674808,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021118639995399126,
+            "position_error": 0.15282740750825327,
+            "score": Infinity,
+            "seed_name": "perturbation_3"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02112568314487416,
+                  "position_error": 0.1525469424922828,
+                  "solver_error_norm": 0.17367262563715694,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7694083280374971,
+              0.7746557192997658,
+              -0.39038536272896207,
+              -0.47376770046969086,
+              0.233653853351092,
+              1.2148909783959625,
+              -1.7584659551067388,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02112568314487416,
+            "position_error": 0.1525469424922828,
+            "score": Infinity,
+            "seed_name": "perturbation_4"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02115158826098341,
+                  "position_error": 0.1525555867113805,
+                  "solver_error_norm": 0.17370717497236393,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7648114581530802,
+              0.7750845821234496,
+              -0.4043429384922256,
+              -0.47516832045527874,
+              0.24375493611903112,
+              1.2149592301517662,
+              -1.7607861301957495,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02115158826098341,
+            "position_error": 0.1525555867113805,
+            "score": Infinity,
+            "seed_name": "perturbation_5"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021129372149383492,
+                  "position_error": 0.15308107649022426,
+                  "solver_error_norm": 0.17421044863960775,
+                  "solver_success": false,
+                  "steps": 12
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 12,
+            "joint_positions": [
+              -1.1076168622915572,
+              0.8214289910676209,
+              0.7405933808815923,
+              -0.45868212217496646,
+              -0.6123794442816438,
+              1.1735227959684267,
+              -1.584310046664174,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021129372149383492,
+            "position_error": 0.15308107649022426,
+            "score": Infinity,
+            "seed_name": "perturbation_6"
+          }
+        ],
+        "report": {
+          "contacts": [],
+          "diagnostics": {
+            "failures": [
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE"
+            ]
+          },
+          "failure_code": "IK_UNREACHABLE",
+          "feasible": false,
+          "message": "no feasible IK candidate from 9 seed(s)"
+        }
+      },
+      "name": "block_1_on_block_0_1_preplace",
+      "path": null,
+      "targets": {
+        "left": {
+          "position": [
+            0.5141396394166164,
+            -0.34965343958255024,
+            1.283302559512313
+          ],
+          "quaternion_wxyz": [
+            -0.022411995316051432,
+            -0.7064318000354266,
+            0.7071739441994418,
+            0.01888986527387841
+          ]
+        }
+      }
+    },
+    {
+      "constraints": {
+        "allowed_contacts": {
+          "penetration_tolerance": 0.012,
+          "rules": [
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:right:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "object:block_1",
+              "penetration_tolerance": null,
+              "second": "object:block_0"
+            }
+          ]
+        },
+        "held_objects": [
+          {
+            "ee_to_object": {
+              "position": [
+                -0.0002736241424684538,
+                0.0008119716162175439,
+                0.12552939031254584
+              ],
+              "quaternion_wxyz": [
+                -0.007538009732111138,
+                0.7077978602948948,
+                -0.7063501624965226,
+                -0.005900450184817174
+              ]
+            },
+            "object_name": "block_1",
+            "side": "left"
+          }
+        ],
+        "maximum_object_tilt": null,
+        "orientation_tolerance": 0.35,
+        "position_tolerance": 0.06
+      },
+      "elapsed_seconds": 0.016101299988804385,
+      "execution": null,
+      "ik": {
+        "accepted": [],
+        "rejected": [
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020247371658092785,
+                  "position_error": 0.14649812394201217,
+                  "solver_error_norm": 0.16674549560010496,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7194368943108221,
+              0.7958375598178681,
+              -0.6083367982083251,
+              -0.4678075268165736,
+              0.3984848213845584,
+              1.1956715286622028,
+              -1.8040269238488311,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020247371658092785,
+            "position_error": 0.14649812394201217,
+            "score": Infinity,
+            "seed_name": "current"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020247371658092785,
+                  "position_error": 0.14649812394201217,
+                  "solver_error_norm": 0.16674549560010496,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7194368943108221,
+              0.7958375598178681,
+              -0.6083367982083251,
+              -0.4678075268165736,
+              0.3984848213845584,
+              1.1956715286622028,
+              -1.8040269238488311,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020247371658092785,
+            "position_error": 0.14649812394201217,
+            "score": Infinity,
+            "seed_name": "initial"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020244043815469355,
+                  "position_error": 0.14638954482644664,
+                  "solver_error_norm": 0.166633588641916,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7493463810540965,
+              0.7818777200142966,
+              -0.4981393174271536,
+              -0.47045897940081927,
+              0.3137127702137252,
+              1.2036150702085078,
+              -1.7869993435609157,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020244043815469355,
+            "position_error": 0.14638954482644664,
+            "score": Infinity,
+            "seed_name": "joint_midpoint"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.015463518420863336,
+                  "position_error": 0.2965896942939262,
+                  "solver_error_norm": 0.3120532127147895,
+                  "solver_success": false,
+                  "steps": 27
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 27,
+            "joint_positions": [
+              2.453214188047887,
+              -1.2637101450089876,
+              0.9324744801953259,
+              -0.5304282164880079,
+              -1.218912162679607,
+              -0.9898520927419744,
+              1.1268298131128895,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.015463518420863336,
+            "position_error": 0.2965896942939262,
+            "score": Infinity,
+            "seed_name": "perturbation_1"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02026917543813852,
+                  "position_error": 0.1463978163768699,
+                  "solver_error_norm": 0.1666669918150084,
+                  "solver_success": false,
+                  "steps": 6
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 6,
+            "joint_positions": [
+              -0.7457767005242357,
+              0.7822488869151001,
+              -0.5088457797503402,
+              -0.47191128997323845,
+              0.32140980148228326,
+              1.20368105252835,
+              -1.7888176625515468,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02026917543813852,
+            "position_error": 0.1463978163768699,
+            "score": Infinity,
+            "seed_name": "perturbation_2"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020304330266909823,
+                  "position_error": 0.14660546720314854,
+                  "solver_error_norm": 0.16690979747005838,
+                  "solver_success": false,
+                  "steps": 10
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 10,
+            "joint_positions": [
+              -0.6941644261783401,
+              0.8077281377314967,
+              -0.7020247411223893,
+              -0.46932786820120453,
+              0.4706937213876758,
+              1.1892891578673763,
+              -1.818712145335939,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020304330266909823,
+            "position_error": 0.14660546720314854,
+            "score": Infinity,
+            "seed_name": "perturbation_3"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020213701578006806,
+                  "position_error": 0.1463120753085439,
+                  "solver_error_norm": 0.16652577688655068,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7793470164561469,
+              0.7724735001351981,
+              -0.39668841255971843,
+              -0.47033764678394013,
+              0.23769047564304283,
+              1.208351591847345,
+              -1.7709009084831977,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020213701578006806,
+            "position_error": 0.1463120753085439,
+            "score": Infinity,
+            "seed_name": "perturbation_4"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020230877043985847,
+                  "position_error": 0.14632441440493457,
+                  "solver_error_norm": 0.16655529144892042,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7733098849344455,
+              0.7737008879487471,
+              -0.4160667691269397,
+              -0.47113460593727163,
+              0.2519621735344296,
+              1.2079057489906337,
+              -1.7740334509970164,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020230877043985847,
+            "position_error": 0.14632441440493457,
+            "score": Infinity,
+            "seed_name": "perturbation_5"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020282221476668527,
+                  "position_error": 0.14679023375930525,
+                  "solver_error_norm": 0.16707245523597378,
+                  "solver_success": false,
+                  "steps": 12
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 12,
+            "joint_positions": [
+              -1.112266850988551,
+              0.8109965151722885,
+              0.7069307215111392,
+              -0.460838521337139,
+              -0.5837548281509416,
+              1.1731233239343624,
+              -1.6003420433114401,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020282221476668527,
+            "position_error": 0.14679023375930525,
+            "score": Infinity,
+            "seed_name": "perturbation_6"
+          }
+        ],
+        "report": {
+          "contacts": [],
+          "diagnostics": {
+            "failures": [
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE"
+            ]
+          },
+          "failure_code": "IK_UNREACHABLE",
+          "feasible": false,
+          "message": "no feasible IK candidate from 9 seed(s)"
+        }
+      },
+      "name": "block_1_on_block_0_2_preplace",
+      "path": null,
+      "targets": {
+        "left": {
+          "position": [
+            0.5021396394166164,
+            -0.34965343958255024,
+            1.283302559512313
+          ],
+          "quaternion_wxyz": [
+            -0.022411995316051432,
+            -0.7064318000354266,
+            0.7071739441994418,
+            0.01888986527387841
+          ]
+        }
+      }
+    },
+    {
+      "constraints": {
+        "allowed_contacts": {
+          "penetration_tolerance": 0.012,
+          "rules": [
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:right:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "object:block_1",
+              "penetration_tolerance": null,
+              "second": "object:block_0"
+            }
+          ]
+        },
+        "held_objects": [
+          {
+            "ee_to_object": {
+              "position": [
+                -0.0002736241424684538,
+                0.0008119716162175439,
+                0.12552939031254584
+              ],
+              "quaternion_wxyz": [
+                -0.007538009732111138,
+                0.7077978602948948,
+                -0.7063501624965226,
+                -0.005900450184817174
+              ]
+            },
+            "object_name": "block_1",
+            "side": "left"
+          }
+        ],
+        "maximum_object_tilt": null,
+        "orientation_tolerance": 0.35,
+        "position_tolerance": 0.06
+      },
+      "elapsed_seconds": 0.01716010001837276,
+      "execution": null,
+      "ik": {
+        "accepted": [],
+        "rejected": [
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020139526493306983,
+                  "position_error": 0.14569679363385718,
+                  "solver_error_norm": 0.16583632012716415,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7113092682035062,
+              0.7940547184628025,
+              -0.6000557079227369,
+              -0.4679947398948994,
+              0.39213651564639296,
+              1.1950452942474188,
+              -1.7924680685861247,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020139526493306983,
+            "position_error": 0.14569679363385718,
+            "score": Infinity,
+            "seed_name": "current"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020139526493306983,
+                  "position_error": 0.14569679363385718,
+                  "solver_error_norm": 0.16583632012716415,
+                  "solver_success": false,
+                  "steps": 9
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 9,
+            "joint_positions": [
+              -0.7113092682035062,
+              0.7940547184628025,
+              -0.6000557079227369,
+              -0.4679947398948994,
+              0.39213651564639296,
+              1.1950452942474188,
+              -1.7924680685861247,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020139526493306983,
+            "position_error": 0.14569679363385718,
+            "score": Infinity,
+            "seed_name": "initial"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020137582940152842,
+                  "position_error": 0.14559170823065481,
+                  "solver_error_norm": 0.16572929117080765,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7407583981934983,
+              0.7805015180711209,
+              -0.4920555213632565,
+              -0.4706407776840686,
+              0.309199673005273,
+              1.2027494553584712,
+              -1.7757599573919067,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020137582940152842,
+            "position_error": 0.14559170823065481,
+            "score": Infinity,
+            "seed_name": "joint_midpoint"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.015376288501526133,
+                  "position_error": 0.29567989122617705,
+                  "solver_error_norm": 0.31105617972770316,
+                  "solver_success": false,
+                  "steps": 25
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 25,
+            "joint_positions": [
+              2.4647253394542097,
+              -1.2618849616992005,
+              0.9384777331928916,
+              -0.5308443501567333,
+              -1.225991926000038,
+              -0.9902732303040097,
+              1.136005955069025,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.015376288501526133,
+            "position_error": 0.29567989122617705,
+            "score": Infinity,
+            "seed_name": "perturbation_1"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02016574391046992,
+                  "position_error": 0.14559724450307845,
+                  "solver_error_norm": 0.16576298841354836,
+                  "solver_success": false,
+                  "steps": 6
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 6,
+            "joint_positions": [
+              -0.7379212649069362,
+              0.7804030857311404,
+              -0.49987467443560163,
+              -0.47239211456455255,
+              0.31463183929457744,
+              1.2031173326535365,
+              -1.7771456324153645,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02016574391046992,
+            "position_error": 0.14559724450307845,
+            "score": Infinity,
+            "seed_name": "perturbation_2"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02018986349681636,
+                  "position_error": 0.14579148574473358,
+                  "solver_error_norm": 0.16598134924154995,
+                  "solver_success": false,
+                  "steps": 10
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 10,
+            "joint_positions": [
+              -0.6883794444643269,
+              0.8045448675086873,
+              -0.684356657064461,
+              -0.4693399467615003,
+              0.4569305852897655,
+              1.1894467022619544,
+              -1.8057048345833342,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02018986349681636,
+            "position_error": 0.14579148574473358,
+            "score": Infinity,
+            "seed_name": "perturbation_3"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02010837334963943,
+                  "position_error": 0.1455145148687462,
+                  "solver_error_norm": 0.1656228882183856,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7711992156952026,
+              0.7711072670143663,
+              -0.38944118836392494,
+              -0.4705599747992403,
+              0.23241817460469605,
+              1.207471900402558,
+              -1.759466627656127,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02010837334963943,
+            "position_error": 0.1455145148687462,
+            "score": Infinity,
+            "seed_name": "perturbation_4"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02012448161283054,
+                  "position_error": 0.14552527636465565,
+                  "solver_error_norm": 0.16564975797748618,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7657513940293462,
+              0.7721459421782461,
+              -0.40682300024768775,
+              -0.4713358643083014,
+              0.24518697803431982,
+              1.2071183741339968,
+              -1.7622811112680117,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02012448161283054,
+            "position_error": 0.14552527636465565,
+            "score": Infinity,
+            "seed_name": "perturbation_5"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.020184851666378057,
+                  "position_error": 0.1460180370497468,
+                  "solver_error_norm": 0.16620288871612487,
+                  "solver_success": false,
+                  "steps": 12
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 12,
+            "joint_positions": [
+              -1.106037692825039,
+              0.8124982982126964,
+              0.722492681328801,
+              -0.46096983892625115,
+              -0.5953568059868212,
+              1.1704457471028633,
+              -1.5877634527631712,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.020184851666378057,
+            "position_error": 0.1460180370497468,
+            "score": Infinity,
+            "seed_name": "perturbation_6"
+          }
+        ],
+        "report": {
+          "contacts": [],
+          "diagnostics": {
+            "failures": [
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE"
+            ]
+          },
+          "failure_code": "IK_UNREACHABLE",
+          "feasible": false,
+          "message": "no feasible IK candidate from 9 seed(s)"
+        }
+      },
+      "name": "block_1_on_block_0_3_preplace",
+      "path": null,
+      "targets": {
+        "left": {
+          "position": [
+            0.5081396394166164,
+            -0.34365343958255024,
+            1.283302559512313
+          ],
+          "quaternion_wxyz": [
+            -0.022411995316051432,
+            -0.7064318000354266,
+            0.7071739441994418,
+            0.01888986527387841
+          ]
+        }
+      }
+    },
+    {
+      "constraints": {
+        "allowed_contacts": {
+          "penetration_tolerance": 0.012,
+          "rules": [
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:left:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "robot:right:finger",
+              "penetration_tolerance": null,
+              "second": "object:block_1"
+            },
+            {
+              "first": "object:block_1",
+              "penetration_tolerance": null,
+              "second": "object:block_0"
+            }
+          ]
+        },
+        "held_objects": [
+          {
+            "ee_to_object": {
+              "position": [
+                -0.0002736241424684538,
+                0.0008119716162175439,
+                0.12552939031254584
+              ],
+              "quaternion_wxyz": [
+                -0.007538009732111138,
+                0.7077978602948948,
+                -0.7063501624965226,
+                -0.005900450184817174
+              ]
+            },
+            "object_name": "block_1",
+            "side": "left"
+          }
+        ],
+        "maximum_object_tilt": null,
+        "orientation_tolerance": 0.35,
+        "position_tolerance": 0.06
+      },
+      "elapsed_seconds": 0.018083899980410933,
+      "execution": null,
+      "ik": {
+        "accepted": [],
+        "rejected": [
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021256215259600874,
+                  "position_error": 0.15353110233474446,
+                  "solver_error_norm": 0.17478731759434532,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7165786451827741,
+              0.7998964532730886,
+              -0.6120472587124782,
+              -0.4710404454028985,
+              0.40207664630214535,
+              1.2027282599628355,
+              -1.8035114974970223,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021256215259600874,
+            "position_error": 0.15353110233474446,
+            "score": Infinity,
+            "seed_name": "current"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021256215259600874,
+                  "position_error": 0.15353110233474446,
+                  "solver_error_norm": 0.17478731759434532,
+                  "solver_success": false,
+                  "steps": 8
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 8,
+            "joint_positions": [
+              -0.7165786451827741,
+              0.7998964532730886,
+              -0.6120472587124782,
+              -0.4710404454028985,
+              0.40207664630214535,
+              1.2027282599628355,
+              -1.8035114974970223,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021256215259600874,
+            "position_error": 0.15353110233474446,
+            "score": Infinity,
+            "seed_name": "initial"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021270249329075567,
+                  "position_error": 0.15342178281138127,
+                  "solver_error_norm": 0.17469203214045684,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7459690288613114,
+              0.7854985472359177,
+              -0.5029541660627143,
+              -0.474446971681462,
+              0.3177834826458297,
+              1.2110797032819787,
+              -1.7866559553670387,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021270249329075567,
+            "position_error": 0.15342178281138127,
+            "score": Infinity,
+            "seed_name": "joint_midpoint"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.016018562903543254,
+                  "position_error": 0.3040917217137195,
+                  "solver_error_norm": 0.32011028461726276,
+                  "solver_success": false,
+                  "steps": 27
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 27,
+            "joint_positions": [
+              2.455592192214294,
+              -1.2656067957039845,
+              0.9398778623412277,
+              -0.5305258200786319,
+              -1.2248095673418886,
+              -0.9953621609814108,
+              1.1284066883275568,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.016018562903543254,
+            "position_error": 0.3040917217137195,
+            "score": Infinity,
+            "seed_name": "perturbation_1"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021194322057399698,
+                  "position_error": 0.15343716650433642,
+                  "solver_error_norm": 0.1746314885617361,
+                  "solver_success": false,
+                  "steps": 6
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 6,
+            "joint_positions": [
+              -0.7439260295905941,
+              0.7896615275823748,
+              -0.5162841476166722,
+              -0.4690691224837785,
+              0.32932790602428585,
+              1.2078935203592374,
+              -1.788288486789243,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021194322057399698,
+            "position_error": 0.15343716650433642,
+            "score": Infinity,
+            "seed_name": "perturbation_2"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021231638250220747,
+                  "position_error": 0.1536360005848142,
+                  "solver_error_norm": 0.17486763883503492,
+                  "solver_success": false,
+                  "steps": 10
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 10,
+            "joint_positions": [
+              -0.6952836587551711,
+              0.8141761055847344,
+              -0.7008469719396141,
+              -0.46634171893123927,
+              0.4728240177677889,
+              1.1939213595759648,
+              -1.8166428530209184,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021231638250220747,
+            "position_error": 0.1536360005848142,
+            "score": Infinity,
+            "seed_name": "perturbation_3"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021229390828122502,
+                  "position_error": 0.15333927324182758,
+                  "solver_error_norm": 0.17456866406995009,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7774663542999177,
+              0.7760335733092183,
+              -0.39760371067347233,
+              -0.47349754164973545,
+              0.23892170898176124,
+              1.2157233023279417,
+              -1.7697941381155333,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021229390828122502,
+            "position_error": 0.15333927324182758,
+            "score": Infinity,
+            "seed_name": "perturbation_4"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.021256926069755634,
+                  "position_error": 0.15334940180979598,
+                  "solver_error_norm": 0.1746063278795516,
+                  "solver_success": false,
+                  "steps": 7
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 7,
+            "joint_positions": [
+              -0.7722732045084499,
+              0.7766233191967098,
+              -0.41351524439667897,
+              -0.47495671926841465,
+              0.2504804203698982,
+              1.2157208032503417,
+              -1.7724311276712827,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.021256926069755634,
+            "position_error": 0.15334940180979598,
+            "score": Infinity,
+            "seed_name": "perturbation_5"
+          },
+          {
+            "converged": false,
+            "diagnostics": {
+              "per_side": {
+                "left": {
+                  "orientation_error": 0.02128555548628466,
+                  "position_error": 0.15384582140547937,
+                  "solver_error_norm": 0.17513137689176403,
+                  "solver_success": false,
+                  "steps": 11
+                }
+              }
+            },
+            "failure_code": "IK_UNREACHABLE",
+            "iterations": 11,
+            "joint_positions": [
+              -1.116344683732486,
+              0.8177463661238937,
+              0.7260956636670238,
+              -0.4634007236901465,
+              -0.599615826650187,
+              1.17812446204543,
+              -1.595686109936591,
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "orientation_error": 0.02128555548628466,
+            "position_error": 0.15384582140547937,
+            "score": Infinity,
+            "seed_name": "perturbation_6"
+          }
+        ],
+        "report": {
+          "contacts": [],
+          "diagnostics": {
+            "failures": [
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE",
+              "IK_UNREACHABLE"
+            ]
+          },
+          "failure_code": "IK_UNREACHABLE",
+          "feasible": false,
+          "message": "no feasible IK candidate from 9 seed(s)"
+        }
+      },
+      "name": "block_1_on_block_0_4_preplace",
+      "path": null,
+      "targets": {
+        "left": {
+          "position": [
+            0.5081396394166164,
+            -0.35565343958255025,
+            1.283302559512313
+          ],
+          "quaternion_wxyz": [
+            -0.022411995316051432,
+            -0.7064318000354266,
+            0.7071739441994418,
+            0.01888986527387841
+          ]
+        }
+      }
+    }
+  ],
+  "result": {
+    "diagnostics": {
+      "attempts": [
+        {
+          "candidate": "block_1_on_block_0_0",
+          "failure": "IK_UNREACHABLE",
+          "stage": "preplace"
+        },
+        {
+          "candidate": "block_1_on_block_0_1",
+          "failure": "IK_UNREACHABLE",
+          "stage": "preplace"
+        },
+        {
+          "candidate": "block_1_on_block_0_2",
+          "failure": "IK_UNREACHABLE",
+          "stage": "preplace"
+        },
+        {
+          "candidate": "block_1_on_block_0_3",
+          "failure": "IK_UNREACHABLE",
+          "stage": "preplace"
+        },
+        {
+          "candidate": "block_1_on_block_0_4",
+          "failure": "IK_UNREACHABLE",
+          "stage": "preplace"
+        }
+      ]
+    },
+    "execution_reports": [],
+    "failure_code": "PLACEMENT_UNREACHABLE",
+    "message": "no stable reachable placement candidate",
+    "request": {
+      "goal": "on:block_0",
+      "object_name": "block_1",
+      "roles": {
+        "left": "block_1"
+      },
+      "skill": "place",
+      "strategy": "direct_stack_from_left"
+    },
+    "state": {
+      "action_shape": [
+        16
+      ],
+      "control_frequency": 20,
+      "metrics": {
+        "avg_cartesian_jerk": {
+          "left": 3.3804492972596343,
+          "right": 2.2266487702020927
+        },
+        "avg_cartesian_path_length": 0.16743626124023547,
+        "avg_joint_jerk": {
+          "left": 9.191297965725715,
+          "right": 2.9811649051903935
+        },
+        "avg_joint_path_length": 0.6170677759793802,
+        "avg_orientation_path_length": 0.10237654245322392,
+        "bimanual_arm_velocity_difference": 0.14367499283974225,
+        "bimanual_gripper_vertical_difference": 0.05137232180204043,
+        "cartesian_path_length": {
+          "left": 0.29555565527691435,
+          "right": 0.039316867203556566
+        },
+        "completion_time": 19.108298778533936,
+        "env_collision_count": 0,
+        "joint_path_length": {
+          "left": 1.1816633004806283,
+          "right": 0.0524722514781322
+        },
+        "orientation_path_length": {
+          "left": 0.1249149591349064,
+          "right": 0.07983812577154142
+        },
+        "overall_avg_cartesian_jerk": 2.8035490337308633,
+        "overall_avg_joint_jerk": 6.086231435458053,
+        "overall_rms_cartesian_jerk": 7.270069149382474,
+        "overall_rms_joint_jerk": 15.987980597627411,
+        "rms_cartesian_jerk": {
+          "left": 7.905202968704256,
+          "right": 6.573855557980798
+        },
+        "rms_joint_jerk": {
+          "left": 20.828073537334387,
+          "right": 8.798999937698154
+        },
+        "self_collision_count": 0,
+        "slip_count": 0,
+        "slip_count_per_object": {
+          "object_1": 0,
+          "object_2": 0
+        },
+        "subtask_progress": 0.3333333333333333,
+        "success": 0.0,
+        "target_distance": {
+          "block_0-gripper_Left": 0.7363008990979262,
+          "block_0-gripper_Right": 0.22809464225183854,
+          "block_1-gripper_Left": 0.1255323145660765,
+          "block_1-gripper_Right": 0.6617968575948852,
+          "cube 1 lift distance": 9.870696677649615e-05,
+          "cube 2 lift distance": 0.10521657677643104
+        },
+        "task_stage_reached": {
+          "1": true,
+          "2": false,
+          "3": false
+        },
+        "task_success": 0.0,
+        "total_cartesian_path_length": 0.33487252248047095,
+        "total_joint_path_length": 1.2341355519587605,
+        "total_orientation_path_length": 0.20475308490644784
+      },
+      "objects": {
+        "block_0": {
+          "aabb_center": [
+            0.4999999972696898,
+            -0.3500000000003623,
+            0.9849719309475041
+          ],
+          "angular_velocity": [
+            -2.0987002647077318e-13,
+            -1.0621066861299901e-08,
+            1.9474903337822495e-13
+          ],
+          "canonical_size": [
+            0.04,
+            0.04,
+            0.04
+          ],
+          "contacts": [
+            "scene:table"
+          ],
+          "held_by": [],
+          "linear_velocity": [
+            -2.124199786188031e-10,
+            2.0362301922919603e-15,
+            -2.124075963218196e-10
+          ],
+          "name": "block_0",
+          "pose": {
+            "position": [
+              0.4999999958381143,
+              -0.3500000000003623,
+              0.9699987069667765
+            ],
+            "quaternion_wxyz": [
+              0.9999999999999994,
+              -1.3808420316646543e-11,
+              -3.244664610936919e-08,
+              -2.1723335189415936e-11
+            ]
+          },
+          "size": [
+            0.04000000546062049,
+            0.04000000000284254,
+            0.07005613810499178
+          ]
+        },
+        "block_1": {
+          "aabb_center": [
+            0.49682601599992343,
+            0.34943121123042986,
+            1.022936628062719
+          ],
+          "angular_velocity": [
+            -0.0001002361847820959,
+            0.0017282002405350303,
+            -4.336153505511256e-05
+          ],
+          "canonical_size": [
+            0.04,
+            0.04,
+            0.04
+          ],
+          "contacts": [
+            "robot:left:finger"
+          ],
+          "held_by": [
+            "left"
+          ],
+          "linear_velocity": [
+            -0.0005336681859620368,
+            -5.518478893615058e-05,
+            0.0027046380766290114
+          ],
+          "name": "block_1",
+          "pose": {
+            "position": [
+              0.49412204704043866,
+              0.3489791174489505,
+              1.075116576776431
+            ],
+            "quaternion_wxyz": [
+              0.9998037474557832,
+              -0.001367857769908629,
+              0.019701973036723632,
+              -0.0015581389392997247
+            ]
+          },
+          "size": [
+            0.04707517999113098,
+            0.041137577541247417,
+            0.14601623535712216
+          ]
+        }
+      },
+      "robot": {
+        "arms": {
+          "left": {
+            "ee_pose": {
+              "position": [
+                0.502261690618941,
+                0.34932567786676255,
+                1.2003842425909106
+              ],
+              "quaternion_wxyz": [
+                0.02241199531605144,
+                0.7064318000354265,
+                -0.7071739441994419,
+                -0.018889865273878405
+              ]
+            },
+            "gripper_aperture_m": 0.0365,
+            "gripper_command": 1.0,
+            "holding": [
+              "block_1"
+            ],
+            "joint_positions": [
+              0.04555141553282738,
+              -0.1508248895406723,
+              0.04750834405422211,
+              -1.793707013130188,
+              0.007591384928673506,
+              1.5844194889068604,
+              -0.6923621892929077
+            ],
+            "joint_velocities": [
+              -3.5728313378058374e-05,
+              0.0012558057205751538,
+              -2.4363380362046883e-05,
+              0.008839922957122326,
+              -4.965994958183728e-05,
+              -0.009841286577284336,
+              3.893064786097966e-05
+            ],
+            "side": "left"
+          },
+          "right": {
+            "ee_pose": {
+              "position": [
+                0.5630552345170585,
+                -0.30023611136210926,
+                1.1834811607814522
+              ],
+              "quaternion_wxyz": [
+                0.030786372789131117,
+                0.7064438461729218,
+                -0.7064890692326087,
+                -0.029368120636843773
+              ]
+            },
+            "gripper_aperture_m": 0.08,
+            "gripper_command": 0.0,
+            "holding": [],
+            "joint_positions": [
+              2.0910735543111514e-07,
+              0.040364816784858704,
+              -3.755847501452081e-05,
+              -1.608862280845642,
+              -0.002002882305532694,
+              1.5641299486160278,
+              -0.7852996587753296
+            ],
+            "joint_velocities": [
+              2.1883090894903034e-09,
+              1.4168220729970926e-07,
+              1.5096058847419158e-09,
+              -1.6495307875175058e-07,
+              -1.0377497083879916e-08,
+              -1.965216789301394e-08,
+              -8.031574710853917e-11
+            ],
+            "side": "right"
+          }
+        },
+        "joint_positions": [
+          0.04555141553282738,
+          -0.1508248895406723,
+          0.04750834405422211,
+          -1.793707013130188,
+          0.007591384928673506,
+          1.5844194889068604,
+          -0.6923621892929077,
+          2.0910735543111514e-07,
+          0.040364816784858704,
+          -3.755847501452081e-05,
+          -1.608862280845642,
+          -0.002002882305532694,
+          1.5641299486160278,
+          -0.7852996587753296
+        ],
+        "joint_velocities": [
+          -3.5728313378058374e-05,
+          0.0012558057205751538,
+          -2.4363380362046883e-05,
+          0.008839922957122326,
+          -4.965994958183728e-05,
+          -0.009841286577284336,
+          3.893064786097966e-05,
+          2.1883090894903034e-09,
+          1.4168220729970926e-07,
+          1.5096058847419158e-09,
+          -1.6495307875175058e-07,
+          -1.0377497083879916e-08,
+          -1.965216789301394e-08,
+          -8.031574710853917e-11
+        ]
+      },
+      "seed": 7,
+      "task_key": "stack_two_blocks",
+      "task_name": "StackTwoBlocks"
+    },
+    "success": false
+  },
+  "state_before": {
+    "action_shape": [
+      16
+    ],
+    "control_frequency": 20,
+    "metrics": {
+      "avg_cartesian_jerk": {
+        "left": 3.3804492972596343,
+        "right": 2.2266487702020927
+      },
+      "avg_cartesian_path_length": 0.16743626124023547,
+      "avg_joint_jerk": {
+        "left": 9.191297965725715,
+        "right": 2.9811649051903935
+      },
+      "avg_joint_path_length": 0.6170677759793802,
+      "avg_orientation_path_length": 0.10237654245322392,
+      "bimanual_arm_velocity_difference": 0.14367499283974225,
+      "bimanual_gripper_vertical_difference": 0.05137232180204043,
+      "cartesian_path_length": {
+        "left": 0.29555565527691435,
+        "right": 0.039316867203556566
+      },
+      "completion_time": 19.108298778533936,
+      "env_collision_count": 0,
+      "joint_path_length": {
+        "left": 1.1816633004806283,
+        "right": 0.0524722514781322
+      },
+      "orientation_path_length": {
+        "left": 0.1249149591349064,
+        "right": 0.07983812577154142
+      },
+      "overall_avg_cartesian_jerk": 2.8035490337308633,
+      "overall_avg_joint_jerk": 6.086231435458053,
+      "overall_rms_cartesian_jerk": 7.270069149382474,
+      "overall_rms_joint_jerk": 15.987980597627411,
+      "rms_cartesian_jerk": {
+        "left": 7.905202968704256,
+        "right": 6.573855557980798
+      },
+      "rms_joint_jerk": {
+        "left": 20.828073537334387,
+        "right": 8.798999937698154
+      },
+      "self_collision_count": 0,
+      "slip_count": 0,
+      "slip_count_per_object": {
+        "object_1": 0,
+        "object_2": 0
+      },
+      "subtask_progress": 0.3333333333333333,
+      "success": 0.0,
+      "target_distance": {
+        "block_0-gripper_Left": 0.7363008990979262,
+        "block_0-gripper_Right": 0.22809464225183854,
+        "block_1-gripper_Left": 0.1255323145660765,
+        "block_1-gripper_Right": 0.6617968575948852,
+        "cube 1 lift distance": 9.870696677649615e-05,
+        "cube 2 lift distance": 0.10521657677643104
+      },
+      "task_stage_reached": {
+        "1": true,
+        "2": false,
+        "3": false
+      },
+      "task_success": 0.0,
+      "total_cartesian_path_length": 0.33487252248047095,
+      "total_joint_path_length": 1.2341355519587605,
+      "total_orientation_path_length": 0.20475308490644784
+    },
+    "objects": {
+      "block_0": {
+        "aabb_center": [
+          0.4999999972696898,
+          -0.3500000000003623,
+          0.9849719309475041
+        ],
+        "angular_velocity": [
+          -2.0987002647077318e-13,
+          -1.0621066861299901e-08,
+          1.9474903337822495e-13
+        ],
+        "canonical_size": [
+          0.04,
+          0.04,
+          0.04
+        ],
+        "contacts": [
+          "scene:table"
+        ],
+        "held_by": [],
+        "linear_velocity": [
+          -2.124199786188031e-10,
+          2.0362301922919603e-15,
+          -2.124075963218196e-10
+        ],
+        "name": "block_0",
+        "pose": {
+          "position": [
+            0.4999999958381143,
+            -0.3500000000003623,
+            0.9699987069667765
+          ],
+          "quaternion_wxyz": [
+            0.9999999999999994,
+            -1.3808420316646543e-11,
+            -3.244664610936919e-08,
+            -2.1723335189415936e-11
+          ]
+        },
+        "size": [
+          0.04000000546062049,
+          0.04000000000284254,
+          0.07005613810499178
+        ]
+      },
+      "block_1": {
+        "aabb_center": [
+          0.49682601599992343,
+          0.34943121123042986,
+          1.022936628062719
+        ],
+        "angular_velocity": [
+          -0.0001002361847820959,
+          0.0017282002405350303,
+          -4.336153505511256e-05
+        ],
+        "canonical_size": [
+          0.04,
+          0.04,
+          0.04
+        ],
+        "contacts": [
+          "robot:left:finger"
+        ],
+        "held_by": [
+          "left"
+        ],
+        "linear_velocity": [
+          -0.0005336681859620368,
+          -5.518478893615058e-05,
+          0.0027046380766290114
+        ],
+        "name": "block_1",
+        "pose": {
+          "position": [
+            0.49412204704043866,
+            0.3489791174489505,
+            1.075116576776431
+          ],
+          "quaternion_wxyz": [
+            0.9998037474557832,
+            -0.001367857769908629,
+            0.019701973036723632,
+            -0.0015581389392997247
+          ]
+        },
+        "size": [
+          0.04707517999113098,
+          0.041137577541247417,
+          0.14601623535712216
+        ]
+      }
+    },
+    "robot": {
+      "arms": {
+        "left": {
+          "ee_pose": {
+            "position": [
+              0.502261690618941,
+              0.34932567786676255,
+              1.2003842425909106
+            ],
+            "quaternion_wxyz": [
+              0.02241199531605144,
+              0.7064318000354265,
+              -0.7071739441994419,
+              -0.018889865273878405
+            ]
+          },
+          "gripper_aperture_m": 0.0365,
+          "gripper_command": 1.0,
+          "holding": [
+            "block_1"
+          ],
+          "joint_positions": [
+            0.04555141553282738,
+            -0.1508248895406723,
+            0.04750834405422211,
+            -1.793707013130188,
+            0.007591384928673506,
+            1.5844194889068604,
+            -0.6923621892929077
+          ],
+          "joint_velocities": [
+            -3.5728313378058374e-05,
+            0.0012558057205751538,
+            -2.4363380362046883e-05,
+            0.008839922957122326,
+            -4.965994958183728e-05,
+            -0.009841286577284336,
+            3.893064786097966e-05
+          ],
+          "side": "left"
+        },
+        "right": {
+          "ee_pose": {
+            "position": [
+              0.5630552345170585,
+              -0.30023611136210926,
+              1.1834811607814522
+            ],
+            "quaternion_wxyz": [
+              0.030786372789131117,
+              0.7064438461729218,
+              -0.7064890692326087,
+              -0.029368120636843773
+            ]
+          },
+          "gripper_aperture_m": 0.08,
+          "gripper_command": 0.0,
+          "holding": [],
+          "joint_positions": [
+            2.0910735543111514e-07,
+            0.040364816784858704,
+            -3.755847501452081e-05,
+            -1.608862280845642,
+            -0.002002882305532694,
+            1.5641299486160278,
+            -0.7852996587753296
+          ],
+          "joint_velocities": [
+            2.1883090894903034e-09,
+            1.4168220729970926e-07,
+            1.5096058847419158e-09,
+            -1.6495307875175058e-07,
+            -1.0377497083879916e-08,
+            -1.965216789301394e-08,
+            -8.031574710853917e-11
+          ],
+          "side": "right"
+        }
+      },
+      "joint_positions": [
+        0.04555141553282738,
+        -0.1508248895406723,
+        0.04750834405422211,
+        -1.793707013130188,
+        0.007591384928673506,
+        1.5844194889068604,
+        -0.6923621892929077,
+        2.0910735543111514e-07,
+        0.040364816784858704,
+        -3.755847501452081e-05,
+        -1.608862280845642,
+        -0.002002882305532694,
+        1.5641299486160278,
+        -0.7852996587753296
+      ],
+      "joint_velocities": [
+        -3.5728313378058374e-05,
+        0.0012558057205751538,
+        -2.4363380362046883e-05,
+        0.008839922957122326,
+        -4.965994958183728e-05,
+        -0.009841286577284336,
+        3.893064786097966e-05,
+        2.1883090894903034e-09,
+        1.4168220729970926e-07,
+        1.5096058847419158e-09,
+        -1.6495307875175058e-07,
+        -1.0377497083879916e-08,
+        -1.965216789301394e-08,
+        -8.031574710853917e-11
+      ]
+    },
+    "seed": 7,
+    "task_key": "stack_two_blocks",
+    "task_name": "StackTwoBlocks"
+  }
+}

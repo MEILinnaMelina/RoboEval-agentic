@@ -1,0 +1,152 @@
+{
+  "aggregate": [
+    {
+      "behavior_quality_rate": 1,
+      "mean_env_collision_count": 0.0,
+      "mean_execution_time_s": 9.205326339998283,
+      "mean_llm_calls": 2.0,
+      "mean_llm_cost_usd": null,
+      "mean_llm_planning_time_s": 6.8706145199961615,
+      "mean_path_length": 1.3461726531739595,
+      "mean_replans": 0.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "method": "v2-full",
+      "success_ci95_high": 0.9999999999999999,
+      "success_ci95_low": 0.7224672001371107,
+      "success_rate": 1.0,
+      "successes": 10,
+      "task_key": "cube_handover",
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "trials": 10
+    },
+    {
+      "behavior_quality_rate": 1,
+      "mean_env_collision_count": 0.0,
+      "mean_execution_time_s": 11.302270279997902,
+      "mean_llm_calls": 3.0,
+      "mean_llm_cost_usd": null,
+      "mean_llm_planning_time_s": 9.023755150001671,
+      "mean_path_length": 1.3012266270718649,
+      "mean_replans": 1.0,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 1.0,
+      "method": "v2-full",
+      "success_ci95_high": 0.9999999999999999,
+      "success_ci95_low": 0.7224672001371107,
+      "success_rate": 1.0,
+      "successes": 10,
+      "task_key": "lift_pot",
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "trials": 10
+    },
+    {
+      "behavior_quality_rate": 0,
+      "mean_env_collision_count": 1.0,
+      "mean_execution_time_s": 31.054008289997,
+      "mean_llm_calls": 6.9,
+      "mean_llm_cost_usd": null,
+      "mean_llm_planning_time_s": 27.14204682998825,
+      "mean_path_length": 1.984088037396821,
+      "mean_replans": 3.4,
+      "mean_self_collision_count": 0.0,
+      "mean_slip_count": 0.0,
+      "mean_subtask_progress": 0.6666666666666666,
+      "method": "v2-full",
+      "success_ci95_high": 0.9999999999999999,
+      "success_ci95_low": 0.7224672001371107,
+      "success_rate": 1.0,
+      "successes": 10,
+      "task_key": "stack_two_blocks",
+      "terminal_failures": {
+        "NONE": 10
+      },
+      "trials": 10
+    }
+  ],
+  "methods": {
+    "v1-p22-independent": {
+      "commit": "d9198fa",
+      "cross_trial_memory": false,
+      "feasibility_gate": "none",
+      "online_replan": "text_feedback_only",
+      "runner": "historical_worktree",
+      "semantic_llm": true
+    },
+    "v1-p23-memory": {
+      "commit": "337d0f0",
+      "cross_trial_memory": true,
+      "feasibility_gate": "none",
+      "online_replan": "text_feedback_only",
+      "runner": "historical_worktree",
+      "semantic_llm": true
+    },
+    "v2-fixed": {
+      "cross_trial_memory": false,
+      "feasibility_gate": "full",
+      "online_replan": false,
+      "runner": "v2",
+      "semantic_llm": false
+    },
+    "v2-full": {
+      "cross_trial_memory": false,
+      "feasibility_gate": "full",
+      "online_replan": true,
+      "runner": "v2",
+      "semantic_llm": true
+    },
+    "v2-full-memory": {
+      "cross_trial_memory": true,
+      "feasibility_gate": "full",
+      "online_replan": true,
+      "runner": "v2",
+      "semantic_llm": true
+    },
+    "v2-full-no-replan": {
+      "cross_trial_memory": false,
+      "feasibility_gate": "full",
+      "online_replan": false,
+      "runner": "v2",
+      "semantic_llm": true
+    },
+    "v2-ik-only": {
+      "cross_trial_memory": false,
+      "feasibility_gate": "ik_only",
+      "online_replan": true,
+      "runner": "v2",
+      "semantic_llm": true
+    }
+  },
+  "primary_paired_comparison": [
+    {
+      "baseline": "v1-p22-independent",
+      "mean_success_delta": null,
+      "method": "v2-full",
+      "paired_seeds": 0,
+      "pairs": [],
+      "task_key": "cube_handover"
+    },
+    {
+      "baseline": "v1-p22-independent",
+      "mean_success_delta": null,
+      "method": "v2-full",
+      "paired_seeds": 0,
+      "pairs": [],
+      "task_key": "lift_pot"
+    },
+    {
+      "baseline": "v1-p22-independent",
+      "mean_success_delta": null,
+      "method": "v2-full",
+      "paired_seeds": 0,
+      "pairs": [],
+      "task_key": "stack_two_blocks"
+    }
+  ]
+}
