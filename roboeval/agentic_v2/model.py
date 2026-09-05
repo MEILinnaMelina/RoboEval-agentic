@@ -8,8 +8,26 @@ from typing import Any
 import mujoco
 import numpy as np
 
-from roboeval.agentic.state import get_task_objects
 from roboeval.utils.physics_utils import get_colliders
+
+
+def _base_task_objects(env: Any) -> dict[str, Any]:
+    """Named task objects for the original three base tasks."""
+
+    objects: dict[str, Any] = {}
+    if hasattr(env, "kitchenpot"):
+        objects["kitchenpot"] = env.kitchenpot
+    if hasattr(env, "cube"):
+        objects["cube"] = env.cube
+    if hasattr(env, "blocks"):
+        for idx, block in enumerate(env.blocks):
+            objects[f"block_{idx}"] = block
+    if hasattr(env, "packing_box"):
+        objects["packing_box"] = env.packing_box
+    if hasattr(env, "valves"):
+        for idx, valve in enumerate(env.valves):
+            objects[f"valve_{idx}"] = valve
+    return objects
 
 
 def element_id(physics: Any, element: Any) -> int:
@@ -85,7 +103,7 @@ def task_objects(env: Any) -> dict[str, Any]:
     """Named task objects for every Agentic v2 base task: the frozen v1 set
     plus the tray, books, and the bookshelf planks as static fixtures."""
 
-    objects: dict[str, Any] = dict(get_task_objects(env))
+    objects: dict[str, Any] = dict(_base_task_objects(env))
     tray = getattr(env, "breakfast_tray", None)
     if tray is not None:
         objects["tray"] = tray
