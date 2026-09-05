@@ -203,7 +203,7 @@ Not yet run: the other ablation rows in `METHOD_SPECS` (`v2-ik-only`,
 `v2-fixed` via the API launcher, `v2-full-no-replan`, `v2-full-memory`)
 and the two frozen v1 baselines (`v1-p22-independent`, `v1-p23-memory`,
 which need `--v1-p22-root`/`--v1-p23-root` worktrees checked out at
-`d9198fa`/`337d0f0`). The deterministic 10/10 gate results above are the
+`fb3876d`/`9400dda`, on `main`). The deterministic 10/10 gate results above are the
 `v2-fixed` row's numbers in substance, but were produced by the gate
 launcher, not the API matrix launcher.
 

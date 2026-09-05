@@ -14,7 +14,7 @@ from roboeval.agentic_v2.artifacts import write_json
 
 METHOD_SPECS: dict[str, dict[str, Any]] = {
     "v1-p22-independent": {
-        "commit": "d9198fa",
+        "commit": "fb3876d",
         "feasibility_gate": "none",
         "semantic_llm": True,
         "online_replan": "text_feedback_only",
@@ -22,7 +22,7 @@ METHOD_SPECS: dict[str, dict[str, Any]] = {
         "runner": "historical_worktree",
     },
     "v1-p23-memory": {
-        "commit": "337d0f0",
+        "commit": "9400dda",
         "feasibility_gate": "none",
         "semantic_llm": True,
         "online_replan": "text_feedback_only",
